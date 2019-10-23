@@ -1,0 +1,23 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: ca.vancouver.opendata.schools
+  rootPollingSource:
+    url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
+    format: csv
+    readerOptions:
+      header: "true"
+      sep: ";"
+      quote: '"'
+      escape: '"'
+      nullValue: ""
+    preprocess:
+    - view: output
+      query: >
+        SELECT
+          address,
+          school_category,
+          school_name,
+          ST_GeomFromGeoJSON(geom) as geom,
+          geo_local_area
+        FROM input
