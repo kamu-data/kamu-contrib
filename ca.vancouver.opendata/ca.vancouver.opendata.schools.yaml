@@ -3,14 +3,16 @@ kind: Dataset
 content:
   id: ca.vancouver.opendata.schools
   rootPollingSource:
-    url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
-    format: csv
-    readerOptions:
-      header: "true"
-      sep: ";"
+    fetch:
+      kind: fetchUrl
+      url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
+    read:
+      kind: csv
+      header: true
+      delimiter: ';'
       quote: '"'
       escape: '"'
-      nullValue: ""
+      nullValue: ''
     preprocess:
     - view: output
       query: >
@@ -21,3 +23,7 @@ content:
           ST_GeomFromGeoJSON(geom) as geom,
           geo_local_area
         FROM input
+    merge:
+      kind: snapshot
+      primaryKey:
+      - school_name
