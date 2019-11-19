@@ -1,0 +1,21 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: ca.vancouver.opendata.zoning-districts
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: ftp://webftp.vancouver.ca/OpenData/shape/zoning_districts_shp.zip
+    read:
+      kind: shapefile
+    preprocess:
+      - view: output
+        query: >
+          SELECT
+            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
+            ZONE_NAME,
+            CATEGORY
+          FROM input
+    merge:
+      # TODO
+      kind: append

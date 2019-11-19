@@ -1,0 +1,18 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: org.geonames.cities
+  derivativeSource:
+    inputs:
+      - id: org.geonames.cities.raw
+    steps:
+      - view: org.geonames.cities
+        query: >
+          SELECT
+            geonameid, name, asciiname, country_code, population, timezone,
+            ST_Point(
+              cast(longitude as decimal(9,6)),
+              cast(latitude as decimal(9,6))
+            ) as location_wgs84,
+            elevation
+          FROM `org.geonames.cities.raw`

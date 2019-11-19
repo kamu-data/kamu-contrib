@@ -1,0 +1,31 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: org.geonames.altnames.raw
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: http://download.geonames.org/export/dump/alternateNamesV2.zip
+    prepare:
+    - kind: decompress
+      format: zip
+      subPath: alternateNamesV2.txt
+    read:
+      kind: csv
+      delimiter: "\t"
+      quote: ''
+      schema:
+        - alternateNameId LONG      # the id of this alternate name, int
+        - geonameid LONG            # geonameId referring to id in table 'geoname', int
+        - isolanguage STRING        # iso 639 language code 2- or 3-characters; 4-characters 'post' for postal codes and 'iata','icao' and faac for airport codes, fr_1793 for French Revolution names,  abbr for abbreviation, link to a website (mostly to wikipedia), wkdt for the wikidataid, varchar(7)
+        - alternateName STRING      # alternate name or name variant, varchar(400)
+        - isPreferredName INTEGER   # '1', if this alternate name is an official/preferred name
+        - isShortName INTEGER       # '1', if this is a short name like 'California' for 'State of California'
+        - isColloquial INTEGER      # '1', if this alternate name is a colloquial or slang term. Example: 'Big Apple' for 'New York'.
+        - isHistoric INTEGER        # '1', if this alternate name is historic and was used in the past. Example 'Bombay' for 'Mumbai'.
+        - from STRING               # from period when the name was used
+        - to STRING                 # to period when the name was used
+    merge:
+      kind: snapshot
+      primaryKey:
+      - alternateNameId

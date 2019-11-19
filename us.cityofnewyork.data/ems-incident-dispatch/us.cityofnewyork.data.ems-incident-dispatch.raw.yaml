@@ -1,0 +1,47 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: us.cityofnewyork.data.ems-incident-dispatch.raw
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: https://data.cityofnewyork.us/api/views/76xm-jjuj/rows.csv?accessType=DOWNLOAD
+    read:
+      kind: csv
+      header: true
+      schema:
+        - cad_incident_id LONG  # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
+        - incident_datetime STRING  # The date and time the incident was created in the dispatch system
+        - initial_call_type STRING  # The call type assigned at the time of incident creation.
+        - initial_severity_level_code LONG  # The segment(priority) assigned at the time of incident creation.
+        - final_call_type STRING  # The call type at the time the incident closes.
+        - final_severity_level_code LONG  # The segment(priority) assigned at the time the incident closes.
+        - first_assignment_datetime STRING  # The date and time the first unit is assigned.
+        - valid_dispatch_rspns_time_indc STRING  # Indicates that the components comprising the calculation of the DISPATCH_RESPONSE_SECONDS_QY are valid.
+        - dispatch_response_seconds_qy LONG  # The time elapsed in seconds between the incident_datetime and the first_assignment_datetime.
+        - first_activation_datetime STRING  # The date and time the first unit gives the signal that it is enroute to the location of the incident.
+        - first_on_scene_datetime STRING  # The date and time the first unit signals that it has arrived at the location of the incident.
+        - valid_incident_rspns_time_indc STRING  # Indicates that the components comprising the calculation of theINCIDENT_RESPONSE_SECONDS_QY are valid.
+        - incident_response_seconds_qy LONG  # The time elapsed in seconds between the incident_datetime and the first_on_scene_datetime.
+        - incident_travel_tm_seconds_qy LONG  # The time elapsed in seconds between the first_assignment_datetime and the first_on_scene_datetime.
+        - first_to_hosp_datetime STRING  # The date and time the first unit gives the signal that it is enroute to the hospital.
+        - first_hosp_arrival_datetime STRING  # The date and time the first unit signals that it has arrived at the hospital.
+        - incident_close_datetime STRING  # The date and time the incident closes in the dispatch system.
+        - held_indicator STRING  # Indicates that for some reason a unit could not be assigned immediately
+        - incident_disposition_code LONG  # A code indicating the final outcome of the incident. See incident dispositions.
+        - borough STRING  # The borough of the incident location.
+        - incident_dispatch_area STRING  # The dispatch area of the incident.
+        - zipcode STRING  # The zip code of the incident.
+        - policeprecinct LONG  # The police precinct of the incident.
+        - citycouncildistrict LONG  # The city council district.
+        - communitydistrict LONG  # The community district.
+        - communityschooldistrict LONG  # The community school district.
+        - congressionaldistrict LONG  # The congressional district.
+        - reopen_indicator STRING  # Indicates that at some point the incident was closed but then reopened.
+        - special_event_indicator STRING  # Indicates that the incident was a special event such as the NYC Marathon.
+        - standby_indicator STRING  # Indicates that the units were assigned to stand by in case they were needed.
+        - transfer_indicator STRING  # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
+    merge:
+      kind: ledger
+      primaryKey:
+      - cad_incident_id

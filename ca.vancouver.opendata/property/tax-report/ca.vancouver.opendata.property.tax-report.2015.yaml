@@ -1,0 +1,22 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: ca.vancouver.opendata.property.tax-report.2015
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: ftp://webftp.vancouver.ca/opendata/csv/property_tax_report_csv2015.zip
+    prepare:
+    - kind: decompress
+      format: zip
+    read:
+      kind: csv
+      header: true
+      delimiter: ','
+      quote: '"'
+      escape: '"'
+      nullValue: ''
+      multiline: true
+    merge:
+      # TODO
+      kind: append

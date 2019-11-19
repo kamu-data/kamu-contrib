@@ -1,0 +1,39 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: org.geonames.features.raw
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: http://download.geonames.org/export/dump/allCountries.zip
+    prepare:
+    - kind: decompress
+      format: zip
+    read:
+      kind: csv
+      delimiter: "\t"
+      schema:
+        - geonameid LONG            # integer id of record in geonames database
+        - name STRING               # name of geographical point (utf8) varchar(200)
+        - asciiname STRING          # name of geographical point in plain ascii characters, varchar(200)
+        - alternatenames STRING     # alternatenames, comma separated, ascii names automatically transliterated, convenience attribute from alternatename table, varchar(10000)
+        - latitude DOUBLE           # latitude in decimal degrees (wgs84)
+        - longitude DOUBLE          # longitude in decimal degrees (wgs84)
+        - feature_class STRING      # see http://www.geonames.org/export/codes.html, char(1)
+        - feature_code STRING       # see http://www.geonames.org/export/codes.html, varchar(10)
+        - country_code STRING       # ISO-3166 2-letter country code, 2 characters
+        - cc2 STRING                # alternate country codes, comma separated, ISO-3166 2-letter country code, 200 characters
+        - admin1_code STRING        # fipscode (subject to change to iso code), see exceptions below, see file admin1Codes.txt for display names of this code; varchar(20)
+        - admin2_code STRING        # code for the second administrative division, a county in the US, see file admin2Codes.txt; varchar(80)
+        - admin3_code STRING        # code for third level administrative division, varchar(20)
+        - admin4_code STRING        # code for fourth level administrative division, varchar(20)
+        - population LONG           # bigint (8 byte int)
+        - elevation DOUBLE          # in meters, integer
+        - dem STRING                # digital elevation model, srtm3 or gtopo30, average elevation of 3''x3'' (ca 90mx90m) or 30''x30'' (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.
+        - timezone STRING           # the iana timezone id (see file timeZone.txt) varchar(40)
+        - modification_date STRING  # date of last modification in yyyy-MM-dd format
+    merge:
+      kind: snapshot
+      primaryKey:
+      - geonameid
+      modificationIndicator: modification_date

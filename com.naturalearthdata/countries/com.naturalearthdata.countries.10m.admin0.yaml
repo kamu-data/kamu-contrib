@@ -1,0 +1,16 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: com.naturalearthdata.countries.10m.admin0
+  rootPollingSource:
+    # TODO: Currently sourcing from a github mirror that has GeoJSON
+    # In future we should load it from the source and do transformation from
+    # Esri ShapeFiles
+    fetch:
+      kind: fetchUrl
+      url: https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_0_countries.geojson
+    read:
+      kind: geojson
+    merge:
+      # TODO
+      kind: append

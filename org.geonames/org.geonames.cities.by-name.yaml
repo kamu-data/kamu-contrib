@@ -1,0 +1,25 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: org.geonames.cities.by-name
+  derivativeSource:
+    inputs:
+      - id: org.geonames.cities.raw
+    steps:
+      - view: org.geonames.cities.by-name
+        query: >
+          SELECT
+            explode(split(alternatenames, ",")) as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`
+            WHERE alternatenames IS NOT NULL
+          UNION ALL
+          SELECT
+            name as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`
+          UNION ALL
+          SELECT
+            asciiname as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`

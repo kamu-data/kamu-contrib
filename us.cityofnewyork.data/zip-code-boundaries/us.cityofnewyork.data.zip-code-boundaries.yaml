@@ -1,0 +1,15 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: us.cityofnewyork.data.zip-code-boundaries
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
+      #url: https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ny_new_york_zip_codes_geo.min.json
+      #url: https://raw.githubusercontent.com/fedhere/PUI2015_EC/master/mam1612_EC/nyc-zip-code-tabulation-areas-polygons.geojson
+    read:
+      kind: shapefile
+    merge:
+      # TODO
+      kind: append
