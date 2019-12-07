@@ -36,4 +36,5 @@ content:
       kind: snapshot
       primaryKey:
       - geonameid
-      modificationIndicator: modification_date
+      compareColumns:
+      - modification_date
