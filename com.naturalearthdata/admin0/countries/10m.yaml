@@ -1,0 +1,14 @@
+apiVersion: 1
+kind: Dataset
+content:
+  id: com.naturalearthdata.admin0.countries.10m
+  rootPollingSource:
+    fetch:
+      kind: fetchUrl
+      url: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip
+    read:
+      kind: shapefile
+    merge:
+      kind: snapshot
+      primaryKey:
+      - ISO_A2

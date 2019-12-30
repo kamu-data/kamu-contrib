@@ -9,7 +9,7 @@ content:
     read:
       kind: csv
       header: true
-      delimiter: ';'
+      sep: ';'
       quote: '"'
       escape: '"'
       nullValue: ''

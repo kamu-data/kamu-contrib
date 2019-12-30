@@ -10,12 +10,12 @@ content:
       kind: shapefile
       subPathRegex: rapid_transit_line.*
     preprocess:
-      - view: output
-        query: >
-          SELECT
-            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
-            LINE
-          FROM input
+    - view: output
+      query: >
+        SELECT
+          ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
+          LINE
+        FROM input
     merge:
       # TODO
       kind: append
