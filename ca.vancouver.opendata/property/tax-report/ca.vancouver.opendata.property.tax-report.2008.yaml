@@ -1,5 +1,5 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: ca.vancouver.opendata.property.tax-report.2008
   rootPollingSource:

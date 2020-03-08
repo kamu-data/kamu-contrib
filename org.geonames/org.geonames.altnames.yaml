@@ -1,12 +1,12 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: org.geonames.altnames
   derivativeSource:
     inputs:
       - id: org.geonames.altnames.raw
     steps:
-      - view: org.geonames.altnames
+      - kind: sparkSQL
         query: >
           SELECT
             alternateNameId, geonameid, isolanguage, alternateName,

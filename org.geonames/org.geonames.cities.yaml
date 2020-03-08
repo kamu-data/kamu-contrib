@@ -1,12 +1,12 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: org.geonames.cities
   derivativeSource:
     inputs:
       - id: org.geonames.cities.raw
     steps:
-      - view: org.geonames.cities
+      - kind: sparkSQL
         query: >
           SELECT
             geonameid, name, asciiname, country_code, population, timezone,

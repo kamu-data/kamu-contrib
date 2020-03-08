@@ -1,5 +1,5 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: com.naturalearthdata.admin0.countries
   derivativeSource:
@@ -10,7 +10,7 @@ content:
       - id: com.naturalearthdata.admin0.countries.110m
         mode: batch
     steps:
-      - view: com.naturalearthdata.admin0.countries
+      - kind: sparkSQL
         query: >
           SELECT
             c10.admin,

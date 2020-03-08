@@ -1,5 +1,5 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: ca.vancouver.opendata.schools
   rootPollingSource:
@@ -14,7 +14,7 @@ content:
       escape: '"'
       nullValue: ''
     preprocess:
-    - view: output
+    - kind: sparkSQL
       query: >
         SELECT
           address,

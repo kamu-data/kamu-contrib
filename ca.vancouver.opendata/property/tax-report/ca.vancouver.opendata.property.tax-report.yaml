@@ -1,5 +1,5 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: ca.vancouver.opendata.property.tax-report
   derivativeSource:
@@ -18,7 +18,7 @@ content:
       - id: ca.vancouver.opendata.property.tax-report.2017
       - id: ca.vancouver.opendata.property.tax-report.2018
     steps:
-      - view: ca.vancouver.opendata.property.tax-report
+      - kind: sparkSQL
         query: >
           SELECT
             system_time,

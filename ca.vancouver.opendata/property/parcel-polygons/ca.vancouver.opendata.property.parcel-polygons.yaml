@@ -1,5 +1,5 @@
 apiVersion: 1
-kind: Dataset
+kind: DatasetSnapshot
 content:
   id: ca.vancouver.opendata.property.parcel-polygons
   rootPollingSource:
@@ -10,7 +10,7 @@ content:
       kind: shapefile
       subPathRegex: property_parcel_polygons.*
     preprocess:
-      - view: output
+      - kind: sparkSQL
         query: >
           SELECT
             ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
