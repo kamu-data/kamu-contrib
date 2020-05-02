@@ -2,17 +2,18 @@ apiVersion: 1
 kind: DatasetSnapshot
 content:
   id: org.geonames.altnames
-  derivativeSource:
+  source:
+    kind: derivative
     inputs:
       - id: org.geonames.altnames.raw
-    steps:
-      - kind: sparkSQL
-        query: >
-          SELECT
-            alternateNameId, geonameid, isolanguage, alternateName,
-            CASE WHEN isPreferredName IS NULL THEN false ELSE isPreferredName > 0 END AS isPreferredName,
-            CASE WHEN isShortName IS NULL THEN false ELSE isShortName > 0 END AS isShortName,
-            CASE WHEN isColloquial IS NULL THEN false ELSE isColloquial > 0 END AS isColloquial,
-            CASE WHEN isHistoric IS NULL THEN false ELSE isHistoric > 0 END AS isHistoric,
-            from, to
-          FROM `org.geonames.altnames.raw`
+    transform:
+      engine: sparkSQL
+      query: >
+        SELECT
+          alternateNameId, geonameid, isolanguage, alternateName,
+          CASE WHEN isPreferredName IS NULL THEN false ELSE isPreferredName > 0 END AS isPreferredName,
+          CASE WHEN isShortName IS NULL THEN false ELSE isShortName > 0 END AS isShortName,
+          CASE WHEN isColloquial IS NULL THEN false ELSE isColloquial > 0 END AS isColloquial,
+          CASE WHEN isHistoric IS NULL THEN false ELSE isHistoric > 0 END AS isHistoric,
+          from, to
+        FROM `org.geonames.altnames.raw`

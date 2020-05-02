@@ -2,19 +2,20 @@ apiVersion: 1
 kind: DatasetSnapshot
 content:
   id: ca.vancouver.opendata.schools
-  rootPollingSource:
+  source:
+    kind: root
     fetch:
-      kind: fetchUrl
+      kind: url
       url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
     read:
       kind: csv
       header: true
-      sep: ';'
+      separator: ';'
       quote: '"'
       escape: '"'
       nullValue: ''
     preprocess:
-    - kind: sparkSQL
+      engine: sparkSQL
       query: >
         SELECT
           address,

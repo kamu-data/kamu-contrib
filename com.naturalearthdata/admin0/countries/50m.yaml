@@ -2,9 +2,10 @@ apiVersion: 1
 kind: DatasetSnapshot
 content:
   id: com.naturalearthdata.admin0.countries.50m
-  rootPollingSource:
+  source:
+    kind: root
     fetch:
-      kind: fetchUrl
+      kind: url
       url: https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_0_countries.zip
     read:
       kind: shapefile
