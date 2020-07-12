@@ -5,19 +5,19 @@ content:
   source:
     kind: derivative
     inputs:
-      - id: ca.vancouver.opendata.property.tax-report.2006
-      - id: ca.vancouver.opendata.property.tax-report.2007
-      - id: ca.vancouver.opendata.property.tax-report.2008
-      - id: ca.vancouver.opendata.property.tax-report.2009
-      - id: ca.vancouver.opendata.property.tax-report.2010
-      - id: ca.vancouver.opendata.property.tax-report.2011
-      - id: ca.vancouver.opendata.property.tax-report.2012
-      - id: ca.vancouver.opendata.property.tax-report.2013
-      - id: ca.vancouver.opendata.property.tax-report.2014
-      - id: ca.vancouver.opendata.property.tax-report.2015
-      - id: ca.vancouver.opendata.property.tax-report.2016
-      - id: ca.vancouver.opendata.property.tax-report.2017
-      - id: ca.vancouver.opendata.property.tax-report.2018
+      - ca.vancouver.opendata.property.tax-report.2006
+      - ca.vancouver.opendata.property.tax-report.2007
+      - ca.vancouver.opendata.property.tax-report.2008
+      - ca.vancouver.opendata.property.tax-report.2009
+      - ca.vancouver.opendata.property.tax-report.2010
+      - ca.vancouver.opendata.property.tax-report.2011
+      - ca.vancouver.opendata.property.tax-report.2012
+      - ca.vancouver.opendata.property.tax-report.2013
+      - ca.vancouver.opendata.property.tax-report.2014
+      - ca.vancouver.opendata.property.tax-report.2015
+      - ca.vancouver.opendata.property.tax-report.2016
+      - ca.vancouver.opendata.property.tax-report.2017
+      - ca.vancouver.opendata.property.tax-report.2018
     transform:
       engine: sparkSQL
       query: >

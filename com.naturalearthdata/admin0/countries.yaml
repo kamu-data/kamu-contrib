@@ -5,9 +5,9 @@ content:
   source:
     kind: derivative
     inputs:
-      - id: com.naturalearthdata.admin0.countries.10m
-      - id: com.naturalearthdata.admin0.countries.50m
-      - id: com.naturalearthdata.admin0.countries.110m
+      - com.naturalearthdata.admin0.countries.10m
+      - com.naturalearthdata.admin0.countries.50m
+      - com.naturalearthdata.admin0.countries.110m
     transform:
       engine: sparkSQL
       query: >

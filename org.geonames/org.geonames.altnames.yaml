@@ -5,7 +5,7 @@ content:
   source:
     kind: derivative
     inputs:
-      - id: org.geonames.altnames.raw
+      - org.geonames.altnames.raw
     transform:
       engine: sparkSQL
       query: >
