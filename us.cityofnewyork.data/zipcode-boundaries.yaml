@@ -8,7 +8,7 @@ content:
       kind: url
       url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
     read:
-      kind: shapefile
+      kind: esriShapefile
     merge:
       kind: snapshot
       primaryKey:

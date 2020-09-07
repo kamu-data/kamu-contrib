@@ -8,7 +8,7 @@ content:
       kind: url
       url: ftp://webftp.vancouver.ca/OpenData/shape/zoning_districts_shp.zip
     read:
-      kind: shapefile
+      kind: esriShapefile
     preprocess:
       engine: sparkSQL
       query: >

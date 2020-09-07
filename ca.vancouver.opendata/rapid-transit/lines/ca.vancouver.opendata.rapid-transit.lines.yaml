@@ -8,8 +8,8 @@ content:
       kind: url
       url: ftp://webftp.vancouver.ca/OpenData/shape/shape_rapid_transit.zip
     read:
-      kind: shapefile
-      subPathRegex: rapid_transit_line.*
+      kind: esriShapefile
+      subPath: rapid_transit_line.*
     preprocess:
       engine: sparkSQL
       query: >

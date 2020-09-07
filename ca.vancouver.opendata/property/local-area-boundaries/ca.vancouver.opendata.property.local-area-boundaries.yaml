@@ -8,7 +8,7 @@ content:
       kind: url
       url: ftp://webftp.vancouver.ca/OpenData/shape/local_area_boundary_shp.zip
     read:
-      kind: shapefile
+      kind: esriShapefile
     preprocess:
       engine: sparkSQL
       query: >

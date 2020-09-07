@@ -47,3 +47,5 @@ content:
       kind: ledger
       primaryKey:
       - cad_incident_id
+  vocab:
+    eventTimeColumn: incident_datetime
