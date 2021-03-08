@@ -10,7 +10,7 @@ content:
     read:
       kind: csv
       header: true
-      timestampFormat: 'MM/dd/yyyy h:mm:ss a'
+      timestampFormat: 'M/d/yyyy h:mm:ss a'
       schema:
       - cad_incident_id LONG  # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
       - incident_datetime TIMESTAMP  # The date and time the incident was created in the dispatch system

@@ -5,10 +5,13 @@ content:
   source:
     kind: derivative
     inputs:
-      - ca.vancouver.opendata.property.tax-report.2006-2013
-      - ca.vancouver.opendata.property.tax-report.2014-now
+      - ca.vancouver.opendata.property.tax-report.2006-2010
+      - ca.vancouver.opendata.property.tax-report.2011-2015
+      - ca.vancouver.opendata.property.tax-report.2016-2019
+      - ca.vancouver.opendata.property.tax-report.2020-now
     transform:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           TAX_ASSESSMENT_YEAR,
@@ -40,7 +43,7 @@ content:
           TAX_LEVY,
           NEIGHBOURHOOD_CODE,
           REPORT_YEAR
-        FROM `ca.vancouver.opendata.property.tax-report.2006-2013`
+        FROM `ca.vancouver.opendata.property.tax-report.2006-2010`
         UNION ALL
         SELECT
           TAX_ASSESSMENT_YEAR,
@@ -72,6 +75,70 @@ content:
           TAX_LEVY,
           NEIGHBOURHOOD_CODE,
           REPORT_YEAR
-        FROM `ca.vancouver.opendata.property.tax-report.2014-now`
+        FROM `ca.vancouver.opendata.property.tax-report.2011-2015`
+        UNION ALL
+        SELECT
+          TAX_ASSESSMENT_YEAR,
+          PID,
+          LEGAL_TYPE,
+          FOLIO,
+          LAND_COORDINATE,
+          ZONE_NAME,
+          ZONE_CATEGORY,
+          BLOCK,
+          PLAN,
+          DISTRICT_LOT,
+          LOT,
+          FROM_CIVIC_NUMBER,
+          TO_CIVIC_NUMBER,
+          STREET_NAME,
+          PROPERTY_POSTAL_CODE,
+          NARRATIVE_LEGAL_LINE3,
+          NARRATIVE_LEGAL_LINE2,
+          NARRATIVE_LEGAL_LINE1,
+          NARRATIVE_LEGAL_LINE4,
+          NARRATIVE_LEGAL_LINE5,
+          CURRENT_LAND_VALUE,
+          CURRENT_IMPROVEMENT_VALUE,
+          PREVIOUS_IMPROVEMENT_VALUE,
+          PREVIOUS_LAND_VALUE,
+          YEAR_BUILT,
+          BIG_IMPROVEMENT_YEAR,
+          TAX_LEVY,
+          NEIGHBOURHOOD_CODE,
+          REPORT_YEAR
+        FROM `ca.vancouver.opendata.property.tax-report.2016-2019`
+        UNION ALL
+        SELECT
+          TAX_ASSESSMENT_YEAR,
+          PID,
+          LEGAL_TYPE,
+          FOLIO,
+          LAND_COORDINATE,
+          ZONE_NAME,
+          ZONE_CATEGORY,
+          BLOCK,
+          PLAN,
+          DISTRICT_LOT,
+          LOT,
+          FROM_CIVIC_NUMBER,
+          TO_CIVIC_NUMBER,
+          STREET_NAME,
+          PROPERTY_POSTAL_CODE,
+          NARRATIVE_LEGAL_LINE3,
+          NARRATIVE_LEGAL_LINE2,
+          NARRATIVE_LEGAL_LINE1,
+          NARRATIVE_LEGAL_LINE4,
+          NARRATIVE_LEGAL_LINE5,
+          CURRENT_LAND_VALUE,
+          CURRENT_IMPROVEMENT_VALUE,
+          PREVIOUS_IMPROVEMENT_VALUE,
+          PREVIOUS_LAND_VALUE,
+          YEAR_BUILT,
+          BIG_IMPROVEMENT_YEAR,
+          TAX_LEVY,
+          NEIGHBOURHOOD_CODE,
+          REPORT_YEAR
+        FROM `ca.vancouver.opendata.property.tax-report.2020-now`
   vocab:
     eventTimeColumn: TAX_ASSESSMENT_YEAR

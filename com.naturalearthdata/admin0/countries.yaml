@@ -9,7 +9,8 @@ content:
       - com.naturalearthdata.admin0.countries.50m
       - com.naturalearthdata.admin0.countries.110m
     transform:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           c10.admin,

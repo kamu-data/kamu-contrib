@@ -15,7 +15,8 @@ content:
       escape: '"'
       nullValue: ''
     preprocess:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           address,

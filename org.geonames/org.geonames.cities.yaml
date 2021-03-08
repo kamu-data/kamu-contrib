@@ -7,7 +7,8 @@ content:
     inputs:
       - org.geonames.cities.raw
     transform:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           geonameid, name, asciiname, country_code, population, timezone,

@@ -7,7 +7,8 @@ content:
     inputs:
       - org.geonames.cities.raw
     transform:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           explode(split(alternatenames, ",")) as alternatename,

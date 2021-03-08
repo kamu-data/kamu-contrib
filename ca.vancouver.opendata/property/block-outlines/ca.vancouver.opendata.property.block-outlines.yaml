@@ -6,12 +6,12 @@ content:
     kind: root
     fetch:
       kind: url
-      url: ftp://webftp.vancouver.ca/OpenData/shape/shape_property_information.zip
+      url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=shp&timezone=America/Los_Angeles&lang=en
     read:
       kind: esriShapefile
-      subPath: block_outlines.*
     preprocess:
-      engine: sparkSQL
+      kind: sql
+      engine: spark
       query: >
         SELECT
           ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry
