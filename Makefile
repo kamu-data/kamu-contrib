@@ -1,6 +1,6 @@
 .PHONY: docs
 docs:
-	kamu depgraph | dot -Tpng > doc/depgraph.png
+	kamu inspect lineage --output-format dot | dot -Tpng > doc/depgraph.png
 
 
 .PHONY: strip-notebooks
