@@ -12,9 +12,45 @@ content:
       separator: ';'
       header: true
       nullValue: ''
+    preprocess:
+      kind: sql
+      engine: spark
+      query: |
+        SELECT
+          PID,
+          to_date(REPORT_YEAR, "yyyy") as REPORT_YEAR,
+          LEGAL_TYPE,
+          FOLIO,
+          LAND_COORDINATE,
+          ZONING_DISTRICT,
+          ZONING_CLASSIFICATION,
+          LOT,
+          PLAN,
+          BLOCK,
+          DISTRICT_LOT,
+          FROM_CIVIC_NUMBER,
+          TO_CIVIC_NUMBER,
+          STREET_NAME,
+          PROPERTY_POSTAL_CODE,
+          NARRATIVE_LEGAL_LINE1,
+          NARRATIVE_LEGAL_LINE2,
+          NARRATIVE_LEGAL_LINE3,
+          NARRATIVE_LEGAL_LINE4,
+          NARRATIVE_LEGAL_LINE5,
+          CURRENT_LAND_VALUE,
+          CURRENT_IMPROVEMENT_VALUE,
+          TAX_ASSESSMENT_YEAR,
+          PREVIOUS_LAND_VALUE,
+          PREVIOUS_IMPROVEMENT_VALUE,
+          YEAR_BUILT,
+          BIG_IMPROVEMENT_YEAR,
+          TAX_LEVY,
+          NEIGHBOURHOOD_CODE
+        FROM input
     merge:
       kind: ledger
       primaryKey:
       - PID
+      - REPORT_YEAR
   vocab:
-    eventTimeColumn: TAX_ASSESSMENT_YEAR
+    eventTimeColumn: REPORT_YEAR
