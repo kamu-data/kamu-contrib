@@ -1,14 +1,14 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: ca.vancouver.opendata.property.tax-report
+  name: ca.vancouver.opendata.property.tax-report
   source:
     kind: derivative
     inputs:
-      - ca.vancouver.opendata.property.tax-report.2006-2010
-      - ca.vancouver.opendata.property.tax-report.2011-2015
-      - ca.vancouver.opendata.property.tax-report.2016-2019
-      - ca.vancouver.opendata.property.tax-report.2020-now
+      - name: ca.vancouver.opendata.property.tax-report.2006-2010
+      - name: ca.vancouver.opendata.property.tax-report.2011-2015
+      - name: ca.vancouver.opendata.property.tax-report.2016-2019
+      - name: ca.vancouver.opendata.property.tax-report.2020-now
     transform:
       kind: sql
       engine: spark

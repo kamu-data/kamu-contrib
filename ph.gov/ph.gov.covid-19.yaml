@@ -1,9 +1,9 @@
 # This is not a trustworthy dataset, used for demonstration purposes only
 # Source: https://www.reddit.com/r/Coronavirus_PH/comments/fehzke/ph_covid19_case_database_is_now_live/
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: ph.gov.covid-19
+  name: ph.gov.covid-19
   source:
     kind: root
     fetch:

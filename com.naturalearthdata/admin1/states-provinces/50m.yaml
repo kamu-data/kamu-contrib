@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: com.naturalearthdata.admin1.states-provinces.50m
+  name: com.naturalearthdata.admin1.states-provinces.50m
   source:
     kind: root
     fetch:

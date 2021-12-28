@@ -1,13 +1,13 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: com.naturalearthdata.admin0.countries
+  name: com.naturalearthdata.admin0.countries
   source:
     kind: derivative
     inputs:
-      - com.naturalearthdata.admin0.countries.10m
-      - com.naturalearthdata.admin0.countries.50m
-      - com.naturalearthdata.admin0.countries.110m
+      - name: com.naturalearthdata.admin0.countries.10m
+      - name: com.naturalearthdata.admin0.countries.50m
+      - name: com.naturalearthdata.admin0.countries.110m
     transform:
       kind: sql
       engine: spark

@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: ca.gc.statcan.census-2016.geo-bounds
+  name: ca.gc.statcan.census-2016.geo-bounds
   source:
     kind: root
     fetch:

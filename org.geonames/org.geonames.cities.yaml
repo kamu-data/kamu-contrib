@@ -1,11 +1,11 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: org.geonames.cities
+  name: org.geonames.cities
   source:
     kind: derivative
     inputs:
-      - org.geonames.cities.raw
+      - name: org.geonames.cities.raw
     transform:
       kind: sql
       engine: spark

@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: io.exchangeratesapi.daily.usd-cad
+  name: io.exchangeratesapi.daily.usd-cad
   source:
     kind: root
     fetch:

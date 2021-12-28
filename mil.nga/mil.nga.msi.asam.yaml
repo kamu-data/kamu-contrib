@@ -1,11 +1,11 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
   # National Geospatial Intelligence Agency / Maritime Safety Information / Anti-shipping Activity Messages 
   # Includes the locations and descriptive accounts of specific hostile acts against ships and mariners. 
   # The reports may be useful for recognition, prevention and avoidance of potential hostile activity.
   # See: https://msi.nga.mil/Piracy
-  id: mil.nga.msi.asam
+  name: mil.nga.msi.asam
   source:
     kind: root
     fetch:

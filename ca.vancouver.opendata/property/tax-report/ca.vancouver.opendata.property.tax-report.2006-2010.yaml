@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: ca.vancouver.opendata.property.tax-report.2006-2010
+  name: ca.vancouver.opendata.property.tax-report.2006-2010
   source:
     kind: root
     fetch:

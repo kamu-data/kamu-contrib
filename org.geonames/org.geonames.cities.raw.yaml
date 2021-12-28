@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: org.geonames.cities.raw
+  name: org.geonames.cities.raw
   source:
     kind: root
     fetch:

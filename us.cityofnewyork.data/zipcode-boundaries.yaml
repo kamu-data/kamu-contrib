@@ -1,7 +1,7 @@
-apiVersion: 1
+version: 1
 kind: DatasetSnapshot
 content:
-  id: us.cityofnewyork.data.zipcode-boundaries
+  name: us.cityofnewyork.data.zipcode-boundaries
   source:
     kind: root
     fetch:
