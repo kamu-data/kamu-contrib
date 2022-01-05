@@ -1,20 +1,21 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: org.geonames.cities
-  source:
-    kind: derivative
-    inputs:
-      - name: org.geonames.cities.raw
-    transform:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          geonameid, name, asciiname, country_code, population, timezone,
-          ST_Point(
-            cast(longitude as decimal(9,6)),
-            cast(latitude as decimal(9,6))
-          ) as location_wgs84,
-          elevation
-        FROM `org.geonames.cities.raw`
+  kind: derivative
+  metadata:
+    - kind: setTransform
+      inputs:
+        - name: org.geonames.cities.raw
+      transform:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            geonameid, name, asciiname, country_code, population, timezone,
+            ST_Point(
+              cast(longitude as decimal(9,6)),
+              cast(latitude as decimal(9,6))
+            ) as location_wgs84,
+            elevation
+          FROM `org.geonames.cities.raw`

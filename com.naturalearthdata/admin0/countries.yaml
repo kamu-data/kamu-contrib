@@ -1,26 +1,27 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: com.naturalearthdata.admin0.countries
-  source:
-    kind: derivative
-    inputs:
-      - name: com.naturalearthdata.admin0.countries.10m
-      - name: com.naturalearthdata.admin0.countries.50m
-      - name: com.naturalearthdata.admin0.countries.110m
-    transform:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          c10.admin,
-          c10.iso_a2,
-          c10.iso_a3,
-          c10.geometry as geometry_10m,
-          c50.geometry as geometry_50m,
-          c110.geometry as geometry_110m
-        FROM `com.naturalearthdata.admin0.countries.10m` as c10
-        LEFT JOIN `com.naturalearthdata.admin0.countries.50m` as c50
-          ON c10.admin = c50.admin
-        LEFT JOIN `com.naturalearthdata.admin0.countries.50m` as c110
-          ON c10.admin = c110.admin
+  kind: derivative
+  metadata:
+    - kind: setTransform
+      inputs:
+        - name: com.naturalearthdata.admin0.countries.10m
+        - name: com.naturalearthdata.admin0.countries.50m
+        - name: com.naturalearthdata.admin0.countries.110m
+      transform:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            c10.admin,
+            c10.iso_a2,
+            c10.iso_a3,
+            c10.geometry as geometry_10m,
+            c50.geometry as geometry_50m,
+            c110.geometry as geometry_110m
+          FROM `com.naturalearthdata.admin0.countries.10m` as c10
+          LEFT JOIN `com.naturalearthdata.admin0.countries.50m` as c50
+            ON c10.admin = c50.admin
+          LEFT JOIN `com.naturalearthdata.admin0.countries.50m` as c110
+            ON c10.admin = c110.admin

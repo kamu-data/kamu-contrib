@@ -2,19 +2,20 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: org.geonames.altnames
-  source:
-    kind: derivative
-    inputs:
-      - name: org.geonames.altnames.raw
-    transform:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          alternateNameId, geonameid, isolanguage, alternateName,
-          CASE WHEN isPreferredName IS NULL THEN false ELSE isPreferredName > 0 END AS isPreferredName,
-          CASE WHEN isShortName IS NULL THEN false ELSE isShortName > 0 END AS isShortName,
-          CASE WHEN isColloquial IS NULL THEN false ELSE isColloquial > 0 END AS isColloquial,
-          CASE WHEN isHistoric IS NULL THEN false ELSE isHistoric > 0 END AS isHistoric,
-          from, to
-        FROM `org.geonames.altnames.raw`
+  kind: derivative
+  metadata:
+    - kind: setTransform
+      inputs:
+        - name: org.geonames.altnames.raw
+      transform:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            alternateNameId, geonameid, isolanguage, alternateName,
+            CASE WHEN isPreferredName IS NULL THEN false ELSE isPreferredName > 0 END AS isPreferredName,
+            CASE WHEN isShortName IS NULL THEN false ELSE isShortName > 0 END AS isShortName,
+            CASE WHEN isColloquial IS NULL THEN false ELSE isColloquial > 0 END AS isColloquial,
+            CASE WHEN isHistoric IS NULL THEN false ELSE isHistoric > 0 END AS isHistoric,
+            from, to
+          FROM `org.geonames.altnames.raw`

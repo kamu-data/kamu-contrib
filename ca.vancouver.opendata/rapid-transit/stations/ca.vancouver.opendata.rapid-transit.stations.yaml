@@ -1,23 +1,24 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: ca.vancouver.opendata.rapid-transit.stations
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: ftp://webftp.vancouver.ca/OpenData/shape/shape_rapid_transit.zip
-    read:
-      kind: esriShapefile
-      subPath: rapid_transit_stations.*
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
-          STATION
-        FROM input
-    merge:
-      # TODO
-      kind: append
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: ftp://webftp.vancouver.ca/OpenData/shape/shape_rapid_transit.zip
+      read:
+        kind: esriShapefile
+        subPath: rapid_transit_stations.*
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
+            STATION
+          FROM input
+      merge:
+        # TODO
+        kind: append

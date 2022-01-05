@@ -1,15 +1,16 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: us.cityofnewyork.data.zipcode-boundaries
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
-    read:
-      kind: esriShapefile
-    merge:
-      kind: snapshot
-      primaryKey:
-      - ZIPCODE
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
+      read:
+        kind: esriShapefile
+      merge:
+        kind: snapshot
+        primaryKey:
+          - ZIPCODE

@@ -1,31 +1,32 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: ca.vancouver.opendata.schools
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
-    read:
-      kind: csv
-      header: true
-      separator: ';'
-      quote: '"'
-      escape: '"'
-      nullValue: ''
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          address,
-          school_category,
-          school_name,
-          ST_GeomFromGeoJSON(geom) as geom,
-          geo_local_area
-        FROM input
-    merge:
-      kind: snapshot
-      primaryKey:
-      - school_name
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://opendata.vancouver.ca/explore/dataset/schools/download/?format=csv&timezone=America/Los_Angeles&use_labels_for_header=true
+      read:
+        kind: csv
+        header: true
+        separator: ';'
+        quote: '"'
+        escape: '"'
+        nullValue: ''
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            address,
+            school_category,
+            school_name,
+            ST_GeomFromGeoJSON(geom) as geom,
+            `geo local area` as geo_local_area
+          FROM input
+      merge:
+        kind: snapshot
+        primaryKey:
+          - school_name

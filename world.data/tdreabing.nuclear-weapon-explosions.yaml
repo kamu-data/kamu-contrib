@@ -1,38 +1,39 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: world.data.tdreabing.nuclear-weapon-explosions
-  source:
-    kind: root
-    fetch:
-      # Source in data.world: https://data.world/tdreabing/nuclear-weapon-explosions
-      # Source paper: https://www.ldeo.columbia.edu/~richards/my_papers/WW_nuclear_tests_IASPEI_HB.pdf
-      kind: url
-      url: https://query.data.world/s/czddlpfvqfonlzmarr2wrr33t3ttlt
-    read:
-      kind: csv
-      separator: ','
-      header: true
-      nullValue: '-'
-    preprocess:
-        kind: sql
-        engine: spark
-        query: >
-          SELECT
-            cast(unix_timestamp(`datetime`, "M/d/yyyy h:m:s a") as timestamp) as event_time,
-            source,
-            `Country` as country,
-            name,
-            confirmation,
-            medium,
-            cast(`latitude` as decimal(9,6)) as latitude,
-            cast(`longitude` as decimal(9,6)) as longitude,
-            cast(`depth` as decimal(9,6)) as depth,
-            mb,
-            cast(`max_yield` as decimal(9,6)) as max_yield,
-            salvo
-          FROM input
-    merge:
-      kind: ledger
-      primaryKey:
-      - event_time
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        # Source in data.world: https://data.world/tdreabing/nuclear-weapon-explosions
+        # Source paper: https://www.ldeo.columbia.edu/~richards/my_papers/WW_nuclear_tests_IASPEI_HB.pdf
+        kind: url
+        url: https://query.data.world/s/czddlpfvqfonlzmarr2wrr33t3ttlt
+      read:
+        kind: csv
+        separator: ','
+        header: true
+        nullValue: '-'
+      preprocess:
+          kind: sql
+          engine: spark
+          query: >
+            SELECT
+              cast(unix_timestamp(`datetime`, "M/d/yyyy h:m:s a") as timestamp) as event_time,
+              source,
+              `Country` as country,
+              name,
+              confirmation,
+              medium,
+              cast(`latitude` as decimal(9,6)) as latitude,
+              cast(`longitude` as decimal(9,6)) as longitude,
+              cast(`depth` as decimal(9,6)) as depth,
+              mb,
+              cast(`max_yield` as decimal(9,6)) as max_yield,
+              salvo
+            FROM input
+      merge:
+        kind: ledger
+        primaryKey:
+          - event_time

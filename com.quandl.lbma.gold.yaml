@@ -1,39 +1,40 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: com.quandl.lbma.gold
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://www.quandl.com/api/v3/datasets/LBMA/GOLD.csv?api_key=J86PRArsxou4JyiZ2-5X
-    read:
-      kind: csv
-      header: true
-      schema:
-      - "Date DATE"
-      - "`USD (AM)` DECIMAL(18,4)"
-      - "`USD (PM)` DECIMAL(18,4)"
-      - "`GBP (AM)` DECIMAL(18,4)"
-      - "`GBP (PM)` DECIMAL(18,4)"
-      - "`EURO (AM)` DECIMAL(18,4)"
-      - "`EURO (PM)` DECIMAL(18,4)"
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          Date as date,
-          `USD (AM)` as usd_am,
-          `USD (PM)` as usd_pm,
-          `GBP (AM)` as gbp_am,
-          `GBP (PM)` as gbp_pm,
-          `EURO (AM)` as euro_am,
-          `EURO (PM)` as euro_pm
-        FROM input
-    merge:
-      kind: ledger
-      primaryKey:
-      - date
-  vocab:
-    eventTimeColumn: date
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://www.quandl.com/api/v3/datasets/LBMA/GOLD.csv?api_key=J86PRArsxou4JyiZ2-5X
+      read:
+        kind: csv
+        header: true
+        schema:
+          - "Date DATE"
+          - "`USD (AM)` DECIMAL(18,4)"
+          - "`USD (PM)` DECIMAL(18,4)"
+          - "`GBP (AM)` DECIMAL(18,4)"
+          - "`GBP (PM)` DECIMAL(18,4)"
+          - "`EURO (AM)` DECIMAL(18,4)"
+          - "`EURO (PM)` DECIMAL(18,4)"
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            Date as date,
+            `USD (AM)` as usd_am,
+            `USD (PM)` as usd_pm,
+            `GBP (AM)` as gbp_am,
+            `GBP (PM)` as gbp_pm,
+            `EURO (AM)` as euro_am,
+            `EURO (PM)` as euro_pm
+          FROM input
+      merge:
+        kind: ledger
+        primaryKey:
+        - date
+    - kind: setVocab
+      eventTimeColumn: date

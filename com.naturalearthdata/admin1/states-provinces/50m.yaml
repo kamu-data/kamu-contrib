@@ -1,15 +1,16 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: com.naturalearthdata.admin1.states-provinces.50m
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_1_states_provinces.zip
-    read:
-      kind: esriShapefile
-    merge:
-      kind: snapshot
-      primaryKey:
-      - iso_3166_2
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_1_states_provinces.zip
+      read:
+        kind: esriShapefile
+      merge:
+        kind: snapshot
+        primaryKey:
+          - iso_3166_2

@@ -1,23 +1,24 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: ca.vancouver.opendata.zoning-districts
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: ftp://webftp.vancouver.ca/OpenData/shape/zoning_districts_shp.zip
-    read:
-      kind: esriShapefile
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
-          ZONE_NAME,
-          CATEGORY
-        FROM input
-    merge:
-      # TODO
-      kind: append
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: ftp://webftp.vancouver.ca/OpenData/shape/zoning_districts_shp.zip
+      read:
+        kind: esriShapefile
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
+            ZONE_NAME,
+            CATEGORY
+          FROM input
+      merge:
+        # TODO
+        kind: append

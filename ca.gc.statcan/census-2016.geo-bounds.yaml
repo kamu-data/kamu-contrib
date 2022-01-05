@@ -1,22 +1,23 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: ca.gc.statcan.census-2016.geo-bounds
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/files-fichiers/2016/lpr_000b16a_e.zip
-    read:
-      kind: esriShapefile
-    preprocess:
-        kind: sql
-        engine: spark
-        query: >
-          SELECT
-            PREABBR, PRENAME, PRFABBR, PRFNAME, PRNAME, PRUID, geometry
-          FROM input
-    merge:
-      kind: snapshot
-      primaryKey:
-      - PRUID
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/files-fichiers/2016/lpr_000b16a_e.zip
+      read:
+        kind: esriShapefile
+      preprocess:
+          kind: sql
+          engine: spark
+          query: >
+            SELECT
+              PREABBR, PRENAME, PRFABBR, PRFNAME, PRNAME, PRUID, geometry
+            FROM input
+      merge:
+        kind: snapshot
+        primaryKey:
+        - PRUID

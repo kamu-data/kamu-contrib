@@ -1,21 +1,22 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   name: ca.vancouver.opendata.property.block-outlines
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=shp&timezone=America/Los_Angeles&lang=en
-    read:
-      kind: esriShapefile
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry
-        FROM input
-    merge:
-      # TODO
-      kind: append
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=shp&timezone=America/Los_Angeles&lang=en
+      read:
+        kind: esriShapefile
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry
+          FROM input
+      merge:
+        # TODO
+        kind: append

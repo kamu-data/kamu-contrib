@@ -2,26 +2,27 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: org.geonames.cities.by-name
-  source:
-    kind: derivative
-    inputs:
-      - name: org.geonames.cities.raw
-    transform:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          explode(split(alternatenames, ",")) as alternatename,
-          country_code, geonameid
-          FROM `org.geonames.cities.raw`
-          WHERE alternatenames IS NOT NULL
-        UNION ALL
-        SELECT
-          name as alternatename,
-          country_code, geonameid
-          FROM `org.geonames.cities.raw`
-        UNION ALL
-        SELECT
-          asciiname as alternatename,
-          country_code, geonameid
-          FROM `org.geonames.cities.raw`
+  kind: derivative
+  metadata:
+    - kind: setTransform
+      inputs:
+        - name: org.geonames.cities.raw
+      transform:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            explode(split(alternatenames, ",")) as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`
+            WHERE alternatenames IS NOT NULL
+          UNION ALL
+          SELECT
+            name as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`
+          UNION ALL
+          SELECT
+            asciiname as alternatename,
+            country_code, geonameid
+            FROM `org.geonames.cities.raw`

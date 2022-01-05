@@ -1,39 +1,40 @@
-version: 1
 kind: DatasetSnapshot
+version: 1
 content:
   # National Geospatial Intelligence Agency / Maritime Safety Information / Anti-shipping Activity Messages 
   # Includes the locations and descriptive accounts of specific hostile acts against ships and mariners. 
   # The reports may be useful for recognition, prevention and avoidance of potential hostile activity.
   # See: https://msi.nga.mil/Piracy
   name: mil.nga.msi.asam
-  source:
-    kind: root
-    fetch:
-      kind: url
-      url: https://msi.nga.mil/api/publications/download?key=16920958/SFH00000/ASAM_shp.zip&type=download
-    read:
-      kind: esriShapefile
-      subPath: asam_data_download/ASAM_events.*
-    preprocess:
-      kind: sql
-      engine: spark
-      query: >
-        SELECT
-          CAST(UNIX_TIMESTAMP(dateofocc, "yyyyMMdd") as TIMESTAMP) as event_time,
-          reference,
-          geometry,
-          subreg,
-          hostility_ as hostility,
-          victim_d,
-          descriptio,
-          hostilityt,
-          hostilit_D,
-          victim_l,
-          victim_l_D,
-          navarea
-        FROM input
-    merge:
-      # TODO
-      kind: ledger
-      primaryKey:
-        - reference
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: url
+        url: https://msi.nga.mil/api/publications/download?key=16920958/SFH00000/ASAM_shp.zip&type=download
+      read:
+        kind: esriShapefile
+        subPath: asam_data_download/ASAM_events.*
+      preprocess:
+        kind: sql
+        engine: spark
+        query: >
+          SELECT
+            CAST(UNIX_TIMESTAMP(dateofocc, "yyyyMMdd") as TIMESTAMP) as event_time,
+            reference,
+            geometry,
+            subreg,
+            hostility_ as hostility,
+            victim_d,
+            descriptio,
+            hostilityt,
+            hostilit_D,
+            victim_l,
+            victim_l_D,
+            navarea
+          FROM input
+      merge:
+        # TODO
+        kind: ledger
+        primaryKey:
+          - reference
