@@ -70,7 +70,8 @@ jobs:
           kamu --version
 
       # TODO: IPFS daemon often times out when searching for a CID :(
-      # we point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast
+      # We tried pointing kamu to Pinata's own IPFS gateway to increase chances of resolving it fast,
+      # but then we hit rate limits on the public gateway.
       - name: Configure
         shell: bash
         env:
@@ -86,7 +87,7 @@ jobs:
 
           # Create workspace and point kamu to Pinata IPFS gateway
           kamu init
-          kamu config set protocol.ipfs.httpGateway "$PINATA_GATEWAY"
+          # kamu config set protocol.ipfs.httpGateway "$PINATA_GATEWAY"
 
       # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
       # - frequent loss of writes
