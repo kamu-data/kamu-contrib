@@ -7,5 +7,3 @@ We find the process of searching, ingesting, and cleaning data from the wild var
 Until that happens - this repo serves as a great catalog of examples of how to deal with different ingestion scenarios.
 
 We gladly accept PRs!
-
-![Dependency Graph](doc/depgraph.png)
