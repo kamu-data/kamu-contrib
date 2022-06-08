@@ -156,7 +156,7 @@ jobs:
           else
             # Pin new CID to replicate data to the pinning service
             echo "Pinning CID in Pinata"
-            ipfs pin remote add --service svc --name ${{ matrix.dataset_name }} -- "/ipfs/$ipfs_cid"
+            timeout 60 ipfs pin remote add --service svc --name ${{ matrix.dataset_name }} "/ipfs/$ipfs_cid"
 
             # Update DNSLink entry
             echo "{
