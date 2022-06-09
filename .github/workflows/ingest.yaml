@@ -139,7 +139,7 @@ jobs:
       - name: Ingest new data
         shell: bash
         run: |
-          kamu -v pull ${{ matrix.dataset_name }}
+          kamu -v pull --fetch-uncacheable ${{ matrix.dataset_name }}
           kamu list --output-format table -w
 
       # TODO: We are not using `kamu push` here to avoid resolving and publishing into IPNS.
