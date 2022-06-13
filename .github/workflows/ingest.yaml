@@ -1,7 +1,8 @@
 name: ingest
 on:
-  schedule:
-    - cron: "*/30 * * * *"
+  # push: {}
+  # schedule:
+  #   - cron: "*/30 * * * *"
   workflow_dispatch: {}
 concurrency: ingest
 env:
@@ -9,9 +10,9 @@ env:
   PINATA_API_URL: https://api.pinata.cloud/psa
   PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
   # TODO: We use public gateway as local fetches almost always timeout :(
-  IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
+  IPFS_HTTP_GATEWAY: http://localhost:8080
+  # IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
   # IPFS_HTTP_GATEWAY: https://gateway.pinata.cloud
-  # IPFS_HTTP_GATEWAY: http://localhost:8080
   AWS_ROUTE53_HOSTED_ZONE_ID: Z25CPWZR4S9IHS
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -27,23 +28,28 @@ jobs:
       # TODO: To decrease the chance of public gateway rate limiting
       max-parallel: 1
       matrix:
-        dataset_name:
-          - com.coinpaprika.tickers.eth-usd
-          - net.rocketpool.reth.mint-burn
-          - co.alphavantage.tickers.daily.spy
+        #dataset_name:
+        # - com.coinpaprika.tickers.eth-usd
+        #- com.cryptocompare.ohlcv.eth-usd
+        # - net.rocketpool.reth.mint-burn
+        # - co.alphavantage.tickers.daily.spy
         include:
-          - dataset_name: com.coinpaprika.tickers.eth-usd
-            ipns_id: k51qzi5uqu5dgxqmxnxblkbh0z56k4o7rpxani1u6s3z5u2oew1zerzbxhcs3j
-            ipns_key_secret: COINPAPRIKA_TICKERS_ETH_USD_KEY
-            dnslink_subdomain: com.coinpaprika.tickers.eth-usd.datasets.kamu.dev
-          - dataset_name: net.rocketpool.reth.mint-burn
-            ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
-            ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
-            dnslink_subdomain: net.rocketpool.reth.mint-burn.datasets.kamu.dev
-          - dataset_name: co.alphavantage.tickers.daily.spy
-            ipns_id: k51qzi5uqu5djln0j1uan84f9btedeqfi9inj1exw8xj4dp9tpc2znbedkcazy
-            ipns_key_secret: CO_ALPHAVANTAGE_TICKERS_DAILY_SPY_KEY
-            dnslink_subdomain: co.alphavantage.tickers.daily.spy.datasets.kamu.dev
+          # - dataset_name: com.coinpaprika.tickers.eth-usd
+          #   ipns_id: k51qzi5uqu5dgxqmxnxblkbh0z56k4o7rpxani1u6s3z5u2oew1zerzbxhcs3j
+          #   ipns_key_secret: COINPAPRIKA_TICKERS_ETH_USD_KEY
+          #   dnslink_subdomain: com.coinpaprika.tickers.eth-usd.datasets.kamu.dev
+          - dataset_name: com.cryptocompare.ohlcv.eth-usd
+            ipns_id: k51qzi5uqu5di44ukms656i7lfpx3kzy1eotzaa514pterzr6d73ee3ndmbs4t
+            ipns_key_secret: CRYPTOCOMPARE_OHLCV_ETH_USD_KEY
+            dnslink_subdomain: com.cryptocompare.ohlcv.eth-usd.datasets.kamu.dev
+          # - dataset_name: net.rocketpool.reth.mint-burn
+          #   ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
+          #   ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
+          #   dnslink_subdomain: net.rocketpool.reth.mint-burn.datasets.kamu.dev
+          # - dataset_name: co.alphavantage.tickers.daily.spy
+          #   ipns_id: k51qzi5uqu5djln0j1uan84f9btedeqfi9inj1exw8xj4dp9tpc2znbedkcazy
+          #   ipns_key_secret: CO_ALPHAVANTAGE_TICKERS_DAILY_SPY_KEY
+          #   dnslink_subdomain: co.alphavantage.tickers.daily.spy.datasets.kamu.dev
     runs-on: ubuntu-latest
     steps:
       - uses: ibnesayeed/setup-ipfs@master
@@ -76,11 +82,11 @@ jobs:
           echo "Kamu version:"
           kamu --version
 
-      - uses: actions/cache@v3
-        with:
-          path: |
-            .kamu
-          key: kamu-${{ env.KAMU_VERSION }}-dataset-${{ matrix.dataset_name }}
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       .kamu
+      #     key: kamu-${{ env.KAMU_VERSION }}-dataset-${{ matrix.dataset_name }}
 
       # TODO: IPFS daemon often times out when searching for a CID :(
       # We point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast.
@@ -98,8 +104,8 @@ jobs:
           # Add pinning service
           ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
 
-          # Create workspace and point kamu to Pinata IPFS gateway
-          kamu init || true
+          # Create workspace and point kamu to IPFS gateway
+          kamu init
           kamu config set protocol.ipfs.httpGateway "$IPFS_HTTP_GATEWAY"
 
       # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
@@ -128,7 +134,21 @@ jobs:
           echo "Current IPFS CID (from DNSLink): $ipfs_cid"
           echo "::set-output name=CID::$ipfs_cid"
 
-      - name: Download dataset
+      - name: Pin dataset in local IPFS node
+        env:
+          CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
+        shell: bash
+        run: |
+          echo "Waiting for peers"
+          sleep 60
+
+          ipfs dht findprovs "/ipfs/$CURRENT_CID"
+
+          ipfs_peers=$(ipfs swarm peers | wc -l)
+          echo "Pinning CID $CURRENT_CID with $ipfs_peers"
+          ipfs pin add "/ipfs/$CURRENT_CID"
+
+      - name: Materialize dataset
         env:
           CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
         shell: bash

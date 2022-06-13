@@ -1,0 +1,106 @@
+name: initialize
+on:
+  workflow_dispatch:
+    inputs:
+      dataset_name:
+        description: "Dataset Name"
+        type: string
+        required: true
+env:
+  KAMU_VERSION: v0.92.0
+  PINATA_API_URL: https://api.pinata.cloud/psa
+  PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
+  # TODO: We use public gateway as local fetches almost always timeout :(
+  IPFS_HTTP_GATEWAY: http://localhost:8080
+  # IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
+  # IPFS_HTTP_GATEWAY: https://gateway.pinata.cloud
+  AWS_ROUTE53_HOSTED_ZONE_ID: Z25CPWZR4S9IHS
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-west-2
+  AWS_ROUTE53_TTL: 60
+  # Required by dataset fetch steps
+  ETH_NODE_PROVIDER_URL: ${{ secrets.INFURA_NODE_URL }}
+  ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+jobs:
+  update:
+    name: Initialize Dataset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ibnesayeed/setup-ipfs@master
+        with:
+          ipfs_version: ^0.12
+          run_daemon: true
+
+      - uses: actions/checkout@v2
+
+      - name: Install kamu
+        shell: bash
+        run: |
+          wget -q "https://github.com/kamu-data/kamu-cli/releases/download/$KAMU_VERSION/kamu-cli-x86_64-unknown-linux-gnu.tar.gz"
+          tar -xf kamu-cli-x86_64-unknown-linux-gnu.tar.gz
+          chmod +x kamu-cli-x86_64-unknown-linux-gnu/kamu
+          echo "$PWD/kamu-cli-x86_64-unknown-linux-gnu" >> $GITHUB_PATH
+
+      - name: Print info
+        shell: bash
+        run: |
+          echo "Work dir: $PWD"
+
+          echo "IPFS version:"
+          ipfs version
+
+          echo "Podman version:"
+          podman version
+
+          echo "AWS CLI version:"
+          aws --version
+
+          echo "Kamu version:"
+          kamu --version
+
+      - name: Configure
+        shell: bash
+        run: |
+          ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
+
+          kamu init
+          kamu add -r .
+          kamu list
+
+      - name: Pull dataset
+        shell: bash
+        run: |
+          kamu -v pull ${{ inputs.dataset_name }}
+          kamu list --output-format table -w
+
+      - name: Publish dataset
+        shell: bash
+        run: |
+          # Add dataset to IPFS
+          ipfs_cid=$(kamu -v system ipfs add ${{ inputs.dataset_name }})
+          echo "New IPFS CID: $ipfs_cid"
+
+          # Pin new CID to replicate data to the pinning service
+          echo "Pinning CID in Pinata"
+          timeout 60 ipfs pin remote add --service svc --name ${{ inputs.dataset_name }} "/ipfs/$ipfs_cid"
+
+          # Update DNSLink entry
+          echo "{
+              \"Comment\": \"GHAction update of DNSLink record\",
+              \"Changes\": [
+                  {
+                      \"Action\": \"UPSERT\",
+                      \"ResourceRecordSet\": {
+                          \"Name\": \"_dnslink.${{ inputs.dataset_name }}.datasets.kamu.dev.\",
+                          \"Type\": \"TXT\",
+                          \"TTL\": $AWS_ROUTE53_TTL,
+                          \"ResourceRecords\": [{
+                              \"Value\": \"\\\"dnslink=/ipfs/$ipfs_cid\\\"\"
+                          }]
+                      }
+                  }
+              ]
+          }" > dns-upsert.json
+          echo "Updating DNSLink entry with: $(cat dns-upsert.json)"
+          aws route53 change-resource-record-sets --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID --change-batch file://dns-upsert.json
