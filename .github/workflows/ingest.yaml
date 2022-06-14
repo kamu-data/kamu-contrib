@@ -30,11 +30,6 @@ jobs:
       # TODO: To decrease the chance of public gateway rate limiting
       max-parallel: 1
       matrix:
-        #dataset_name:
-        # - com.coinpaprika.tickers.eth-usd
-        #- com.cryptocompare.ohlcv.eth-usd
-        # - net.rocketpool.reth.mint-burn
-        # - co.alphavantage.tickers.daily.spy
         include:
           # - dataset_name: com.coinpaprika.tickers.eth-usd
           #   ipns_id: k51qzi5uqu5dgxqmxnxblkbh0z56k4o7rpxani1u6s3z5u2oew1zerzbxhcs3j
@@ -44,14 +39,14 @@ jobs:
             ipns_id: k51qzi5uqu5di44ukms656i7lfpx3kzy1eotzaa514pterzr6d73ee3ndmbs4t
             ipns_key_secret: CRYPTOCOMPARE_OHLCV_ETH_USD_KEY
             dnslink_subdomain: com.cryptocompare.ohlcv.eth-usd.datasets.kamu.dev
-          # - dataset_name: net.rocketpool.reth.mint-burn
-          #   ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
-          #   ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
-          #   dnslink_subdomain: net.rocketpool.reth.mint-burn.datasets.kamu.dev
-          # - dataset_name: co.alphavantage.tickers.daily.spy
-          #   ipns_id: k51qzi5uqu5djln0j1uan84f9btedeqfi9inj1exw8xj4dp9tpc2znbedkcazy
-          #   ipns_key_secret: CO_ALPHAVANTAGE_TICKERS_DAILY_SPY_KEY
-          #   dnslink_subdomain: co.alphavantage.tickers.daily.spy.datasets.kamu.dev
+          - dataset_name: net.rocketpool.reth.mint-burn
+            ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
+            ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
+            dnslink_subdomain: net.rocketpool.reth.mint-burn.datasets.kamu.dev
+          - dataset_name: co.alphavantage.tickers.daily.spy
+            ipns_id: k51qzi5uqu5djln0j1uan84f9btedeqfi9inj1exw8xj4dp9tpc2znbedkcazy
+            ipns_key_secret: CO_ALPHAVANTAGE_TICKERS_DAILY_SPY_KEY
+            dnslink_subdomain: co.alphavantage.tickers.daily.spy.datasets.kamu.dev
     runs-on: ubuntu-latest
     steps:
       - uses: ibnesayeed/setup-ipfs@master
