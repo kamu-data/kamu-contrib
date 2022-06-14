@@ -168,6 +168,7 @@ jobs:
         shell: bash
         env:
           OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
+          PIN_TRIES: "3"
         run: |
           # Add dataset to IPFS
           ipfs_cid=$(kamu -v system ipfs add ${{ matrix.dataset_name }})
@@ -177,16 +178,24 @@ jobs:
             echo "CID didn't change - skipping publishing"
           else
             # Pin new CID to replicate data to the pinning service
-            echo "Pinning CID"
-            response=$(timeout 120 \
-              curl -X POST \
-              -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
-              "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
-            pinned=$(echo "$response" | jq -r ".Pins[0]")
-            if [ "$pinned" != "$ipfs_cid" ]; then
-              echo "Pinning service returned an error: $response"
-              exit 1
-            fi
+            for i in $(seq 1 $PIN_TRIES); do
+              echo "Pinning CID (attempt $i)"
+
+              response=$(timeout 120 \
+                curl -X POST \
+                -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
+                "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
+
+              pinned=$(echo "$response" | jq -r ".Pins[0]")
+              if [ "$pinned" == "$ipfs_cid" ]; then
+                break
+              else
+                echo "Pinning service returned an error: $response"
+                if [ $i == $PIN_TRIES ]; then
+                  exit 1
+                fi
+              fi
+            done
             # timeout 60 ipfs pin remote add --service svc --name ${{ matrix.dataset_name }} "/ipfs/$ipfs_cid"
 
             # Update DNSLink entry
