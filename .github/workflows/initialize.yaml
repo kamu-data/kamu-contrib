@@ -79,7 +79,7 @@ jobs:
       - name: Publish dataset
         shell: bash
         env:
-          PIN_TRIES: "3"
+          PIN_TRIES: "5"
         run: |
           # Add dataset to IPFS
           ipfs_cid=$(kamu -v system ipfs add ${{ inputs.dataset_name }})
@@ -89,8 +89,7 @@ jobs:
           for i in $(seq 1 $PIN_TRIES); do
             echo "Pinning CID (attempt $i)"
 
-            response=$(timeout 120 \
-              curl -sS -X POST \
+            response=$(curl -sS -X POST \
               -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
               "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
 
