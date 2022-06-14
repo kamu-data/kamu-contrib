@@ -182,7 +182,7 @@ jobs:
               echo "Pinning CID (attempt $i)"
 
               response=$(timeout 120 \
-                curl -X POST \
+                curl -sS -X POST \
                 -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
                 "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
 
