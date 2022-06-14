@@ -8,6 +8,8 @@ on:
         required: true
 env:
   KAMU_VERSION: v0.92.0
+  INFURA_IPFS_PROJECT_ID: ${{ secrets.INFURA_IPFS_PROJECT_ID }}
+  INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
   PINATA_API_URL: https://api.pinata.cloud/psa
   PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
   # TODO: We use public gateway as local fetches almost always timeout :(
@@ -29,7 +31,7 @@ jobs:
     steps:
       - uses: ibnesayeed/setup-ipfs@master
         with:
-          ipfs_version: ^0.12
+          ipfs_version: ^0.13
           run_daemon: true
 
       - uses: actions/checkout@v2
@@ -62,7 +64,7 @@ jobs:
       - name: Configure
         shell: bash
         run: |
-          ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
+          # ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
 
           kamu init
           kamu add -r .
@@ -82,8 +84,12 @@ jobs:
           echo "New IPFS CID: $ipfs_cid"
 
           # Pin new CID to replicate data to the pinning service
-          echo "Pinning CID in Pinata"
-          timeout 60 ipfs pin remote add --service svc --name ${{ inputs.dataset_name }} "/ipfs/$ipfs_cid"
+          echo "Pinning CID"
+          timeout 120 \
+            curl -X POST \
+            -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
+            "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid"
+          # timeout 60 ipfs pin remote add --service svc --name ${{ inputs.dataset_name }} "/ipfs/$ipfs_cid"
 
           # Update DNSLink entry
           echo "{
