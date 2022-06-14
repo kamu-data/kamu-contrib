@@ -28,7 +28,7 @@ jobs:
     name: Update Dataset
     strategy:
       # TODO: To decrease the chance of public gateway rate limiting
-      max-parallel: 1
+      # max-parallel: 1
       matrix:
         include:
           # - dataset_name: com.coinpaprika.tickers.eth-usd
