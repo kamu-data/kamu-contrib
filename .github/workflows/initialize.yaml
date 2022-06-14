@@ -85,10 +85,16 @@ jobs:
 
           # Pin new CID to replicate data to the pinning service
           echo "Pinning CID"
-          timeout 120 \
+          response=$(timeout 120 \
             curl -X POST \
             -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
-            "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid"
+            "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
+          pinned=$(echo "$response" | jq -r ".Pins[0]")
+          if [ "$pinned" != "$ipfs_cid" ]; then
+            echo "Pinning service returned an error: $response"
+            exit 1
+          fi
+
           # timeout 60 ipfs pin remote add --service svc --name ${{ inputs.dataset_name }} "/ipfs/$ipfs_cid"
 
           # Update DNSLink entry
