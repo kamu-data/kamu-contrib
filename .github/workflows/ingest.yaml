@@ -11,9 +11,9 @@ env:
   INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
   PINATA_API_URL: https://api.pinata.cloud/psa
   PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
-  # TODO: We use public gateway as local fetches almost always timeout :(
-  IPFS_HTTP_GATEWAY: http://localhost:8080
-  # IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
+  # TODO: We use public gateway as local fetches always timeout :(
+  # IPFS_HTTP_GATEWAY: http://localhost:8080
+  IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
   # IPFS_HTTP_GATEWAY: https://gateway.pinata.cloud
   AWS_ROUTE53_HOSTED_ZONE_ID: Z25CPWZR4S9IHS
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -136,21 +136,21 @@ jobs:
           echo "Current IPFS CID (from DNSLink): $ipfs_cid"
           echo "::set-output name=CID::$ipfs_cid"
 
-      # TODO: This always times out! Pinata seems to be unable to provide us data.
-      - name: Pin dataset in local IPFS node
-        env:
-          CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
-        shell: bash
-        run: |
-          echo "Waiting for peers"
-          sleep 60
+      # TODO: This always times out!
+      # - name: Pin dataset in local IPFS node
+      #   env:
+      #     CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
+      #   shell: bash
+      #   run: |
+      #     echo "Waiting for peers"
+      #     sleep 60
 
-          # echo "Searching providers"
-          # timeout 120 ipfs dht findprovs "/ipfs/$CURRENT_CID"
+      #     # echo "Searching providers"
+      #     # timeout 120 ipfs dht findprovs "/ipfs/$CURRENT_CID"
 
-          ipfs_peers=$(ipfs swarm peers | wc -l)
-          echo "Pinning CID $CURRENT_CID with $ipfs_peers"
-          timeout 300 ipfs pin add "/ipfs/$CURRENT_CID"
+      #     ipfs_peers=$(ipfs swarm peers | wc -l)
+      #     echo "Pinning CID $CURRENT_CID (currently connected to $ipfs_peers peers)"
+      #     timeout 300 ipfs pin add "/ipfs/$CURRENT_CID"
 
       - name: Materialize dataset
         env:
