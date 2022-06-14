@@ -142,11 +142,11 @@ jobs:
           echo "Waiting for peers"
           sleep 60
 
-          ipfs dht findprovs "/ipfs/$CURRENT_CID"
+          timeout 120 ipfs dht findprovs "/ipfs/$CURRENT_CID"
 
           ipfs_peers=$(ipfs swarm peers | wc -l)
           echo "Pinning CID $CURRENT_CID with $ipfs_peers"
-          ipfs pin add "/ipfs/$CURRENT_CID"
+          timeout 120 ipfs pin add "/ipfs/$CURRENT_CID"
 
       - name: Materialize dataset
         env:
