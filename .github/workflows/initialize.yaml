@@ -51,6 +51,7 @@ jobs:
 
           echo "IPFS version:"
           ipfs version
+          ipfs id
 
           echo "Podman version:"
           podman version
