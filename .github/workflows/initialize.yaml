@@ -114,7 +114,7 @@ jobs:
                   {
                       \"Action\": \"UPSERT\",
                       \"ResourceRecordSet\": {
-                          \"Name\": \"_dnslink.${{ inputs.dataset_name }}.datasets.kamu.dev.\",
+                          \"Name\": \"_dnslink.${{ inputs.dataset_name }}.ipns.kamu.dev.\",
                           \"Type\": \"TXT\",
                           \"TTL\": $AWS_ROUTE53_TTL,
                           \"ResourceRecords\": [{
