@@ -21,6 +21,7 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   AWS_DEFAULT_REGION: us-west-2
   AWS_ROUTE53_TTL: 60
+  AWS_S3_BUCKET: s3://datasets.kamu.dev
   # Required by dataset fetch steps
   ETH_NODE_PROVIDER_URL: ${{ secrets.INFURA_NODE_URL }}
   ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
@@ -106,6 +107,9 @@ jobs:
           done
 
           # timeout 60 ipfs pin remote add --service svc --name ${{ inputs.dataset_name }} "/ipfs/$ipfs_cid"
+
+          # Update data in S3
+          kamu push ${{ inputs.dataset_name }} --to "$AWS_S3_BUCKET/${{ inputs.dataset_name }}" --no-alias
 
           # Update DNSLink entry
           echo "{
