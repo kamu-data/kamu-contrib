@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
 concurrency: ingest
 env:
-  KAMU_VERSION: v0.92.0
+  KAMU_VERSION: v0.94.0
   INFURA_IPFS_PROJECT_ID: ${{ secrets.INFURA_IPFS_PROJECT_ID }}
   INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
   PINATA_API_URL: https://api.pinata.cloud/psa
@@ -108,7 +108,7 @@ jobs:
 
           # Create workspace and point kamu to IPFS gateway
           kamu init || true
-          kamu list
+          kamu list --output-format table -w
           kamu config set protocol.ipfs.httpGateway "$IPFS_HTTP_GATEWAY"
 
       # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
