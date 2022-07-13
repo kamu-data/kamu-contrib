@@ -165,7 +165,7 @@ jobs:
       - name: Sync dataset from S3
         shell: bash
         run: |
-          kamu pull -v "$AWS_S3_BUCKET/${{ matrix.dataset_name }}" --as ${{ matrix.dataset_name }} --no-alias
+          kamu -v pull "$AWS_S3_BUCKET/${{ matrix.dataset_name }}" --as ${{ matrix.dataset_name }} --no-alias
           kamu list --output-format table -w
 
       - name: Ingest new data
