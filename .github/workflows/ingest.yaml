@@ -107,7 +107,8 @@ jobs:
           # ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
 
           # Create workspace and point kamu to IPFS gateway
-          kamu init
+          kamu init || true
+          kamu list
           kamu config set protocol.ipfs.httpGateway "$IPFS_HTTP_GATEWAY"
 
       # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
