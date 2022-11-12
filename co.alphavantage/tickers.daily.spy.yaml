@@ -9,7 +9,7 @@ content:
       fetch:
         kind: url
         url: "https://www.alphavantage.co/query\
-          ?function=TIME_SERIES_DAILY\
+          ?function=TIME_SERIES_DAILY_ADJUSTED\
           &symbol=SPY\
           &outputsize=full\
           &datatype=csv\
@@ -23,7 +23,10 @@ content:
           - high FLOAT
           - low FLOAT
           - close FLOAT
+          - adjusted_close FLOAT
           - volume FLOAT
+          - dividend_amount FLOAT
+          - split_coefficient FLOAT
       preprocess:
         kind: sql
         engine: spark
