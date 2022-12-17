@@ -55,7 +55,7 @@ jobs:
     steps:
       - uses: ibnesayeed/setup-ipfs@master
         with:
-          ipfs_version: ^0.13
+          ipfs_version: ^0.17
           run_daemon: true
 
       - name: Install kamu
@@ -139,7 +139,7 @@ jobs:
           )
 
           echo "Current IPFS CID (from DNSLink): $ipfs_cid"
-          echo "::set-output name=CID::$ipfs_cid"
+          echo "CID=$ipfs_cid" >> $GITHUB_OUTPUT
 
       # # TODO: This always times out!
       # - name: Pin dataset in local IPFS node
