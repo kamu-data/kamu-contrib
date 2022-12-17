@@ -186,7 +186,7 @@ jobs:
         shell: bash
         env:
           OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
-          PIN_TRIES: "5"
+          PIN_TRIES: "10"
         run: |
           # Add dataset to IPFS
           ipfs_cid=$(kamu -v system ipfs add ${{ matrix.dataset_name }})
