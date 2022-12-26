@@ -216,7 +216,7 @@ jobs:
 
                 echo "IPFS addresses:"
                 ipfs id
-                
+
                 if curl -s --fail "https://dweb.link/ipfs/$ipfs_cid" > /dev/null; then
                   echo "CID is RESOLVABLE via public gateway"
                 else
@@ -224,6 +224,7 @@ jobs:
                 fi
 
                 if [ $i == $PIN_TRIES ]; then
+                  echo "Failed to pin CID after $PIN_TRIES attempts"
                   exit 1
                 fi
               fi
