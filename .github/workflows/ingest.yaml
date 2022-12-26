@@ -205,9 +205,24 @@ jobs:
 
               pinned=$(echo "$response" | jq -r ".Pins[0]")
               if [ "$pinned" == "$ipfs_cid" ]; then
+                echo "Successfully pinned"
                 break
               else
                 echo "Pinning service returned an error: $response"
+
+                # TODO: Remove this debug stuff when pinning is reliable
+                peers_num=$(ipfs swarm peers | wc -l)
+                echo "IPFS is connected to $peers_num peers"
+
+                echo "IPFS addresses:"
+                ipfs id
+                
+                if curl -s --fail "https://dweb.link/ipfs/$ipfs_cid" > /dev/null; then
+                  echo "CID is RESOLVABLE via public gateway"
+                else
+                  echo "CID is NOT resolvable via public gateway"
+                fi
+
                 if [ $i == $PIN_TRIES ]; then
                   exit 1
                 fi
