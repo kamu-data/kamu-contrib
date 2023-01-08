@@ -179,10 +179,15 @@ jobs:
           kamu -v pull --fetch-uncacheable ${{ matrix.dataset_name }}
           kamu list --output-format table -w
 
+      - name: Publish dataset to S3
+        shell: bash
+        run: |
+          kamu push ${{ matrix.dataset_name }} --to "$AWS_S3_BUCKET/${{ matrix.dataset_name }}" --no-alias
+
       # TODO: We are not using `kamu push` here to avoid resolving and publishing into IPNS.
       # IPNS has proven to be unreliable and cause frequent timeouts, so we limit interactions to IPFS and then do
       # best-effort attempt to publish to IPNS.
-      - name: Publish updated dataset
+      - name: Publish dataset to IPFS
         shell: bash
         env:
           OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
@@ -230,9 +235,6 @@ jobs:
               fi
             done
             # timeout 60 ipfs pin remote add --service svc --name ${{ matrix.dataset_name }} "/ipfs/$ipfs_cid"
-
-            # Update data in S3
-            kamu push ${{ matrix.dataset_name }} --to "$AWS_S3_BUCKET/${{ matrix.dataset_name }}" --no-alias
 
             # Update DNSLink entry
             echo "{
