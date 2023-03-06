@@ -1,0 +1,30 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.github.stargazers.open-data-fabric.open-data-fabric
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: container
+        image: "docker.io/kamudata/example-github-stargazers:0.1.0"
+        env:
+          - name: GH_USER
+            value: open-data-fabric
+          - name: GH_REPO
+            value: open-data-fabric
+      read:
+        kind: jsonLines
+        schema:
+          - starred_at TIMESTAMP
+          - login STRING
+          - html_url STRING
+          - url STRING
+      merge:
+        kind: ledger
+        primaryKey:
+          - starred_at
+          - login
+    - kind: setVocab
+      eventTimeColumn: starred_at

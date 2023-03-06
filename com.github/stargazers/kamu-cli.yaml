@@ -1,0 +1,30 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.github.stargazers.kamu-data.kamu-cli
+  kind: root
+  metadata:
+    - kind: setPollingSource
+      fetch:
+        kind: container
+        image: "docker.io/kamudata/example-github-stargazers:0.1.0"
+        env:
+          - name: GH_USER
+            value: kamu-data
+          - name: GH_REPO
+            value: kamu-cli
+      read:
+        kind: jsonLines
+        schema:
+          - starred_at TIMESTAMP
+          - login STRING
+          - html_url STRING
+          - url STRING
+      merge:
+        kind: ledger
+        primaryKey:
+          - starred_at
+          - login
+    - kind: setVocab
+      eventTimeColumn: starred_at
