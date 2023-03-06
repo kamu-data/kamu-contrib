@@ -1,0 +1,76 @@
+name: example-datasets
+on:
+  #schedule:
+  #  - cron: "45 */3 * * *"
+  workflow_dispatch: {}
+concurrency: example-datasets
+env:
+  # TODO: Always use latest version?
+  KAMU_VERSION: "0.112.0"
+  # AWS credentials
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  AWS_DEFAULT_REGION: us-west-2
+jobs:
+  update:
+    name: Update datasets
+    #strategy:
+    #  fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+
+      ###########################################
+      # Install dependencies
+      ###########################################
+
+      - name: Install kamu
+        shell: bash
+        run: |
+          wget -q "https://github.com/kamu-data/kamu-cli/releases/download/v${KAMU_VERSION}/kamu-cli-x86_64-unknown-linux-gnu.tar.gz"
+          tar -xf kamu-cli-x86_64-unknown-linux-gnu.tar.gz
+          chmod +x kamu-cli-x86_64-unknown-linux-gnu/kamu
+          rm kamu-cli-x86_64-unknown-linux-gnu.tar.gz
+          echo "$PWD/kamu-cli-x86_64-unknown-linux-gnu" >> $GITHUB_PATH
+
+      - name: Print info
+        shell: bash
+        run: |
+          echo "Work dir: $PWD"
+
+          #echo "IPFS version:"
+          #ipfs version
+          #ipfs id
+
+          echo "Podman version:"
+          podman version
+
+          echo "AWS CLI version:"
+          aws --version
+
+          echo "Kamu version:"
+          kamu --version
+
+      ###########################################
+      # Checkout manifests
+      ###########################################
+
+      - name: Checkout kamu-contrib
+        uses: actions/checkout@v3
+        with:
+          path: kamu-contrib
+      
+      - name: Checkout kamu-cli
+        uses: actions/checkout@v3
+        with:
+          repository: kamu-data/kamu-cli
+          path: kamu-cli
+
+      ###########################################
+      # ???
+      ###########################################
+
+      - name: Foo
+        shell: bash
+        run: |
+          ls -la kamu-contrib
+          ls -la kamu-cli/examples
