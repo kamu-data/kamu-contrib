@@ -34,6 +34,6 @@ for name in datasets:
         continue
     
     subprocess.run(
-        f"kamu push {name} --to {KAMU_S3_URL}{name} --no-alias", 
+        f"kamu -v push {name} --to {KAMU_S3_URL}{name} --no-alias", 
         shell=True, check=True
     )

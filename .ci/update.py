@@ -21,7 +21,7 @@ UNCACHEABLE_TO_PULL = [
 ###############################################################################
 
 # Pull uncacheables
-subprocess.run(f"kamu pull {' '.join(UNCACHEABLE_TO_PULL)} --fetch-uncacheable", shell=True, check=True)
+subprocess.run(f"kamu -v pull {' '.join(UNCACHEABLE_TO_PULL)} --fetch-uncacheable", shell=True, check=True)
 
 # Pull everything else
-subprocess.run(f"kamu pull --all", shell=True, check=True)
+subprocess.run(f"kamu -v pull --all", shell=True, check=True)

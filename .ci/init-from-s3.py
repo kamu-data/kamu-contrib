@@ -37,7 +37,7 @@ for id in s3_datasets:
         flags = "--no-alias"
     
     subprocess.run(
-        f"kamu pull {KAMU_S3_URL}{id} {flags}", 
+        f"kamu -v pull {KAMU_S3_URL}{id} {flags}", 
         shell=True,
         check=True,
     )
