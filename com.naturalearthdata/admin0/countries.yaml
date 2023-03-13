@@ -12,8 +12,11 @@ content:
       transform:
         kind: sql
         engine: spark
+        # TODO: This query is invalid as it is non-temporal
+        # It will produce incorrect results as input datasets evolve over time
         query: >
           SELECT
+            c10.event_time,
             c10.admin,
             c10.iso_a2,
             c10.iso_a3,
