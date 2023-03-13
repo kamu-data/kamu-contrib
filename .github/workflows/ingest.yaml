@@ -6,7 +6,6 @@ on:
   workflow_dispatch: {}
 concurrency: ingest
 env:
-  KAMU_VERSION: v0.97.0
   INFURA_IPFS_PROJECT_ID: ${{ secrets.INFURA_IPFS_PROJECT_ID }}
   INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
   PINATA_API_URL: https://api.pinata.cloud/psa
@@ -61,10 +60,7 @@ jobs:
       - name: Install kamu
         shell: bash
         run: |
-          wget -q "https://github.com/kamu-data/kamu-cli/releases/download/$KAMU_VERSION/kamu-cli-x86_64-unknown-linux-gnu.tar.gz"
-          tar -xf kamu-cli-x86_64-unknown-linux-gnu.tar.gz
-          chmod +x kamu-cli-x86_64-unknown-linux-gnu/kamu
-          echo "$PWD/kamu-cli-x86_64-unknown-linux-gnu" >> $GITHUB_PATH
+          curl -s "https://get.kamu.dev" | sh
 
       - name: Print info
         shell: bash
@@ -90,9 +86,9 @@ jobs:
             .kamu
           # TODO: Currently cache action will not update the cache upon hit and there is no option to do so
           # Below uses a workaround suggested here: https://github.com/actions/cache/issues/342#issuecomment-673371329
-          key: cachegen-4-kamu-${{ env.KAMU_VERSION }}-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
+          key: cachegen-4-kamu-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
           restore-keys: |
-            cachegen-4-kamu-${{ env.KAMU_VERSION }}-dataset-${{ matrix.dataset_name }}-
+            cachegen-4-kamu-dataset-${{ matrix.dataset_name }}-
 
       # TODO: IPFS daemon often times out when searching for a CID :(
       # We point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast.

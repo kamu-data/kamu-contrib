@@ -7,7 +7,6 @@ on:
         type: string
         required: true
 env:
-  KAMU_VERSION: v0.97.0
   INFURA_IPFS_PROJECT_ID: ${{ secrets.INFURA_IPFS_PROJECT_ID }}
   INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
   PINATA_API_URL: https://api.pinata.cloud/psa
@@ -40,10 +39,7 @@ jobs:
       - name: Install kamu
         shell: bash
         run: |
-          wget -q "https://github.com/kamu-data/kamu-cli/releases/download/$KAMU_VERSION/kamu-cli-x86_64-unknown-linux-gnu.tar.gz"
-          tar -xf kamu-cli-x86_64-unknown-linux-gnu.tar.gz
-          chmod +x kamu-cli-x86_64-unknown-linux-gnu/kamu
-          echo "$PWD/kamu-cli-x86_64-unknown-linux-gnu" >> $GITHUB_PATH
+          curl -s "https://get.kamu.dev" | sh
 
       - name: Print info
         shell: bash
