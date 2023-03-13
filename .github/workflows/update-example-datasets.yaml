@@ -1,7 +1,7 @@
 name: update-example-datasets
 on:
-  #schedule:
-  #  - cron: "45 */3 * * *"
+  schedule:
+    - cron: "45 */3 * * *"
   workflow_dispatch: {}
 concurrency: update-example-datasets
 env:
