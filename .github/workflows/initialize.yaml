@@ -35,7 +35,7 @@ jobs:
           ipfs_version: ^0.13
           run_daemon: true
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install kamu
         shell: bash
