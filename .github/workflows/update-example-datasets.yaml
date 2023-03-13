@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           cd workspace
-          ../kamu-contrib/.ci/init-from-s3.py
+          ../kamu-contrib/.ci/update.py
       
       - name: Push to S3
         shell: bash
