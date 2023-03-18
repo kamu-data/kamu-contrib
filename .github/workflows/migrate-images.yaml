@@ -1,4 +1,4 @@
-name: build
+name: migrate-images
 on:
   # manual trigger
   workflow_dispatch: {}
