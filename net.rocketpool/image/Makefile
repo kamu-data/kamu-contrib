@@ -1,4 +1,4 @@
-IMAGE = kamudata/example-rocketpool-ingest:0.1.0
+IMAGE = ghcr.io/kamu-data/fetch-net.rocketpool.reth.mint-burn:0.1.0
 
 .PHONY: image
 image:

@@ -1,4 +1,4 @@
-IMAGE = kamudata/example-coinpaprika-ingest:0.1.0
+IMAGE = ghcr.io/kamu-data/fetch-com.coinpaprika.tickers.eth-usd:0.1.0
 
 .PHONY: image
 image:
