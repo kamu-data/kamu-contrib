@@ -13,7 +13,7 @@ content:
       preprocess:
           kind: sql
           engine: spark
-          query: >
+          query: |
             SELECT
               PREABBR, PRENAME, PRFABBR, PRFNAME, PRNAME, PRUID, geometry
             FROM input

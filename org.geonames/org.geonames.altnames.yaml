@@ -10,7 +10,7 @@ content:
       transform:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             alternateNameId, geonameid, isolanguage, alternateName,
             CASE WHEN isPreferredName IS NULL THEN false ELSE isPreferredName > 0 END AS isPreferredName,

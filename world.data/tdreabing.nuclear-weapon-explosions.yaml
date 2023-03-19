@@ -18,7 +18,7 @@ content:
       preprocess:
           kind: sql
           engine: spark
-          query: >
+          query: |
             SELECT
               cast(unix_timestamp(`datetime`, "M/d/yyyy h:m:s a") as timestamp) as event_time,
               source,

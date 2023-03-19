@@ -16,7 +16,7 @@ content:
       preprocess:
           kind: sql
           engine: spark
-          query: >
+          query: |
             SELECT
               CAST(`Case no.` as BIGINT) as case_no,
               CAST(UNIX_TIMESTAMP(`Report date`, "dd/MM/yyyy") as TIMESTAMP) as report_date,

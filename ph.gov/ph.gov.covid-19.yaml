@@ -18,7 +18,7 @@ content:
       preprocess:
           kind: sql
           engine: spark
-          query: >
+          query: |
             SELECT
               CAST(`Case #` as BIGINT) as case_no,
               CAST(UNIX_TIMESTAMP(CONCAT(`Tested Positive`, " 2020"), "MMMM d yyyy") as TIMESTAMP) as report_date,

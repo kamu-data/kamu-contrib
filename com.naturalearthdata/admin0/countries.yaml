@@ -14,7 +14,7 @@ content:
         engine: spark
         # TODO: This query is invalid as it is non-temporal
         # It will produce incorrect results as input datasets evolve over time
-        query: >
+        query: |
           SELECT
             c10.event_time,
             c10.admin,

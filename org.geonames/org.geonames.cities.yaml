@@ -10,7 +10,7 @@ content:
       transform:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             geonameid, name, asciiname, country_code, population, timezone,
             ST_Point(

@@ -26,7 +26,7 @@ content:
       preprocess:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             'rETH' as token_symbol,
             eventName as event_name,

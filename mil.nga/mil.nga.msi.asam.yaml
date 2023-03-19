@@ -18,7 +18,7 @@ content:
       preprocess:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             CAST(UNIX_TIMESTAMP(dateofocc, "yyyyMMdd") as TIMESTAMP) as event_time,
             reference,

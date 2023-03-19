@@ -10,7 +10,7 @@ content:
       transform:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             explode(split(alternatenames, ",")) as alternatename,
             country_code, geonameid

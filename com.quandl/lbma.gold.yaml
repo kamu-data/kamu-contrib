@@ -22,7 +22,7 @@ content:
       preprocess:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             Date as date,
             `USD (AM)` as usd_am,

@@ -14,7 +14,7 @@ content:
       preprocess:
         kind: sql
         engine: spark
-        query: >
+        query: |
           SELECT
             ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
             STATION

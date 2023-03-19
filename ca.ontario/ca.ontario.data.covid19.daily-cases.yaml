@@ -10,7 +10,7 @@ content:
       transform:
         kind: sql
         engine: flink
-        query: >
+        query: |
           SELECT
             TUMBLE_START(`case_reported_date`, INTERVAL '1' DAY) as `case_reported_date`,
             COUNT(*) as `total_daily`
