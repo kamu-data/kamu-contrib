@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: ibnesayeed/setup-ipfs@master
         with:
-          ipfs_version: ^0.17
+          ipfs_version: ^0.19
           run_daemon: true
 
       - name: Install kamu
@@ -200,12 +200,7 @@ jobs:
             for i in $(seq 1 $PIN_TRIES); do
               echo "Pinning CID (attempt $i)"
 
-              response=$(curl -sS -X POST \
-                -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" \
-                "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid")
-
-              pinned=$(echo "$response" | jq -r ".Pins[0]")
-              if [ "$pinned" == "$ipfs_cid" ]; then
+              if curl --fail -sS -X POST -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid"; then
                 echo "Successfully pinned"
                 break
               else
