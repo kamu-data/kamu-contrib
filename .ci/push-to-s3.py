@@ -15,7 +15,7 @@ from common import *
 
 ###############################################################################
 
-KAMU_S3_URL=os.environ["KAMU_S3_URL"]
+KAMU_S3_URL = os.environ.get("KAMU_S3_URL", "s3://datasets.kamu.dev/example/")
 
 ###############################################################################
 

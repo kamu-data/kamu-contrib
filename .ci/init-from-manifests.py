@@ -17,8 +17,7 @@ from common import *
 
 ###############################################################################
 
-KAMU_S3_URL=os.environ["KAMU_S3_URL"]
-KAMU_PROJECTS_ROOT=os.environ["KAMU_PROJECTS_ROOT"]
+KAMU_PROJECTS_ROOT = os.environ.get("KAMU_PROJECTS_ROOT", "..")
 
 ###############################################################################
 
@@ -35,8 +34,8 @@ subprocess.run("kamu init", shell=True, check=True)
 
 
 # External datasets
-for id in EXTERNAL_DATASETS:
-    subprocess.run(f"kamu pull {KAMU_S3_URL}{id}", shell=True, check=True)
+for name, url in EXTERNAL_DATASETS.items():
+    subprocess.run(f"kamu pull {url} --as {name}", shell=True, check=True)
 
 
 # Example datasets

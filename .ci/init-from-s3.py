@@ -14,10 +14,17 @@ from common import *
 
 ###############################################################################
 
-KAMU_S3_URL=os.environ["KAMU_S3_URL"]
+KAMU_S3_URL = os.environ.get("KAMU_S3_URL", "s3://datasets.kamu.dev/example/")
 
 ###############################################################################
 
+subprocess.run("kamu init", shell=True, check=True)
+
+# External datasets
+for name, url in EXTERNAL_DATASETS.items():
+    subprocess.run(f"kamu pull {url} --as {name}", shell=True, check=True)
+
+# Regular datasets
 s3_datasets = [
     line.strip().split(' ')[1].rstrip("/")
     for line in subprocess.run(
@@ -29,15 +36,9 @@ s3_datasets = [
     ).stdout.splitlines()
 ]
 
-subprocess.run("kamu init", shell=True, check=True)
-
-for id in s3_datasets:
-    flags = ""
-    if not is_external(id):
-        flags = "--no-alias"
-    
+for name in s3_datasets:
     subprocess.run(
-        f"kamu -v pull {KAMU_S3_URL}{id} {flags}", 
+        f"kamu -v pull --no-alias {KAMU_S3_URL}{name}",
         shell=True,
         check=True,
     )
