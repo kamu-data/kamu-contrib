@@ -14,7 +14,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "abi-decoder": "^2.4.0",
-    "web3": "^1.7.3"
+    "web3": "^4.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.26.0",
