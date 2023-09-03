@@ -10,20 +10,20 @@ content:
         kind: container
         image: "ghcr.io/kamu-data/fetch-com.coinpaprika.tickers.eth-usd:0.1.0"
       read:
-        kind: jsonLines
+        kind: ndJson
         schema:
           - timestamp TIMESTAMP
-          - price FLOAT
-          - volume_24h FLOAT
-          - market_cap FLOAT
+          - price DOUBLE
+          - volume_24h DOUBLE
+          - market_cap DOUBLE
       preprocess:
         kind: sql
-        engine: spark
+        engine: datafusion
         query: |
           select
             timestamp as event_time,
-            "eth" as from_symbol,
-            "usd" as to_symbol,
+            'eth' as from_symbol,
+            'usd' as to_symbol,
             price,
             volume_24h,
             market_cap

@@ -10,6 +10,19 @@ content:
         url: https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip
       read:
         kind: esriShapefile
+      # TODO: This no-op step makes kamu-cli use the experimental
+      # DataFusion ingest implementation instead of Spark. This should be
+      # removed once DataFusion ingest becomes the default.
+      preprocess:
+        kind: sql
+        engine: datafusion
+        query: |
+          select
+            "ADMIN" as admin,
+            "ISO_A2" as iso_a2,
+            "ISO_A3" as iso_a3,
+            geometry
+          from input
       merge:
         kind: snapshot
         primaryKey:

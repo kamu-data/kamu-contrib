@@ -5,7 +5,6 @@ on:
   workflow_dispatch: {}
 concurrency: update-example-datasets
 env:
-  KAMU_S3_URL: s3://datasets.kamu.dev/example/
   # AWS credentials
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

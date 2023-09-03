@@ -10,7 +10,29 @@ content:
         url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
       read:
         kind: esriShapefile
+      # TODO: This no-op step makes kamu-cli use the experimental
+      # DataFusion ingest implementation instead of Spark. This should be
+      # removed once DataFusion ingest becomes the default.
+      preprocess:
+        kind: sql
+        engine: datafusion
+        query: |
+          select
+            "ZIPCODE" as zipcode,
+            "STATE" as state,
+            "COUNTY" as county,
+            "PO_NAME" as po_name,
+            "CTY_FIPS" as cty_fips,
+            "ST_FIPS" as st_fips,
+            "BLDGZIP" as bldgzip,
+            "AREA" as area,
+            "POPULATION" as population,
+            "URL" as url,
+            "SHAPE_AREA" as shape_area,
+            "SHAPE_LEN" as shape_len,
+            geometry
+          from input
       merge:
         kind: snapshot
         primaryKey:
-          - ZIPCODE
+          - zipcode

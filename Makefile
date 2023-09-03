@@ -1,4 +1,6 @@
 DATE:=$(shell date +%F)
+S3_CONTRIB_BASE_URL="https://s3.us-west-2.amazonaws.com/datasets.kamu.dev/odf/v1/contrib/"
+S3_BACKUP_BASE_URL="https://s3.us-west-2.amazonaws.com/datasets.kamu.dev/odf/v1/contrib/"
 
 .PHONY: strip-notebooks
 strip-notebooks:
@@ -6,16 +8,16 @@ strip-notebooks:
 	find . -name '*.ipynb' -type f -exec nbstripout {} \;
 
 backup:
-	aws s3 cp --recursive s3://datasets.kamu.dev/net.rocketpool.reth.mint-burn s3://datasets.kamu.dev/backups/net.rocketpool.reth.mint-burn.$(DATE)
-	aws s3 cp --recursive s3://datasets.kamu.dev/com.cryptocompare.ohlcv.eth-usd s3://datasets.kamu.dev/backups/com.cryptocompare.ohlcv.eth-usd.$(DATE)
-	aws s3 cp --recursive s3://datasets.kamu.dev/co.alphavantage.tickers.daily.spy s3://datasets.kamu.dev/backups/co.alphavantage.tickers.daily.spy.$(DATE)
+	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn" "$(S3_BACKUP_BASE_URL)net.rocketpool.reth.mint-burn.$(DATE)"
+	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd" "$(S3_BACKUP_BASE_URL)com.cryptocompare.ohlcv.eth-usd.$(DATE)"
+	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy" "$(S3_BACKUP_BASE_URL)co.alphavantage.tickers.daily.spy.$(DATE)"
 
 purge:
-	aws s3 rm --recursive s3://datasets.kamu.dev/net.rocketpool.reth.mint-burn
-	aws s3 rm --recursive s3://datasets.kamu.dev/com.cryptocompare.ohlcv.eth-usd
-	aws s3 rm --recursive s3://datasets.kamu.dev/co.alphavantage.tickers.daily.spy
+	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn"
+	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd"
+	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy"
 
 push:
-	kamu push net.rocketpool.reth.mint-burn --to "s3://datasets.kamu.dev/net.rocketpool.reth.mint-burn" --no-alias
-	kamu push com.cryptocompare.ohlcv.eth-usd --to "s3://datasets.kamu.dev/com.cryptocompare.ohlcv.eth-usd" --no-alias
-	kamu push co.alphavantage.tickers.daily.spy --to "s3://datasets.kamu.dev/co.alphavantage.tickers.daily.spy" --no-alias
+	kamu push net.rocketpool.reth.mint-burn --to "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn" --no-alias
+	kamu push com.cryptocompare.ohlcv.eth-usd --to "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd" --no-alias
+	kamu push co.alphavantage.tickers.daily.spy --to "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy" --no-alias

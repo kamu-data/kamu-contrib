@@ -17,24 +17,23 @@ content:
         subPath: asam_data_download/ASAM_events.*
       preprocess:
         kind: sql
-        engine: spark
+        engine: datafusion
         query: |
           SELECT
-            CAST(UNIX_TIMESTAMP(dateofocc, "yyyyMMdd") as TIMESTAMP) as event_time,
+            cast(dateofocc as date) as event_time,
             reference,
-            geometry,
             subreg,
             hostility_ as hostility,
             victim_d,
             descriptio,
             hostilityt,
-            hostilit_D,
+            "hostilit_D" as hostilit_d,
             victim_l,
-            victim_l_D,
-            navarea
+            "victim_l_D" as victim_l_d,
+            navarea,
+            geometry
           FROM input
       merge:
-        # TODO
         kind: ledger
         primaryKey:
           - reference

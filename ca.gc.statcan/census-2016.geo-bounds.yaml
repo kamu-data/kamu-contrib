@@ -12,12 +12,15 @@ content:
         kind: esriShapefile
       preprocess:
           kind: sql
-          engine: spark
+          engine: datafusion
           query: |
             SELECT
-              PREABBR, PRENAME, PRFABBR, PRFNAME, PRNAME, PRUID, geometry
+              "PRUID" as province_uid,
+              "PRENAME" as province_name_en,
+              "PREABBR" as province_abbr_en,
+              geometry
             FROM input
       merge:
         kind: snapshot
         primaryKey:
-        - PRUID
+        - province_uid

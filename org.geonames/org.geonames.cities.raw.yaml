@@ -13,9 +13,10 @@ content:
           format: zip
       read:
         kind: csv
+        header: false
         separator: "\t"
         schema:
-          - geonameid LONG            # integer id of record in geonames database
+          - geonameid BIGINT          # integer id of record in geonames database
           - name STRING               # name of geographical point (utf8) varchar(200)
           - asciiname STRING          # name of geographical point in plain ascii characters, varchar(200)
           - alternatenames STRING     # alternatenames, comma separated, ascii names automatically transliterated, convenience attribute from alternatename table, varchar(10000)
@@ -29,11 +30,18 @@ content:
           - admin2_code STRING        # code for the second administrative division, a county in the US, see file admin2Codes.txt; varchar(80)
           - admin3_code STRING        # code for third level administrative division, varchar(20)
           - admin4_code STRING        # code for fourth level administrative division, varchar(20)
-          - population LONG           # bigint (8 byte int)
+          - population BIGINT         # bigint (8 byte int)
           - elevation DOUBLE          # in meters, integer
           - dem STRING                # digital elevation model, srtm3 or gtopo30, average elevation of 3''x3'' (ca 90mx90m) or 30''x30'' (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.
           - timezone STRING           # the iana timezone id (see file timeZone.txt) varchar(40)
           - modification_date STRING  # date of last modification in yyyy-MM-dd format
+      # TODO: This no-op step makes kamu-cli use the experimental
+      # DataFusion ingest implementation instead of Spark. This should be
+      # removed once DataFusion ingest becomes the default.
+      preprocess:
+        kind: sql
+        engine: datafusion
+        query: select * from input
       merge:
         kind: snapshot
         primaryKey:

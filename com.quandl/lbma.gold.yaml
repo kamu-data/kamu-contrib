@@ -12,25 +12,25 @@ content:
         kind: csv
         header: true
         schema:
-          - "Date DATE"
-          - "`USD (AM)` DECIMAL(18,4)"
-          - "`USD (PM)` DECIMAL(18,4)"
-          - "`GBP (AM)` DECIMAL(18,4)"
-          - "`GBP (PM)` DECIMAL(18,4)"
-          - "`EURO (AM)` DECIMAL(18,4)"
-          - "`EURO (PM)` DECIMAL(18,4)"
+          - '"Date" DATE'
+          - '"USD (AM)" DECIMAL(18,4)'
+          - '"USD (PM)" DECIMAL(18,4)'
+          - '"GBP (AM)" DECIMAL(18,4)'
+          - '"GBP (PM)" DECIMAL(18,4)'
+          - '"EURO (AM)" DECIMAL(18,4)'
+          - '"EURO (PM)" DECIMAL(18,4)'
       preprocess:
         kind: sql
-        engine: spark
+        engine: datafusion
         query: |
           SELECT
-            Date as date,
-            `USD (AM)` as usd_am,
-            `USD (PM)` as usd_pm,
-            `GBP (AM)` as gbp_am,
-            `GBP (PM)` as gbp_pm,
-            `EURO (AM)` as euro_am,
-            `EURO (PM)` as euro_pm
+            "Date" as date,
+            "USD (AM)" as usd_am,
+            "USD (PM)" as usd_pm,
+            "GBP (AM)" as gbp_am,
+            "GBP (PM)" as gbp_pm,
+            "EURO (AM)" as euro_am,
+            "EURO (PM)" as euro_pm
           FROM input
       merge:
         kind: ledger

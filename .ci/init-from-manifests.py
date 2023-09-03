@@ -61,7 +61,7 @@ content:
   metadata:
     - kind: setTransform
       inputs:
-        - id: {get_dataset_id("com.cryptocompare.ohlcv.eth-usd")}
+        - id: {get_dataset_id("testing.empty-root")}
           name: foo
       transform:
         kind: sql
