@@ -25,10 +25,10 @@ async function readEventsFromETH(
   startBlock,
   endBlock,
   clb: (_: Event) => boolean,
-  stride = 1000
+  stride = 10000
 ) {
   console.log(
-    "Syncing events in block range [%s, %s] (%s blocks)",
+    "Considering events in block range [%s, %s] (%s blocks)",
     startBlock,
     endBlock,
     endBlock - startBlock
@@ -41,6 +41,19 @@ async function readEventsFromETH(
     fromBlock = toBlock + 1;
     toBlock = Math.min(endBlock, fromBlock + stride);
 
+    console.log("Syncing block range [%s, %s]", fromBlock, toBlock);
+    await readEventsFromETHRangeWithFallback(fromBlock, toBlock, clb);
+  } while (toBlock != endBlock);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+async function readEventsFromETHRangeWithFallback(
+  fromBlock,
+  toBlock,
+  clb: (_: Event) => boolean
+) {
+  try {
     const logs = await web3.eth.getPastLogs({
       fromBlock,
       toBlock,
@@ -75,7 +88,24 @@ async function readEventsFromETH(
         return;
       }
     }
-  } while (toBlock != endBlock);
+  } catch (err) {
+    // TODO: Is this too Infura-specific?
+    if (err.message.includes("query returned more than")) {
+      const middle = Math.round((fromBlock + toBlock) / 2);
+      console.log(
+        "Hit API limit, splitting interval to [%s, %s] and [%s, %s]",
+        fromBlock,
+        middle,
+        middle + 1,
+        toBlock
+      );
+
+      await readEventsFromETHRangeWithFallback(fromBlock, middle, clb);
+      await readEventsFromETHRangeWithFallback(middle + 1, toBlock, clb);
+    } else {
+      throw err;
+    }
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -91,7 +121,14 @@ abiDecoder.addABI(rethAbi);
 // Init
 const providerUrl = process.env.ETH_NODE_PROVIDER_URL;
 console.log("ETH node provider URL: %s", providerUrl);
-const web3 = new Web3(providerUrl);
+const web3 = new Web3(
+  new Web3.providers.WebsocketProvider(providerUrl, {
+    clientConfig: {
+      maxReceivedFrameSize: 10000000,
+      maxReceivedMessageSize: 10000000,
+    },
+  })
+);
 
 // Block range
 const etag = process.env.ODF_ETAG;
@@ -103,6 +140,13 @@ console.log("Last seen block: %s", lastSeenBlock);
 const ethHeadBlock = await web3.eth.getBlockNumber();
 console.log("Current chain head block: %s", ethHeadBlock);
 
+let stride;
+if (process.env.STRIDE) {
+  stride = Number(process.env.STRIDE);
+} else {
+  stride = undefined;
+}
+
 await readEventsFromETH(
   Math.max(lastSeenBlock + 1, rethStartBlock),
   ethHeadBlock,
@@ -110,7 +154,8 @@ await readEventsFromETH(
     process.stdout.write(JSON.stringify(event));
     process.stdout.write("\n");
     return true;
-  }
+  },
+  stride
 );
 
 // Save last seen block
