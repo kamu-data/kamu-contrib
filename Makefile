@@ -1,6 +1,6 @@
 DATE:=$(shell date +%F)
 S3_CONTRIB_BASE_URL="s3://datasets.kamu.dev/odf/v1/contrib/"
-S3_BACKUP_BASE_URL="s3://datasets.kamu.dev/odf/backup/"
+S3_BACKUP_BASE_URL="s3://datasets.kamu.dev/odf/backup/v1/contrib/"
 
 .PHONY: strip-notebooks
 strip-notebooks:
