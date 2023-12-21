@@ -1,7 +1,8 @@
 import fs from "fs";
+import { Console } from "console";
+
 import Web3 from "web3";
 import abiDecoder from "abi-decoder";
-import { Console } from "console";
 
 const console = new Console(process.stderr);
 
@@ -22,11 +23,11 @@ interface Event {
 /////////////////////////////////////////////////////////////////////////////////////////
 
 async function readEventsFromETH(
-  startBlock,
-  endBlock,
+  startBlock: number,
+  endBlock: number,
   clb: (_: Event) => boolean,
-  stride = 10000
-) {
+  blockBatchSize: number
+): Promise<void> {
   console.log(
     "Considering events in block range [%s, %s] (%s blocks)",
     startBlock,
@@ -39,9 +40,10 @@ async function readEventsFromETH(
 
   do {
     fromBlock = toBlock + 1;
-    toBlock = Math.min(endBlock, fromBlock + stride);
+    toBlock = Math.min(endBlock, fromBlock + blockBatchSize);
 
     console.log("Syncing block range [%s, %s]", fromBlock, toBlock);
+
     await readEventsFromETHRangeWithFallback(fromBlock, toBlock, clb);
   } while (toBlock != endBlock);
 }
@@ -49,17 +51,16 @@ async function readEventsFromETH(
 /////////////////////////////////////////////////////////////////////////////////////////
 
 async function readEventsFromETHRangeWithFallback(
-  fromBlock,
-  toBlock,
+  fromBlock: number,
+  toBlock: number,
   clb: (_: Event) => boolean
-) {
+): Promise<void> {
   try {
     const logs = await web3.eth.getPastLogs({
       fromBlock,
       toBlock,
       address: rethAddress,
     });
-
     const logsDecoded = abiDecoder.decodeLogs(logs);
 
     for (let i = 0; i != logsDecoded.length; i++) {
@@ -92,6 +93,7 @@ async function readEventsFromETHRangeWithFallback(
     // TODO: Is this too Infura-specific?
     if (err.message.includes("query returned more than")) {
       const middle = Math.round((fromBlock + toBlock) / 2);
+
       console.log(
         "Hit API limit, splitting interval to [%s, %s] and [%s, %s]",
         fromBlock,
@@ -120,7 +122,9 @@ abiDecoder.addABI(rethAbi);
 
 // Init
 const providerUrl = process.env.ETH_NODE_PROVIDER_URL;
+
 console.log("ETH node provider URL: %s", providerUrl);
+
 const web3 = new Web3(
   new Web3.providers.WebsocketProvider(providerUrl, {
     clientConfig: {
@@ -140,12 +144,7 @@ console.log("Last seen block: %s", lastSeenBlock);
 const ethHeadBlock = await web3.eth.getBlockNumber();
 console.log("Current chain head block: %s", ethHeadBlock);
 
-let stride;
-if (process.env.STRIDE) {
-  stride = Number(process.env.STRIDE);
-} else {
-  stride = undefined;
-}
+const blockBatchSize = Number(process.env.ODF_BATCH_SIZE);
 
 await readEventsFromETH(
   Math.max(lastSeenBlock + 1, rethStartBlock),
@@ -155,7 +154,7 @@ await readEventsFromETH(
     process.stdout.write("\n");
     return true;
   },
-  stride
+  blockBatchSize
 );
 
 // Save last seen block
