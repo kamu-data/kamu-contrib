@@ -8,9 +8,13 @@ content:
     - kind: setPollingSource
       fetch:
         kind: container
-        image: "ghcr.io/kamu-data/fetch-net.rocketpool.reth.mint-burn:0.1.1"
+        image: "ghcr.io/kamu-data/fetch-net.rocketpool.reth.mint-burn:0.2.0"
         env:
           - name: ETH_NODE_PROVIDER_URL
+          - name: BLOCK_BATCH_SIZE
+            value: "100000"
+          - name: ODF_BATCH_SIZE
+            value: "10000"
       read:
         kind: ndJson
       preprocess:
@@ -24,7 +28,7 @@ content:
             cast("ethAmount" as double) / pow(10.0, 18) as eth_amount,
             "blockNumber" as block_number,
             "blockHash" as block_hash,
-            to_timestamp_seconds("blockTime") as block_time,
+            to_timestamp_seconds("eventTime") as event_time,
             "transactionIndex" as transaction_index,
             "transactionHash" as transaction_hash,
             "logIndex" as log_index
