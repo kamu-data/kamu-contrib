@@ -41,6 +41,7 @@ async function main() {
     BLOCK_BATCH_SIZE: num(),
     // ODF interface:
     ODF_BATCH_SIZE: num(),
+    ODF_ETAG: num({ default: 0 }),
     ODF_NEW_ETAG_PATH: str(),
     ODF_NEW_HAS_MORE_DATA_PATH: str(),
   })
@@ -59,7 +60,7 @@ async function main() {
   const rethContract = RethAbi__factory.connect(rethAddress, provider)
 
   // Block range
-  const lastSeenBlock = process.env.ODF_ETAG ? Number(process.env.ODF_ETAG) : 0;
+  const lastSeenBlock = env.ODF_ETAG;
 
   console.log(`Last seen block: ${lastSeenBlock}`);
 
@@ -93,59 +94,18 @@ async function odfReadRows(
 ): Promise<OdfReadRowsResult> {
   let outputRowsCount = 0;
   let lastOutputBlockNumber = 0;
-  let hasBatchAlreadyCollected = false;
 
-  const allBlockRangeHasProcessed = await readEventsFromETH(
+  const allBlockRangeHasProcessed = await readRethContractEvents(
     rethContract,
     startBlock,
     endBlock,
     async function (eventRow) {
-      // In a usual situation (not web3), we could write the following condition:
-      // ```
-      // if (outputRowsCount >= odfBatchSize) {
-      //   return false;
-      // }
-      // ```
-      // But in our case, we cannot act so naively -- there can be multiple events in one block:
-      // ```
-      // ┌─────────────┐
-      // │ E1 E2 E3 E4 │
-      // └─────────────┘
-      //  Block №1
-      // ```
-      //
-      // This gives us an interesting edge case if the batch size goes through the middle of the block:
-      // ```
-      //  Batch №1  ┆ Batch №2
-      // ┌───────── ┆ ───┐  ┌─────────────┐
-      // │ E1 E2 E3 ┆ E4 │  │ E5 E6 E7 E8 │
-      // └───────── ┆ ───┘  └─────────────┘
-      //  Block №1  ┆        Block №2
-      // ```
-      //
-      // Since, our next read iteration relies on a range of blocks, this situation creates ambiguity for us:
-      // should we consider this block as processed or not?
-      //
-      // For this reason, we read additional events to consider this block as fully processed:
-      // ```
-      //  Batch №1         ┆  Batch №2
-      // ┌─────────   ───┐ ┆ ┌─────────────┐
-      // │ E1 E2 E3 + E4 │ ┆ │ E5 E6 E7 E8 │
-      // └─────────   ───┘ ┆ └─────────────┘
-      //  Block №1         ┆  Block №2
-      // ```
-      const isEventFromSameBlock = lastOutputBlockNumber === eventRow.blockNumber;
-
-      if (hasBatchAlreadyCollected && !isEventFromSameBlock) {
+      if (outputRowsCount >= odfBatchSize) {
         return false;
       }
 
       outputRowsCount++;
       lastOutputBlockNumber = eventRow.blockNumber;
-
-      if (!hasBatchAlreadyCollected) {
-        hasBatchAlreadyCollected = outputRowsCount >= odfBatchSize;
-      }
 
       await stdOutWrite(`${JSON.stringify(eventRow)}\n`);
 
@@ -165,7 +125,7 @@ async function odfReadRows(
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-async function readEventsFromETH(
+async function readRethContractEvents(
   rethContract: RethAbi,
   startBlock: number,
   endBlock: number,
@@ -185,21 +145,21 @@ async function readEventsFromETH(
 
     console.log(`Syncing block range [${fromBlock}, ${toBlock}]`);
 
-    const stopProcessing = !await readEventsFromETHRangeWithFallback(
+    const stopProcessing = !await readRethContractEventsBatch(
       rethContract, fromBlock, toBlock, onEventCallback
     );
 
     if (stopProcessing) {
       return false;
     }
-  } while (toBlock != endBlock);
+  } while (toBlock !== endBlock);
 
   return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-async function readEventsFromETHRangeWithFallback(
+async function readRethContractEventsBatch(
   rethContract: RethAbi,
   fromBlock: number,
   toBlock: number,
