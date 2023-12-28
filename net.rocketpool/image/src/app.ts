@@ -29,7 +29,7 @@ interface OdfReadRowsResult {
 }
 
 type Provider = ethers.providers.JsonRpcProvider | ethers.providers.WebSocketProvider;
-type OnEventCallback = (_: EventRow) => boolean;
+type OnEventCallback = (_: EventRow) => Promise<boolean>;
 type AllBlockRangeHasProcessed = boolean;
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -99,7 +99,7 @@ async function odfReadRows(
     rethContract,
     startBlock,
     endBlock,
-    function (eventRow) {
+    async function (eventRow) {
       // In a usual situation (not web3), we could write the following condition:
       // ```
       // if (outputRowsCount >= odfBatchSize) {
@@ -147,8 +147,7 @@ async function odfReadRows(
         hasBatchAlreadyCollected = outputRowsCount >= odfBatchSize;
       }
 
-      process.stdout.write(JSON.stringify(eventRow));
-      process.stdout.write("\n");
+      await stdOutWrite(`${JSON.stringify(eventRow)}\n`);
 
       return true;
     },
@@ -232,7 +231,7 @@ async function readEventsFromETHRangeWithFallback(
   eventRows.sort((right, left) => right.eventTime - left.eventTime);
 
   for (const eventRow of eventRows) {
-    if (!onEventCallback(eventRow)) {
+    if (!await onEventCallback(eventRow)) {
       return false;
     }
   }
@@ -255,7 +254,26 @@ function getProvider(url: string): Provider {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-main().then(() => process.exit(0)).catch((e) => {
+async function stdOutWrite(data: Uint8Array | string): Promise<void> {
+  // https://nodejs.org/docs/latest-v20.x/api/stream.html#writablewritechunk-encoding-callback
+  return new Promise((resolve) => {
+    const hasDrained = process.stdout.write(data);
+
+    if (hasDrained) {
+      resolve();
+    } else {
+      process.stdout.once('drain', function(){
+        resolve();
+      });
+    }
+  })
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+main().then(() => {
+  process.exit(0)
+}).catch((e) => {
   console.error(e);
 
   process.exit(1)
