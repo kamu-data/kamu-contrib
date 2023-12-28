@@ -29,13 +29,13 @@ interface OdfReadRowsResult {
 }
 
 type Provider = ethers.providers.JsonRpcProvider | ethers.providers.WebSocketProvider;
-type OnEventCallback = (_: EventRow) => Promise<boolean>;
+type OnEventsBatchCallback = (eventRows: ReadonlyArray<EventRow>) => boolean;
 type AllBlockRangeHasProcessed = boolean;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 async function main() {
-  const env = cleanEnv(process.env, {
+  const env = cleanEnv(sanitizeEnvMiddleware(process.env), {
     // Application:
     ETH_NODE_PROVIDER_URL: url(),
     BLOCK_BATCH_SIZE: num(),
@@ -44,7 +44,7 @@ async function main() {
     ODF_ETAG: num({ default: 0 }),
     ODF_NEW_ETAG_PATH: str(),
     ODF_NEW_HAS_MORE_DATA_PATH: str(),
-  })
+  });
 
   // See: https://etherscan.io/token/0xae78736cd615f374d3085123a210448e74fc6393
   //      https://etherscan.io/address/0xae78736cd615f374d3085123a210448e74fc6393
@@ -81,6 +81,8 @@ async function main() {
   if (hasMore) {
     fs.writeFileSync(env.ODF_NEW_HAS_MORE_DATA_PATH, "");
   }
+
+  await destroy(provider);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -99,17 +101,17 @@ async function odfReadRows(
     rethContract,
     startBlock,
     endBlock,
-    async function (eventRow) {
-      if (outputRowsCount >= odfBatchSize) {
-        return false;
+    function (eventRows) {
+      for (const eventRow of eventRows) {
+        process.stdout.write(`${JSON.stringify(eventRow)}\n`);
       }
 
-      outputRowsCount++;
-      lastOutputBlockNumber = eventRow.blockNumber;
+      outputRowsCount += eventRows.length;
+      lastOutputBlockNumber = eventRows[eventRows.length - 1].blockNumber;
 
-      await stdOutWrite(`${JSON.stringify(eventRow)}\n`);
+      const requestNextEventsBatch = outputRowsCount < odfBatchSize;
 
-      return true;
+      return requestNextEventsBatch;
     },
     blockBatchSize,
   );
@@ -129,14 +131,14 @@ async function readRethContractEvents(
   rethContract: RethAbi,
   startBlock: number,
   endBlock: number,
-  onEventCallback: OnEventCallback,
+  onEventsBatchCallback: OnEventsBatchCallback,
   blockBatchSize: number
 ): Promise<AllBlockRangeHasProcessed> {
   const blocksDelta = endBlock - startBlock;
 
   console.log(`Considering events in block range [${startBlock}, ${endBlock}] (${blocksDelta} blocks)`);
 
-  let fromBlock = startBlock;
+  let fromBlock = startBlock - 1;
   let toBlock = fromBlock;
 
   do {
@@ -146,7 +148,7 @@ async function readRethContractEvents(
     console.log(`Syncing block range [${fromBlock}, ${toBlock}]`);
 
     const stopProcessing = !await readRethContractEventsBatch(
-      rethContract, fromBlock, toBlock, onEventCallback
+      rethContract, fromBlock, toBlock, onEventsBatchCallback
     );
 
     if (stopProcessing) {
@@ -163,7 +165,7 @@ async function readRethContractEventsBatch(
   rethContract: RethAbi,
   fromBlock: number,
   toBlock: number,
-  onEventCallback: OnEventCallback
+  onEventsBatchCallback: OnEventsBatchCallback
 ): Promise<AllBlockRangeHasProcessed> {
   const eventFilters = [
     rethContract.filters.TokensMinted(),
@@ -188,15 +190,13 @@ async function readRethContractEventsBatch(
   });
   const eventRows = (await Promise.all(eventsRowsPromises)).flat();
 
-  eventRows.sort((right, left) => right.eventTime - left.eventTime);
+  eventRows.sort((left, right) => left.blockNumber - right.blockNumber);
 
-  for (const eventRow of eventRows) {
-    if (!await onEventCallback(eventRow)) {
-      return false;
-    }
+  if (eventRows.length > 0) {
+    return onEventsBatchCallback(eventRows);
+  } else {
+    return true;
   }
-
-  return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -214,27 +214,26 @@ function getProvider(url: string): Provider {
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-async function stdOutWrite(data: Uint8Array | string): Promise<void> {
-  // https://nodejs.org/docs/latest-v20.x/api/stream.html#writablewritechunk-encoding-callback
-  return new Promise((resolve) => {
-    const hasDrained = process.stdout.write(data);
-
-    if (hasDrained) {
-      resolve();
-    } else {
-      process.stdout.once('drain', function(){
-        resolve();
-      });
-    }
-  })
+async function destroy(provider: Provider): Promise<void> {
+  if (provider instanceof ethers.providers.WebSocketProvider) {
+    await provider.destroy();
+  }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-main().then(() => {
-  process.exit(0)
-}).catch((e) => {
-  console.error(e);
+function sanitizeEnvMiddleware(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  for (const key in env) {
+    const value = env[key];
 
-  process.exit(1)
-});
+    if (value === '') {
+      delete env[key];
+    }
+  }
+
+  return env;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+main().catch(console.log);
