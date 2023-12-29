@@ -1,2 +1,8 @@
-/dist
-/node_modules
+*
+
+!/abi
+!/src
+!/types
+
+!/package*.json
+!/tsconfig.json

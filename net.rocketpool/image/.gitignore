@@ -1,2 +1,5 @@
 /dist
 /node_modules
+
+.odf_new_etag
+.odf_new_has_more
