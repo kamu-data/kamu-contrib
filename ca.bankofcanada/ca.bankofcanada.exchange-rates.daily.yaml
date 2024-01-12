@@ -2,11 +2,11 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.bankofcanada.exchange-rates.daily
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://www.bankofcanada.ca/valet/observations/group/FX_RATES_DAILY/csv?start_date=2017-01-03
       prepare:
         - kind: pipe
@@ -15,7 +15,7 @@ content:
             - -e
             - 1,/OBSERVATIONS/d
       read:
-        kind: csv
+        kind: Csv
         header: true
         schema:
           - date TIMESTAMP
@@ -49,12 +49,12 @@ content:
       # DataFusion ingest implementation instead of Spark. This should be
       # removed once DataFusion ingest becomes the default.
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: select * from input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - date
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: date

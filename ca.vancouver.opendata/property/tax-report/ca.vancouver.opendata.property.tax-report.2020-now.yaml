@@ -2,19 +2,19 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.property.tax-report.2020-now
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://opendata.vancouver.ca/explore/dataset/property-tax-report/download/?format=csv&timezone=America/Los_Angeles&lang=en&use_labels_for_header=true&csv_separator=%3B
       read:
-        kind: csv
+        kind: Csv
         separator: ';'
         header: true
         nullValue: ''
       preprocess:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT
@@ -49,9 +49,9 @@ content:
             NEIGHBOURHOOD_CODE
           FROM input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - PID
           - REPORT_YEAR
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: REPORT_YEAR

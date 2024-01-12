@@ -2,17 +2,17 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: org.geonames.features.raw
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: http://download.geonames.org/export/dump/allCountries.zip
       prepare:
         - kind: decompress
           format: zip
       read:
-        kind: csv
+        kind: Csv
         header: false
         separator: "\t"
         schema:
@@ -39,7 +39,7 @@ content:
       # DataFusion ingest implementation instead of Spark. This should be
       # removed once DataFusion ingest becomes the default.
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: select * from input
       merge:

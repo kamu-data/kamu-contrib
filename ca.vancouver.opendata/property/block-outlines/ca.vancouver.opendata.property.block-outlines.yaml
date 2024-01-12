@@ -2,16 +2,16 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.property.block-outlines
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=shp&timezone=America/Los_Angeles&lang=en
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
       preprocess:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT
@@ -19,4 +19,4 @@ content:
           FROM input
       merge:
         # TODO
-        kind: append
+        kind: Append

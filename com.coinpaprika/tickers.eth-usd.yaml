@@ -3,21 +3,21 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: com.coinpaprika.tickers.eth-usd
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: container
+        kind: Container
         image: "ghcr.io/kamu-data/fetch-com.coinpaprika.tickers.eth-usd:0.1.0"
       read:
-        kind: ndJson
+        kind: NdJson
         schema:
           - timestamp TIMESTAMP
           - price DOUBLE
           - volume_24h DOUBLE
           - market_cap DOUBLE
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: |
           select
@@ -29,20 +29,20 @@ content:
             market_cap
           from input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - event_time
           - from_symbol
           - to_symbol
-    - kind: setAttachments
+    - kind: SetAttachments
       attachments:
-        kind: embedded
+        kind: Embedded
         items:
           - path: README.md
             content: |
               # ETH to USD Prices from Coinpaprika
               This dataset pull best available granularity data that is within Coinpaprika's free tier.
-    - kind: setLicense
+    - kind: SetLicense
       shortName: Proprietary
       name: Coinpaprika - Terms of Use
       websiteUrl: https://api.coinpaprika.com/#section/Terms-of-use

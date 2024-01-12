@@ -4,19 +4,19 @@ content:
   # This is not a trustworthy dataset, used for demonstration purposes only
   # Source: https://www.reddit.com/r/Coronavirus_PH/comments/fehzke/ph_covid19_case_database_is_now_live/
   name: ph.gov.covid-19
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://docs.google.com/spreadsheets/d/1wdxIwD0b58znX4UrH6JJh_0IhnZP0YWn23Uqs7lHB6Q/export?format=csv
       read:
-        kind: csv
+        kind: Csv
         separator: ','
         header: true
         nullValue: ''
       preprocess:
-          kind: sql
+          kind: Sql
           engine: spark
           query: |
             SELECT
@@ -32,8 +32,8 @@ content:
               UNIX_TIMESTAMP(CONCAT(`Tested Positive`, " 2020"), "MMMM d yyyy") IS NOT NULL
               AND CAST(`Case #` as BIGINT) IS NOT NULL
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - case_no
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: report_date

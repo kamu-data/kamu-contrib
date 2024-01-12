@@ -2,16 +2,16 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.gc.statcan.census-2016.geo-bounds
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/files-fichiers/2016/lpr_000b16a_e.zip
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
       preprocess:
-          kind: sql
+          kind: Sql
           engine: datafusion
           query: |
             SELECT

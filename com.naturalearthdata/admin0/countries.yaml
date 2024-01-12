@@ -2,15 +2,15 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: com.naturalearthdata.admin0.countries
-  kind: derivative
+  kind: Derivative
   metadata:
-    - kind: setTransform
+    - kind: SetTransform
       inputs:
-        - name: com.naturalearthdata.admin0.countries.10m
-        - name: com.naturalearthdata.admin0.countries.50m
-        - name: com.naturalearthdata.admin0.countries.110m
+        - datasetRef: com.naturalearthdata.admin0.countries.10m
+        - datasetRef: com.naturalearthdata.admin0.countries.50m
+        - datasetRef: com.naturalearthdata.admin0.countries.110m
       transform:
-        kind: sql
+        kind: Sql
         engine: datafusion
         # TODO: This query is invalid as it is non-temporal
         # It will produce incorrect results as input datasets evolve over time

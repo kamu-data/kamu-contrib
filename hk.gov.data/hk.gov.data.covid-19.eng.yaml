@@ -2,19 +2,19 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: hk.gov.data.covid-19.eng
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://www.chp.gov.hk/files/misc/enhanced_sur_covid_19_eng.csv
       read:
-        kind: csv
+        kind: Csv
         separator: ','
         header: true
         nullValue: ''
       preprocess:
-          kind: sql
+          kind: Sql
           engine: spark
           query: |
             SELECT
@@ -30,8 +30,8 @@ content:
               `Confirmed/probable` as confirmation_status
             FROM input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - case_no
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: report_date

@@ -2,14 +2,14 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: us.cityofnewyork.data.ems-incident-dispatch
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://data.cityofnewyork.us/api/views/76xm-jjuj/rows.csv?accessType=DOWNLOAD
       read:
-        kind: csv
+        kind: Csv
         header: true
         timestampFormat: 'M/d/yyyy h:mm:ss a'
         schema:
@@ -45,8 +45,8 @@ content:
           - standby_indicator STRING  # Indicates that the units were assigned to stand by in case they were needed.
           - transfer_indicator STRING  # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - cad_incident_id
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: incident_datetime

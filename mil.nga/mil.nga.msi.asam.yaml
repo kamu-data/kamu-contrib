@@ -6,17 +6,17 @@ content:
   # The reports may be useful for recognition, prevention and avoidance of potential hostile activity.
   # See: https://msi.nga.mil/Piracy
   name: mil.nga.msi.asam
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://msi.nga.mil/api/publications/download?key=16920958/SFH00000/ASAM_shp.zip&type=download
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
         subPath: asam_data_download/ASAM_events.*
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: |
           SELECT
@@ -34,6 +34,6 @@ content:
             geometry
           FROM input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - reference

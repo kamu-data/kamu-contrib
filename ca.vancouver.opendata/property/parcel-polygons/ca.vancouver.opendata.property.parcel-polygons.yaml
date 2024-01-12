@@ -2,11 +2,11 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.property.parcel-polygons
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://opendata.vancouver.ca/explore/dataset/property-parcel-polygons/download/?format=geojson&timezone=America/Los_Angeles&lang=en
       prepare:
         # Transforms the single object GeoJson with "FeatureCollection" at the root
@@ -22,7 +22,7 @@ content:
             - '-c'
             - '.features[] | {type: .type, geometry: .geometry, properties: {tax_coord: .properties.tax_coord, civic_number: .properties.civic_number, site_name: .properties.site_id, street_name: .properties.streetname}}'
       read:
-        kind: geoJson
+        kind: GeoJson
       merge:
         # TODO
-        kind: append
+        kind: Append

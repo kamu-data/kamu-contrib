@@ -2,21 +2,21 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: world.data.tdreabing.nuclear-weapon-explosions
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
         # Source in data.world: https://data.world/tdreabing/nuclear-weapon-explosions
         # Source paper: https://www.ldeo.columbia.edu/~richards/my_papers/WW_nuclear_tests_IASPEI_HB.pdf
-        kind: url
+        kind: Url
         url: https://query.data.world/s/czddlpfvqfonlzmarr2wrr33t3ttlt
       read:
-        kind: csv
+        kind: Csv
         separator: ','
         header: true
         nullValue: '-'
       preprocess:
-          kind: sql
+          kind: Sql
           engine: spark
           query: |
             SELECT
@@ -34,6 +34,6 @@ content:
               salvo
             FROM input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
           - event_time

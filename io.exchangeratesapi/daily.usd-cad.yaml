@@ -2,11 +2,11 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: io.exchangeratesapi.daily.usd-cad
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://api.exchangeratesapi.io/history?base=USD&symbols=CAD&start_at=1900-01-01&end_at=2200-01-01
       prepare:
       - kind: pipe
@@ -15,14 +15,14 @@ content:
         - '-r'
         - '.rates | with_entries(.value |= .CAD) | to_entries[] | [.key, .value] | @csv'
       read:
-        kind: csv
+        kind: Csv
         header: false
         schema:
         - date TIMESTAMP
         - rate DECIMAL(18,10)
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
         - date
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: date

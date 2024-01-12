@@ -2,13 +2,13 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: testing.empty-deriv
-  kind: derivative
+  kind: Derivative
   metadata:
-    - kind: setTransform
+    - kind: SetTransform
       inputs:
-        - name: testing.empty-root
+        - datasetRef: testing.empty-root
       transform:
-        kind: sql
+        kind: Sql
         engine: flink
         query: |
           select * from `testing.empty-root`

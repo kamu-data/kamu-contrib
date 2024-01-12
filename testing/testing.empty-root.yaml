@@ -2,5 +2,5 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: testing.empty-root
-  kind: root
+  kind: Root
   metadata: []

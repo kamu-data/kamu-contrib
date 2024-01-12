@@ -2,17 +2,17 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.rapid-transit.stations
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: ftp://webftp.vancouver.ca/OpenData/shape/shape_rapid_transit.zip
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
         subPath: rapid_transit_stations.*
       preprocess:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT
@@ -21,4 +21,4 @@ content:
           FROM input
       merge:
         # TODO
-        kind: append
+        kind: Append

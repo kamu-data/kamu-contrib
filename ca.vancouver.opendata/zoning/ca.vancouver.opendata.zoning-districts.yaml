@@ -2,16 +2,16 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.zoning-districts
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: ftp://webftp.vancouver.ca/OpenData/shape/zoning_districts_shp.zip
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
       preprocess:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT
@@ -21,4 +21,4 @@ content:
           FROM input
       merge:
         # TODO
-        kind: append
+        kind: Append

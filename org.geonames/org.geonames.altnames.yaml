@@ -2,13 +2,13 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: org.geonames.altnames
-  kind: derivative
+  kind: Derivative
   metadata:
-    - kind: setTransform
+    - kind: SetTransform
       inputs:
-        - name: org.geonames.altnames.raw
+        - datasetRef: org.geonames.altnames.raw
       transform:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT

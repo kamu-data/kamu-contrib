@@ -2,14 +2,14 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: com.quandl.lbma.gold
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://www.quandl.com/api/v3/datasets/LBMA/GOLD.csv?api_key=J86PRArsxou4JyiZ2-5X
       read:
-        kind: csv
+        kind: Csv
         header: true
         schema:
           - '"Date" DATE'
@@ -20,7 +20,7 @@ content:
           - '"EURO (AM)" DECIMAL(18,4)'
           - '"EURO (PM)" DECIMAL(18,4)'
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: |
           SELECT
@@ -33,8 +33,8 @@ content:
             "EURO (PM)" as euro_pm
           FROM input
       merge:
-        kind: ledger
+        kind: Ledger
         primaryKey:
         - date
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: date

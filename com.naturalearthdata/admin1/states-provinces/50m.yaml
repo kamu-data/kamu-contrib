@@ -2,19 +2,19 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: com.naturalearthdata.admin1.states-provinces.50m
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://naciscdn.org/naturalearth/50m/cultural/ne_50m_admin_1_states_provinces.zip
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
       # TODO: This no-op step makes kamu-cli use the experimental
       # DataFusion ingest implementation instead of Spark. This should be
       # removed once DataFusion ingest becomes the default.
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: select * from input
       merge:

@@ -2,19 +2,19 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: us.cityofnewyork.data.zipcode-boundaries
-  kind: root
+  kind: Root
   metadata:
-    - kind: setPollingSource
+    - kind: SetPollingSource
       fetch:
-        kind: url
+        kind: Url
         url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
       read:
-        kind: esriShapefile
+        kind: EsriShapefile
       # TODO: This no-op step makes kamu-cli use the experimental
       # DataFusion ingest implementation instead of Spark. This should be
       # removed once DataFusion ingest becomes the default.
       preprocess:
-        kind: sql
+        kind: Sql
         engine: datafusion
         query: |
           select

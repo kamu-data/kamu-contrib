@@ -2,13 +2,13 @@ version: 1
 kind: DatasetSnapshot
 content:
   name: testing.set-transform-input-by-id
-  kind: derivative
+  kind: Derivative
   metadata:
-    - kind: setTransform
+    - kind: SetTransform
       inputs:
-        - id: "did:odf:<substitiute>"
-          name: foo
+        - datasetRef: "did:odf:<substitiute>"
+          alias: foo
       transform:
-        kind: sql
+        kind: Sql
         engine: flink
         query: "select event_time from foo"

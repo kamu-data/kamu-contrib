@@ -2,16 +2,16 @@ kind: DatasetSnapshot
 version: 1
 content:
   name: ca.vancouver.opendata.property.tax-report
-  kind: derivative
+  kind: Derivative
   metadata:
-    - kind: setTransform
+    - kind: SetTransform
       inputs:
-        - name: ca.vancouver.opendata.property.tax-report.2006-2010
-        - name: ca.vancouver.opendata.property.tax-report.2011-2015
-        - name: ca.vancouver.opendata.property.tax-report.2016-2019
-        - name: ca.vancouver.opendata.property.tax-report.2020-now
+        - datasetRef: ca.vancouver.opendata.property.tax-report.2006-2010
+        - datasetRef: ca.vancouver.opendata.property.tax-report.2011-2015
+        - datasetRef: ca.vancouver.opendata.property.tax-report.2016-2019
+        - datasetRef: ca.vancouver.opendata.property.tax-report.2020-now
       transform:
-        kind: sql
+        kind: Sql
         engine: spark
         query: |
           SELECT
@@ -141,5 +141,5 @@ content:
             TAX_LEVY,
             NEIGHBOURHOOD_CODE
           FROM `ca.vancouver.opendata.property.tax-report.2020-now`
-    - kind: setVocab
+    - kind: SetVocab
       eventTimeColumn: REPORT_YEAR
