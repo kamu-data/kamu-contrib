@@ -7,32 +7,13 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Url
-        url: https://data.cityofnewyork.us/api/views/i8iw-xf4u/files/YObIR0MbpUVA0EpQzZSq5x55FzKGM2ejSeahdvjqR20?filename=ZIP_CODE_040114.zip
+        # Dataset home: https://data.cityofnewyork.us/Health/Modified-Zip-Code-Tabulation-Areas-MODZCTA-/pri4-ifjk
+        url: https://data.cityofnewyork.us/api/geospatial/pri4-ifjk?date=20240115&accessType=DOWNLOAD&method=export&format=Shapefile
       read:
         kind: EsriShapefile
-      # TODO: This no-op step makes kamu-cli use the experimental
-      # DataFusion ingest implementation instead of Spark. This should be
-      # removed once DataFusion ingest becomes the default.
-      preprocess:
-        kind: Sql
-        engine: datafusion
-        query: |
-          select
-            "ZIPCODE" as zipcode,
-            "STATE" as state,
-            "COUNTY" as county,
-            "PO_NAME" as po_name,
-            "CTY_FIPS" as cty_fips,
-            "ST_FIPS" as st_fips,
-            "BLDGZIP" as bldgzip,
-            "AREA" as area,
-            "POPULATION" as population,
-            "URL" as url,
-            "SHAPE_AREA" as shape_area,
-            "SHAPE_LEN" as shape_len,
-            geometry
-          from input
       merge:
-        kind: snapshot
+        kind: Snapshot
         primaryKey:
-          - zipcode
+          # Modified ZIP Code Tabulation Area (ZCTA)
+          # See for explanation: https://nychealth.github.io/covid-maps/modzcta-geo/about.html
+          - modzcta

@@ -28,6 +28,9 @@ pull:
 	kamu pull "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd"
 	kamu pull "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy"
 
+.PHONY: update
+update:
+	kamu pull net.rocketpool.reth.mint-burn com.cryptocompare.ohlcv.eth-usd co.alphavantage.tickers.daily.spy
 
 .PHONY: push
 push:
