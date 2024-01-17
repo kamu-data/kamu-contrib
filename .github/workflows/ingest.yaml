@@ -86,9 +86,9 @@ jobs:
             .kamu
           # TODO: Currently cache action will not update the cache upon hit and there is no option to do so
           # Below uses a workaround suggested here: https://github.com/actions/cache/issues/342#issuecomment-673371329
-          key: cachegen-8-kamu-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
+          key: cachegen-9-kamu-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
           restore-keys: |
-            cachegen-8-kamu-dataset-${{ matrix.dataset_name }}-
+            cachegen-9-kamu-dataset-${{ matrix.dataset_name }}-
 
       # TODO: IPFS daemon often times out when searching for a CID :(
       # We point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast.
