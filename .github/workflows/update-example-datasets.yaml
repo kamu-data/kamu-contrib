@@ -75,7 +75,7 @@ jobs:
           ../kamu-contrib/.ci/example-datasets/init-from-s3.py
 
           echo "State before update:"
-          kamu list --all-accounts -w
+          kamu list -w
 
       - name: Update datasets
         shell: bash
@@ -84,7 +84,7 @@ jobs:
           ../kamu-contrib/.ci/example-datasets/update.py
 
           echo "State after update:"
-          kamu list --all-accounts -w
+          kamu list -w
 
       - name: Push to S3
         shell: bash
