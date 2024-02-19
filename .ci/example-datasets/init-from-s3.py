@@ -18,7 +18,7 @@ KAMU_S3_URL = os.environ.get("KAMU_S3_URL", S3_EXAMPLE_DATASETS_URL)
 
 ###############################################################################
 
-subprocess.run("kamu init", shell=True, check=True)
+subprocess.run("kamu init --exists-ok", shell=True, check=True)
 
 # External datasets
 for name, url in EXTERNAL_DATASETS.items():
@@ -28,8 +28,8 @@ for name, url in EXTERNAL_DATASETS.items():
 s3_datasets = [
     line.strip().split(' ')[1].rstrip("/")
     for line in subprocess.run(
-        f"aws s3 ls {KAMU_S3_URL}", 
-        shell=True, 
+        f"aws s3 ls {KAMU_S3_URL}",
+        shell=True,
         text=True,
         check=True,
         capture_output=True,
