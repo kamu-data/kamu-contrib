@@ -9,5 +9,3 @@ jobs:
     steps:
       - name: Clear caches
         uses: easimon/wipe-cache@main
-        with:
-          dry-run: 'true'
