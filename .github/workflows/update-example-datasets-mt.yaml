@@ -69,11 +69,11 @@ jobs:
         run: |
           mkdir -p workspace
           cd workspace
-          ../kamu-contrib/.ci/init-from-s3.py
+          ../kamu-contrib/.ci/example-datasets-mt/init-from-s3.py
           kamu list --all-accounts -w
 
       - name: Push to S3
         shell: bash
         run: |
           cd workspace
-          ../kamu-contrib/.ci/push-to-s3.py
+          ../kamu-contrib/.ci/example-datasets-mt/push-to-s3.py

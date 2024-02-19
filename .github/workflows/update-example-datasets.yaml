@@ -72,16 +72,16 @@ jobs:
         run: |
           mkdir -p workspace
           cd workspace
-          ../kamu-contrib/.ci/init-from-s3.py
+          ../kamu-contrib/.ci/example-datasets/init-from-s3.py
 
           echo "State before update:"
           kamu list --all-accounts -w
-      
+
       - name: Update datasets
         shell: bash
         run: |
           cd workspace
-          ../kamu-contrib/.ci/update.py
+          ../kamu-contrib/.ci/example-datasets/update.py
 
           echo "State after update:"
           kamu list --all-accounts -w
@@ -90,4 +90,4 @@ jobs:
         shell: bash
         run: |
           cd workspace
-          ../kamu-contrib/.ci/push-to-s3.py
+          ../kamu-contrib/.ci/example-datasets/push-to-s3.py
