@@ -1,0 +1,13 @@
+name: clear-caches
+on:
+  workflow_dispatch:
+
+jobs:
+  clear:
+    name: Delete all caches
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clear caches
+        uses: easimon/wipe-cache@main
+        with:
+          dry-run: 'true'
