@@ -17,7 +17,7 @@ from common import *
 
 ###############################################################################
 
-KAMU_PROJECTS_ROOT = os.environ.get("KAMU_PROJECTS_ROOT", "..")
+KAMU_PROJECTS_ROOT = os.environ.get("KAMU_PROJECTS_ROOT", "../../..")
 
 ###############################################################################
 
@@ -30,7 +30,15 @@ def get_dataset_id(name):
 
 ###############################################################################
 
-subprocess.run("kamu init", shell=True, check=True)
+subprocess.run(
+    "kamu init",
+    env=dict(
+        **os.environ,
+        KAMU_WORKSPACE=os.getcwd()
+    ),
+    shell=True,
+    check=True,
+)
 
 
 # External datasets
