@@ -10,6 +10,10 @@ from common import *
 
 ###############################################################################
 
+S3_TARGET_URL = os.environ.get('S3_TARGET_URL', S3_EXAMPLE_MT_DATASETS_URL)
+
+###############################################################################
+
 # List datasets
 datasets = json.loads(subprocess.check_output(
     "kamu list --all-accounts --output-format json --wide",
@@ -22,7 +26,7 @@ for dataset in datasets:
     account = dataset["Owner"]
     name = dataset["Name"]
 
-    url = f"{S3_EXAMPLE_MT_DATASETS_URL}{id}/"
+    url = f"{S3_TARGET_URL}{id}/"
 
     subprocess.run(
         f"kamu --account {account} push {name} --to {url}",

@@ -77,3 +77,12 @@ jobs:
         run: |
           cd workspace
           ../kamu-contrib/.ci/example-datasets-mt/push-to-s3.py
+
+      # Keep demo env up-to-date with flowing data
+      - name: Push to Demo Env
+        shell: bash
+        env:
+          S3_TARGET_URL: "s3://datasets.demo.kamu.dev/"
+        run: |
+          cd workspace
+          ../kamu-contrib/.ci/example-datasets-mt/push-to-s3.py
