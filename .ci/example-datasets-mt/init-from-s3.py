@@ -35,12 +35,13 @@ for url in s3_datasets:
     )
 
 # Multi-tenant datasets
-for did in s3_listdir(S3_EUROPORT_REPO_URL):
-    url = S3_EUROPORT_REPO_URL + did
-    alias = s3_cat(f"{S3_EUROPORT_REPO_URL}{did}info/alias")
-    account, name = alias.split('/', 1)
-    subprocess.run(
-        f"kamu --account {account} pull --no-alias {url} --as {name}",
-        shell=True,
-        check=True,
-    )
+for mt_repo_url in S3_MULTI_TENANT_EXAMPLES_URLS:
+    for did in s3_listdir(mt_repo_url):
+        url = mt_repo_url + did
+        alias = s3_cat(f"{mt_repo_url}{did}info/alias")
+        account, name = alias.split('/', 1)
+        subprocess.run(
+            f"kamu --account {account} pull --no-alias {url} --as {name}",
+            shell=True,
+            check=True,
+        )
