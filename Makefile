@@ -1,6 +1,11 @@
+KAMU_WORKSPACE=.priv/workspace-contrib
 DATE:=$(shell date +%F)
 S3_CONTRIB_BASE_URL=s3://datasets.kamu.dev/odf/v2/contrib/
 S3_BACKUP_BASE_URL=s3://datasets.kamu.dev/odf/backup/v2/contrib/
+
+###############################################################################
+# Repo maintenance
+###############################################################################
 
 .PHONY: strip-notebooks
 strip-notebooks:
@@ -8,35 +13,57 @@ strip-notebooks:
 	find . -name '*.ipynb' -type f -exec nbstripout {} \;
 
 
-.PHONY: backup
-backup:
+###############################################################################
+# Datasets upkeep
+###############################################################################
+
+.PHONY: local-compact-hard
+local-compact-hard:
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu system compact --hard "net.rocketpool.reth.mint-burn"
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu system compact --hard "com.cryptocompare.ohlcv.eth-usd"
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu system compact --hard "co.alphavantage.tickers.daily.spy"
+
+
+.PHONY: local-pull
+local-pull:
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu pull --all --fetch-uncacheable
+
+
+###############################################################################
+# S3
+###############################################################################
+
+.PHONY: s3-backup
+s3-backup:
 	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn" "$(S3_BACKUP_BASE_URL)net.rocketpool.reth.mint-burn.$(DATE)"
 	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd" "$(S3_BACKUP_BASE_URL)com.cryptocompare.ohlcv.eth-usd.$(DATE)"
 	aws s3 cp --recursive "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy" "$(S3_BACKUP_BASE_URL)co.alphavantage.tickers.daily.spy.$(DATE)"
 
 
-.PHONY: purge
-purge:
+.PHONY: s3-purge
+s3-purge:
 	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn"
 	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd"
 	aws s3 rm --recursive "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy"
 
+.PHONY: sync-from-s3
+sync-from-s3:
+	mkdir -p $(KAMU_WORKSPACE)
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu init --exists-ok
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu pull "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn"
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu pull "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd"
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu pull "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy"
 
-.PHONY: pull
-pull:
-	kamu pull "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn"
-	kamu pull "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd"
-	kamu pull "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy"
+.PHONY: sync-to-s3
+sync-to-s3:
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu push net.rocketpool.reth.mint-burn --to "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn" --no-alias
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu push com.cryptocompare.ohlcv.eth-usd --to "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd" --no-alias
+	KAMU_WORKSPACE=$(KAMU_WORKSPACE) kamu push co.alphavantage.tickers.daily.spy --to "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy" --no-alias
 
-.PHONY: update
-update:
-	kamu pull net.rocketpool.reth.mint-burn com.cryptocompare.ohlcv.eth-usd co.alphavantage.tickers.daily.spy
 
-.PHONY: push
-push:
-	kamu push net.rocketpool.reth.mint-burn --to "$(S3_CONTRIB_BASE_URL)net.rocketpool.reth.mint-burn" --no-alias
-	kamu push com.cryptocompare.ohlcv.eth-usd --to "$(S3_CONTRIB_BASE_URL)com.cryptocompare.ohlcv.eth-usd" --no-alias
-	kamu push co.alphavantage.tickers.daily.spy --to "$(S3_CONTRIB_BASE_URL)co.alphavantage.tickers.daily.spy" --no-alias
+###############################################################################
+# IPFS
+###############################################################################
 
 .PHONY: push-ipfs
 push-ipfs:
