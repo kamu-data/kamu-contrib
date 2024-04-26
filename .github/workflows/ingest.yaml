@@ -15,9 +15,6 @@ env:
   IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
   # IPFS_HTTP_GATEWAY: https://gateway.pinata.cloud
   AWS_ROUTE53_HOSTED_ZONE_ID: Z25CPWZR4S9IHS
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  AWS_DEFAULT_REGION: us-west-2
   AWS_ROUTE53_TTL: 60
   AWS_S3_BASE_URL: s3://datasets.kamu.dev/odf/v2/contrib
   # Required by dataset fetch steps
@@ -26,6 +23,8 @@ env:
 jobs:
   update:
     name: Update Dataset
+    permissions:
+      id-token: write
     # TODO: Run all matrix jobs to the end even if one fails
     # continue-on-error: true
     strategy:
@@ -89,6 +88,12 @@ jobs:
           key: cachegen-9-kamu-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
           restore-keys: |
             cachegen-9-kamu-dataset-${{ matrix.dataset_name }}-
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          audience: sts.amazonaws.com
+          aws-region: us-west-2
+          role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
       # TODO: IPFS daemon often times out when searching for a CID :(
       # We point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast.
