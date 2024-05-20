@@ -87,6 +87,7 @@ jobs:
         shell: bash
         env:
           S3_TARGET_URL: ${{ secrets.DEMO_DATASETS_S3_TARGET_URL }}
+          PUSH_FLAGS: --force
         run: |
           cd workspace
           ../kamu-contrib/.ci/example-datasets-mt/push-to-s3.py

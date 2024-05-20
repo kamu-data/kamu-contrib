@@ -11,6 +11,7 @@ from common import *
 ###############################################################################
 
 S3_TARGET_URL = os.environ.get('S3_TARGET_URL', S3_EXAMPLE_MT_DATASETS_URL)
+PUSH_FLAGS = os.environ.get('PUSH_FLAGS', '')
 
 ###############################################################################
 
@@ -29,7 +30,7 @@ for dataset in datasets:
     url = f"{S3_TARGET_URL}{id}/"
 
     subprocess.run(
-        f"kamu --account {account} push {name} --to {url}",
+        f"kamu --account {account} push {PUSH_FLAGS} {name} --to {url}",
         shell=True,
         check=True,
     )
