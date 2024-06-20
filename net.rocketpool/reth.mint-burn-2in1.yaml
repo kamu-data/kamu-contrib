@@ -1,0 +1,75 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: net.rocketpool.reth.mint-burn
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: EthereumLogs
+        chainId: 1 # Ethereum Mainnet
+        filter: |
+          address = X'ae78736cd615f374d3085123a210448e74fc6393'
+          and
+          (
+            topic0 = eth_event_selector('TokensMinted(address indexed to, uint256 amount, uint256 ethAmount, uint256 time)')
+            or
+            topic0 = eth_event_selector('TokensBurned(address indexed from, uint256 amount, uint256 ethAmount, uint256 time)')
+          )
+          and
+          block_number > 13325304
+      read:
+        kind: Parquet
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        # Note many providers don't yet return `blockTimestamp` from `eth_getLogs` so we fallback to time within the event
+        # See: https://github.com/ethereum/execution-apis/issues/295
+        query: |
+          select
+            coalesce(
+              block_timestamp,
+              to_timestamp_seconds(cast(json_get_str(event, 'time') as bigint))
+            ) as event_time,
+            block_number,
+            block_hash,
+            transaction_index,
+            transaction_hash,
+            log_index,
+            'rETH' as token_symbol,
+            json_get_str(event, 'name') as event_name,
+            decode(
+              coalesce(
+                json_get_str(event, 'to'),
+                json_get_str(event, 'from')
+              ),
+              'hex'
+            ) as holder_address,
+            cast(json_get_str(event, 'amount') as double) / pow(10.0, 18) as amount,
+            cast(json_get_str(event, 'ethAmount') as double) / pow(10.0, 18) as eth_amount
+          from (
+            select
+              *,
+              coalesce(
+                eth_try_decode_event(
+                  'TokensMinted(address indexed to, uint256 amount, uint256 ethAmount, uint256 time)',
+                  topic0,
+                  topic1,
+                  topic2,
+                  topic3,
+                  data
+                ),
+                eth_try_decode_event(
+                  'TokensBurned(address indexed from, uint256 amount, uint256 ethAmount, uint256 time)',
+                  topic0,
+                  topic1,
+                  topic2,
+                  topic3,
+                  data
+                )
+              ) as event
+            from input
+          )
+      merge:
+        kind: Append
