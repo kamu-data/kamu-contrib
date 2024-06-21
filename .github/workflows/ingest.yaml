@@ -18,7 +18,7 @@ env:
   AWS_ROUTE53_TTL: 60
   AWS_S3_BASE_URL: s3://datasets.kamu.dev/odf/v2/contrib
   # Required by dataset fetch steps
-  ETH_NODE_PROVIDER_URL: ${{ secrets.INFURA_NODE_URL }}
+  INFURA_ETH_MAINNET_WS: ${{ secrets.INFURA_ETH_MAINNET_WS }}
   ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
 jobs:
   update:
@@ -107,6 +107,16 @@ jobs:
         # env:
         #   IPNS_KEY: ${{ secrets[matrix.ipns_key_secret] }}
         run: |
+          # Setup kamu config
+          echo "
+            source:
+              ethereum:
+                rpcEndpoints:
+                - chainId: 1
+                  chainName: Ethereum Mainnet
+                  nodeUrl: ${INFURA_ETH_MAINNET_WS}
+          " > .kamuconfig
+
           # Add IPNS key
           # echo $IPNS_KEY | base64 -d > ipns_key
           # ipfs key import ${{ matrix.dataset_name }} ipns_key
