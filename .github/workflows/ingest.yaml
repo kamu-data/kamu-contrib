@@ -109,6 +109,9 @@ jobs:
         run: |
           # Setup kamu config
           echo "
+          kind: CLIConfig
+          version: 1
+          content:
             source:
               ethereum:
                 rpcEndpoints:
