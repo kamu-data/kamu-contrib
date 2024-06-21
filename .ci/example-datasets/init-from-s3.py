@@ -18,7 +18,15 @@ KAMU_S3_URL = os.environ.get("KAMU_S3_URL", S3_EXAMPLE_DATASETS_URL)
 
 ###############################################################################
 
-subprocess.run("kamu init --exists-ok", shell=True, check=True)
+subprocess.run(
+    "kamu init --exists-ok",
+    env=dict(
+        **os.environ,
+        KAMU_WORKSPACE=os.getcwd()
+    ),
+    shell=True,
+    check=True,
+)
 
 # External datasets
 for name, url in EXTERNAL_DATASETS.items():
@@ -38,7 +46,7 @@ s3_datasets = [
 
 for name in s3_datasets:
     subprocess.run(
-        f"kamu -v pull --no-alias {KAMU_S3_URL}{name}",
+        f"kamu pull --no-alias {KAMU_S3_URL}{name}",
         shell=True,
         check=True,
     )

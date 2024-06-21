@@ -16,6 +16,7 @@ content:
             uint256 ethAmount,
             uint256 time
           )
+        # Using contract deployment block to limit scanning
         filter: |
           address = X'ae78736cd615f374d3085123a210448e74fc6393'
           and
@@ -25,7 +26,8 @@ content:
       preprocess:
         kind: Sql
         engine: datafusion
-        # Note many providers don't yet return `blockTimestamp` from `eth_getLogs` so we fallback to time within the event
+        # Note many providers don't yet return `blockTimestamp` from `eth_getLogs`
+        # so we fallback to the time contained within the event
         # See: https://github.com/ethereum/execution-apis/issues/295
         query: |
           select
