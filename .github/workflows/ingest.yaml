@@ -55,10 +55,10 @@ jobs:
             # dnslink_subdomain: net.rocketpool.reth.tokens-burned.ipns.kamu.dev
     runs-on: ubuntu-latest
     steps:
-      - uses: ibnesayeed/setup-ipfs@master
-        with:
-          ipfs_version: ^0.19
-          run_daemon: true
+      # - uses: ibnesayeed/setup-ipfs@master
+      #   with:
+      #     ipfs_version: ^0.19
+      #     run_daemon: true
 
       - name: Install kamu
         shell: bash
@@ -70,9 +70,9 @@ jobs:
         run: |
           echo "Work dir: $PWD"
 
-          echo "IPFS version:"
-          ipfs version
-          ipfs id
+          # echo "IPFS version:"
+          # ipfs version
+          # ipfs id
 
           echo "Podman version:"
           podman version
