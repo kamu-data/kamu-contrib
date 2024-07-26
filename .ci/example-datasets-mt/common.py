@@ -6,6 +6,7 @@ S3_EXAMPLE_DATASETS_URL = f"{S3_BASE_URL}example/"
 S3_EXAMPLE_MT_DATASETS_URL = f"{S3_BASE_URL}example-mt/"
 
 S3_MULTI_TENANT_EXAMPLES_URLS = [
+    "s3://datasets.kamu.dev/odf/v2/demo/2022-04-deltares/",
     "s3://datasets.kamu.dev/odf/v2/demo/2023-08-fisheries/"
 ]
 
