@@ -6,59 +6,36 @@ on:
   workflow_dispatch: {}
 concurrency: ingest
 env:
-  INFURA_IPFS_PROJECT_ID: ${{ secrets.INFURA_IPFS_PROJECT_ID }}
-  INFURA_IPFS_PROJECT_SECRET: ${{ secrets.INFURA_IPFS_PROJECT_SECRET }}
-  PINATA_API_URL: https://api.pinata.cloud/psa
-  PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
-  # TODO: We use public gateway as local fetches always timeout :(
-  # IPFS_HTTP_GATEWAY: http://localhost:8080
-  IPFS_HTTP_GATEWAY: https://kamu.infura-ipfs.io
-  # IPFS_HTTP_GATEWAY: https://gateway.pinata.cloud
   AWS_ROUTE53_HOSTED_ZONE_ID: Z25CPWZR4S9IHS
   AWS_ROUTE53_TTL: 60
   AWS_S3_BASE_URL: s3://datasets.kamu.dev/odf/v2/contrib
-  # Required by dataset fetch steps
-  INFURA_ETH_MAINNET_WS: ${{ secrets.INFURA_ETH_MAINNET_WS }}
-  ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
 jobs:
   update:
     name: Update Dataset
     permissions:
       id-token: write
-    # TODO: Run all matrix jobs to the end even if one fails
-    # continue-on-error: true
     strategy:
       fail-fast: false
-      # TODO: To decrease the chance of public gateway rate limiting
-      # max-parallel: 1
+      # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
+      # - frequent loss of writes
+      # - lack of read-after-write consistency
+      # - abysmal resolution times and frequent timeouts
       matrix:
         include:
-          # - dataset_name: com.coinpaprika.tickers.eth-usd
-          #   ipns_id: k51qzi5uqu5dgxqmxnxblkbh0z56k4o7rpxani1u6s3z5u2oew1zerzbxhcs3j
-          #   ipns_key_secret: COINPAPRIKA_TICKERS_ETH_USD_KEY
-          #   dnslink_subdomain: com.coinpaprika.tickers.eth-usd.ipns.kamu.dev
           - dataset_name: com.cryptocompare.ohlcv.eth-usd
-            ipns_id: k51qzi5uqu5di44ukms656i7lfpx3kzy1eotzaa514pterzr6d73ee3ndmbs4t
-            ipns_key_secret: CRYPTOCOMPARE_OHLCV_ETH_USD_KEY
-            dnslink_subdomain: com.cryptocompare.ohlcv.eth-usd.ipns.kamu.dev
+            dnslink_subdomain: _dnslink.com.cryptocompare.ohlcv.eth-usd.ipns.kamu.dev
           - dataset_name: co.alphavantage.tickers.daily.spy
-            ipns_id: k51qzi5uqu5djln0j1uan84f9btedeqfi9inj1exw8xj4dp9tpc2znbedkcazy
-            ipns_key_secret: CO_ALPHAVANTAGE_TICKERS_DAILY_SPY_KEY
-            dnslink_subdomain: co.alphavantage.tickers.daily.spy.ipns.kamu.dev
+            dnslink_subdomain: _dnslink.co.alphavantage.tickers.daily.spy.ipns.kamu.dev
           - dataset_name: net.rocketpool.reth.tokens-minted
-            # ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
-            # ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
-            # dnslink_subdomain: net.rocketpool.reth.tokens-minted.ipns.kamu.dev
+            dnslink_subdomain: _dnslink.net.rocketpool.reth.tokens-minted.ipns.kamu.dev
           - dataset_name: net.rocketpool.reth.tokens-burned
-            # ipns_id: k51qzi5uqu5dj6e8rprw175y8tqt55ipji4c1maqqtpxl11gpnpd3qb7luta6r
-            # ipns_key_secret: NET_ROCKETPOOL_RETH_MINT_BURN_KEY
-            # dnslink_subdomain: net.rocketpool.reth.tokens-burned.ipns.kamu.dev
+            dnslink_subdomain: _dnslink.net.rocketpool.reth.tokens-burned.ipns.kamu.dev
     runs-on: ubuntu-latest
     steps:
-      # - uses: ibnesayeed/setup-ipfs@master
-      #   with:
-      #     ipfs_version: ^0.19
-      #     run_daemon: true
+      - uses: oduwsdl/setup-ipfs@main
+        with:
+          ipfs_version: ^0.29
+          run_daemon: true
 
       - name: Install kamu
         shell: bash
@@ -70,9 +47,9 @@ jobs:
         run: |
           echo "Work dir: $PWD"
 
-          # echo "IPFS version:"
-          # ipfs version
-          # ipfs id
+          echo "IPFS version:"
+          ipfs version
+          ipfs id
 
           echo "Podman version:"
           podman version
@@ -83,15 +60,12 @@ jobs:
           echo "Kamu version:"
           kamu --version
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
+          key: ingest-${{ matrix.dataset_name }}
+          save-always: true
           path: |
             .kamu
-          # TODO: Currently cache action will not update the cache upon hit and there is no option to do so
-          # Below uses a workaround suggested here: https://github.com/actions/cache/issues/342#issuecomment-673371329
-          key: kamu-dataset-${{ matrix.dataset_name }}-${{ github.run_id }}
-          restore-keys: |
-            kamu-dataset-${{ matrix.dataset_name }}-
 
       - uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -99,13 +73,8 @@ jobs:
           aws-region: us-west-2
           role-to-assume: ${{ secrets.AWS_IAM_ROLE }}
 
-      # TODO: IPFS daemon often times out when searching for a CID :(
-      # We point kamu to Pinata's own IPFS gateway to increase chances of resolving it fast.
-      # This however puts us at risk of blowing past the rate limits on the public gateway.
       - name: Configure
         shell: bash
-        # env:
-        #   IPNS_KEY: ${{ secrets[matrix.ipns_key_secret] }}
         run: |
           # Setup kamu config
           echo "
@@ -117,73 +86,15 @@ jobs:
                 rpcEndpoints:
                 - chainId: 1
                   chainName: Ethereum Mainnet
-                  nodeUrl: ${INFURA_ETH_MAINNET_WS}
+                  nodeUrl: ${{ secrets.INFURA_ETH_MAINNET_WS }}
           " > .kamuconfig
 
-          # Add IPNS key
-          # echo $IPNS_KEY | base64 -d > ipns_key
-          # ipfs key import ${{ matrix.dataset_name }} ipns_key
-          # rm ipns_key
-
           # Add pinning service
-          # ipfs pin remote service add svc "$PINATA_API_URL" "$PINATA_ACCESS_TOKEN"
+          ipfs pin remote service add pinata https://api.pinata.cloud/psa "${{ secrets.PINATA_ACCESS_TOKEN }}"
 
-          # Create workspace and point kamu to IPFS gateway
+          # Create workspace
           kamu init --exists-ok
           kamu list --output-format table -w
-          # kamu config set protocol.ipfs.httpGateway "$IPFS_HTTP_GATEWAY"
-
-      # TODO: We use DNSLink instead of IPNS due to IPNS's current usability issues like:
-      # - frequent loss of writes
-      # - lack of read-after-write consistency
-      # - abysmal resolution times and frequent timeouts
-      #
-      # - name: Resolve dataset
-      #   shell: bash
-      #   run: |
-      #     ipfs_cid=$(ipfs name resolve "/ipns/$IPNS_ID" | grep -oE "[^/]+$")
-      #     echo "Current IPFS CID: $ipfs_cid"
-
-      # - name: Resolve dataset
-      #   id: resolve-dataset
-      #   shell: bash
-      #   run: |
-      #     ipfs_cid=$( \
-      #       aws route53 list-resource-record-sets \
-      #       --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID \
-      #       | jq -r ".ResourceRecordSets[] | select(.Name == \"_dnslink.${{ matrix.dnslink_subdomain }}.\") | .ResourceRecords[0].Value" \
-      #       | grep -oE '[^/]+"$' \
-      #       | grep -oE '^[^"]+'
-      #     )
-      #
-      #     echo "Current IPFS CID (from DNSLink): $ipfs_cid"
-      #     echo "CID=$ipfs_cid" >> $GITHUB_OUTPUT
-
-      # # TODO: This always times out!
-      # - name: Pin dataset in local IPFS node
-      #   env:
-      #     CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
-      #   shell: bash
-      #   run: |
-      #     echo "Waiting for peers"
-      #     sleep 60
-      #
-      #     # echo "Searching providers"
-      #     # timeout 120 ipfs dht findprovs "/ipfs/$CURRENT_CID"
-      #
-      #     ipfs_peers=$(ipfs swarm peers | wc -l)
-      #     echo "Pinning CID $CURRENT_CID (currently connected to $ipfs_peers peers)"
-      #     timeout 300 ipfs pin add "/ipfs/$CURRENT_CID"
-
-      # # TODO: Repeatedly downloading datasets from IPFS gateways causes a lot of strain once the number of blocks gets high
-      # # so currently we are basing all update on S3 and only pin to IPFS as the last step
-      # - name: Materialize dataset from IPFS
-      #   env:
-      #     CURRENT_CID: ${{ steps.resolve-dataset.outputs.CID }}
-      #   shell: bash
-      #   run: |
-      #     kamu -v pull "ipfs://$CURRENT_CID" --as ${{ matrix.dataset_name }} --no-alias
-      #     kamu list --output-format table -w
 
       - name: Sync dataset from S3
         shell: bash
@@ -193,6 +104,8 @@ jobs:
 
       - name: Ingest new data
         shell: bash
+        env:
+          ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
         run: |
           kamu -v pull --fetch-uncacheable ${{ matrix.dataset_name }}
           kamu list --output-format table -w
@@ -201,89 +114,84 @@ jobs:
         shell: bash
         run: |
           kamu push ${{ matrix.dataset_name }} --to "$AWS_S3_BASE_URL/${{ matrix.dataset_name }}" --no-alias
+      
+      - name: Resolve current dataset CID
+        id: resolve-dataset
+        shell: bash
+        run: |
+          ipfs_cid=$( \
+            aws route53 list-resource-record-sets \
+            --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID \
+            | jq -r ".ResourceRecordSets[] | select(.Name == \"${{ matrix.dnslink_subdomain }}.\") | .ResourceRecords[0].Value" \
+            | grep -oE '[^/]+"$' \
+            | grep -oE '^[^"]+'
+          )
 
-      # TODO: We are not using `kamu push` here to avoid resolving and publishing into IPNS.
-      # IPNS has proven to be unreliable and cause frequent timeouts, so we limit interactions to IPFS and then do
-      # best-effort attempt to publish to IPNS.
-      # - name: Publish dataset to IPFS
-      #   shell: bash
-      #   env:
-      #     OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
-      #     PIN_TRIES: "10"
-      #   run: |
-      #     # Add dataset to IPFS
-      #     ipfs_cid=$(kamu -v system ipfs add ${{ matrix.dataset_name }})
-      #     echo "New IPFS CID: $ipfs_cid"
-      #
-      #     if [ "$OLD_CID" == "$ipfs_cid" ]; then
-      #       echo "CID didn't change - skipping publishing"
-      #     else
-      #       # Pin new CID to replicate data to the pinning service
-      #       for i in $(seq 1 $PIN_TRIES); do
-      #         echo "Pinning CID (attempt $i)"
-      #
-      #         if curl --fail -sS -X POST -u "$INFURA_IPFS_PROJECT_ID:$INFURA_IPFS_PROJECT_SECRET" "https://ipfs.infura.io:5001/api/v0/pin/add?arg=$ipfs_cid"; then
-      #           echo "Successfully pinned"
-      #           break
-      #         else
-      #           echo "Pinning service returned an error: $response"
-      #
-      #           # TODO: Remove this debug stuff when pinning is reliable
-      #           peers_num=$(ipfs swarm peers | wc -l)
-      #           echo "IPFS is connected to $peers_num peers"
-      #
-      #           echo "IPFS addresses:"
-      #           ipfs id
-      #
-      #           if curl -s --fail "https://dweb.link/ipfs/$ipfs_cid" > /dev/null; then
-      #             echo "CID is RESOLVABLE via public gateway"
-      #           else
-      #             echo "CID is NOT resolvable via public gateway"
-      #           fi
-      #
-      #           if [ $i == $PIN_TRIES ]; then
-      #             echo "Failed to pin CID after $PIN_TRIES attempts"
-      #
-      #             # TODO: Pinning fails so often that we have to ignore this for now
-      #             # not to obscure ingest errors.
-      #             exit 0
-      #           fi
-      #         fi
-      #       done
-      #       # timeout 60 ipfs pin remote add --service svc --name ${{ matrix.dataset_name }} "/ipfs/$ipfs_cid"
-      #
-      #       # Update DNSLink entry
-      #       echo "{
-      #           \"Comment\": \"GHAction update of DNSLink record\",
-      #           \"Changes\": [
-      #               {
-      #                   \"Action\": \"UPSERT\",
-      #                   \"ResourceRecordSet\": {
-      #                       \"Name\": \"_dnslink.${{ matrix.dnslink_subdomain }}.\",
-      #                       \"Type\": \"TXT\",
-      #                       \"TTL\": $AWS_ROUTE53_TTL,
-      #                       \"ResourceRecords\": [{
-      #                           \"Value\": \"\\\"dnslink=/ipfs/$ipfs_cid\\\"\"
-      #                       }]
-      #                   }
-      #               }
-      #           ]
-      #       }" > dns-upsert.json
-      #       echo "Updating DNSLink entry with: $(cat dns-upsert.json)"
-      #       aws route53 change-resource-record-sets --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID --change-batch file://dns-upsert.json
-      #
-      #       # TODO: IPNS is not ready for use
-      #       # # Try publishing to IPNS (best effort)
-      #       # echo "Attempting to publish to IPNS"
-      #       # timeout 60 ipfs name publish --resolve=false --key=${{ matrix.dataset_name }} /ipfs/$ipfs_cid || true
-      #     fi
+          echo "Current IPFS CID (from DNSLink): $ipfs_cid"
+          echo "CID=$ipfs_cid" >> $GITHUB_OUTPUT
 
-      # - name: Ingest & push loop
-      #   shell: bash
-      #   run: |
-      #     stop_time=$((SECONDS + LOOP_TOTAL_SEC))
-      #     while [ $SECONDS -lt $stop_time ]; do
-      #       # Chill
-      #       echo "Sleeping for $LOOP_SLEEP_SEC seconds..."
-      #       sleep $LOOP_SLEEP_SEC
-      #     done
+      - name: Pin dataset in Pinata
+        shell: bash
+        env:
+          OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
+          PIN_TRIES: "10"
+        run: |
+          # Add dataset to IPFS
+          ipfs_cid=$(kamu -v system ipfs add ${{ matrix.dataset_name }})
+          echo "New IPFS CID: $ipfs_cid"
+
+          if [ "$OLD_CID" == "$ipfs_cid" ]; then
+            echo "CID didn't change - skipping publishing"
+          else
+            for i in $(seq 1 $PIN_TRIES); do
+              echo "Pinning CID (attempt $i)"
+
+              if ipfs pin remote add --service=pinata --name=${{ matrix.dataset_name }} $ipfs_cid; then
+                echo "Successfully pinned"
+                break
+              else
+                echo "Pinning service returned an error"
+
+                # TODO: Remove this debug stuff when pinning is reliable
+                peers_num=$(ipfs swarm peers | wc -l)
+                echo "IPFS is connected to $peers_num peers"
+
+                echo "IPFS addresses:"
+                ipfs id
+
+                if curl -s --fail "https://dweb.link/ipfs/$ipfs_cid" > /dev/null; then
+                  echo "CID is RESOLVABLE via public gateway"
+                else
+                  echo "CID is NOT resolvable via public gateway"
+                fi
+
+                if [ $i == $PIN_TRIES ]; then
+                  echo "Failed to pin CID after $PIN_TRIES attempts"
+
+                  # TODO: Pinning fails so often that we have to ignore this for now
+                  # not to obscure ingest errors.
+                  exit 0
+                fi
+              fi
+            done
+
+            # Update DNSLink entry
+            echo "{
+                \"Comment\": \"GHAction update of DNSLink record\",
+                \"Changes\": [
+                    {
+                        \"Action\": \"UPSERT\",
+                        \"ResourceRecordSet\": {
+                            \"Name\": \"${{ matrix.dnslink_subdomain }}.\",
+                            \"Type\": \"TXT\",
+                            \"TTL\": $AWS_ROUTE53_TTL,
+                            \"ResourceRecords\": [{
+                                \"Value\": \"\\\"dnslink=/ipfs/$ipfs_cid\\\"\"
+                            }]
+                        }
+                    }
+                ]
+            }" > dns-upsert.json
+            echo "Updating DNSLink entry with: $(cat dns-upsert.json)"
+            aws route53 change-resource-record-sets --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID --change-batch file://dns-upsert.json
+          fi
