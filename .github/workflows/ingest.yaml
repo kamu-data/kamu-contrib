@@ -32,6 +32,11 @@ jobs:
             dnslink_subdomain: _dnslink.net.rocketpool.reth.tokens-burned.ipns.kamu.dev
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          path: kamu-contrib
+
       - uses: oduwsdl/setup-ipfs@main
         with:
           ipfs_version: ^0.29
@@ -195,3 +200,10 @@ jobs:
             echo "Updating DNSLink entry with: $(cat dns-upsert.json)"
             aws route53 change-resource-record-sets --hosted-zone-id $AWS_ROUTE53_HOSTED_ZONE_ID --change-batch file://dns-upsert.json
           fi
+
+      - name: Cleanup old pins
+        shell: bash
+        env:
+          PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
+        run: |
+          kamu-contrib/.ci/pinata.py unpin-old --name ${{ matrix.dataset_name }} --keep-latest 1
