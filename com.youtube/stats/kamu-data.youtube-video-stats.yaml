@@ -1,0 +1,23 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.youtube.stats.kamu-data.video
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.youtube.stats:0.1.0"
+        env:
+          - name: CHANNEL_ID
+            value: "UCWciDIWI_HsJ6Md_DdyJPIQ"
+          - name: YOUTUBE_API_KEY
+            value: ${{ env.YOUTUBE_API_KEY }}
+      read:
+        kind: NdJson
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - video_id
+    - kind: SetVocab

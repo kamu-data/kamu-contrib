@@ -1,0 +1,45 @@
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.youtube.kamu-data.channel.stats
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Url
+        url: https://www.googleapis.com/youtube/v3/channels?part=statistics&id=UCWciDIWI_HsJ6Md_DdyJPIQ&key=${{env.YOUTUBE_API_KEY}}
+        headers:
+          - name: User-Agent
+            value: kamu
+      prepare:
+        - kind: pipe
+          command:
+            - jq
+            - -c
+            - '.items[] | {"etag": .etag, "id": .id, "viewCount": .statistics.viewCount, "subscriberCount": .statistics.subscriberCount, "videoCount": .statistics.videoCount}'
+      read:
+        kind: NdJson
+        schema:
+          - etag STRING
+          - id STRING
+          - viewCount BIGINT
+          - subscriberCount BIGINT
+          - videoCount INT
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          SELECT
+            etag as etag,
+            id as id,
+            viewCount as viewCount,
+            subscriberCount as subscriberCount,
+            videoCount as videoCount
+          FROM input
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - id
+          - etag
+    - kind: SetInfo
+      description: View, Subscriber and video count of the selected youtube channel.
