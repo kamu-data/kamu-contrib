@@ -1,0 +1,39 @@
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.github.odf.views
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Url
+        url: https://api.github.com/repos/open-data-fabric/open-data-fabric/traffic/views
+        headers:
+          - name: User-Agent
+            value: kamu
+          - name: Accept
+            value: application/vnd.github+json
+          - name: Authorization
+            value: Bearer ${{env.GITHUB_KEY}}
+      read:
+        kind: Json
+        subPath: views
+        schema:
+          - timestamp TIMESTAMP
+          - count BIGINT
+          - uniques BIGINT
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          SELECT
+            timestamp as event_time,
+            count,
+            uniques as unique_count
+          FROM input
+      merge:
+        kind: Ledger
+        primaryKey:
+          - event_time
+    - kind: SetInfo
+      description: Two weeks of views of the selected github repository.
