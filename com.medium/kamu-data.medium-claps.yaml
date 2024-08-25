@@ -1,0 +1,21 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.medium.claps.kamu-data
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.medium.claps:0.1.0"
+        env:
+          - name: MEDIUM_USER
+            value: "kamu-data"
+      read:
+        kind: NdJson
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - entry_url
+    - kind: SetVocab
