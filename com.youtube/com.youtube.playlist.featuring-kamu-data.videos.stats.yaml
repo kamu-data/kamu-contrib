@@ -1,0 +1,33 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.youtube.playlist.featuring-kamu-data.videos.stats
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.youtube.stats:0.1.0"
+        env:
+          - name: PLAYLIST_ID
+            value: PLV91cS45lwVEPBshrvmATOSiStzgDpms3
+          - name: YOUTUBE_API_KEY
+      read:
+        kind: NdJson
+        schema:
+          - video_id STRING
+          - title STRING
+          - published_at TIMESTAMP
+          - channel_id STRING
+          - channel_title STRING
+          - video_owner_channel_id STRING
+          - video_owner_channel_title STRING
+          - view_count BIGINT
+          - like_count BIGINT
+          - comment_count BIGINT
+          - favorite_count BIGINT
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - video_id

@@ -2,7 +2,7 @@
 kind: DatasetSnapshot
 version: 1
 content:
-  name: com.medium.claps.kamu-data
+  name: com.medium.kamu-data.claps
   kind: Root
   metadata:
     - kind: SetPollingSource

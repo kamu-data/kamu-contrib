@@ -1,8 +1,10 @@
-IMAGE = ghcr.io/kamu-data/fetch-com.github.stargazers:0.1.0
+IMAGE = ghcr.io/kamu-data/fetch-com.medium.claps:0.1.0
+
 
 .PHONY: requirements
 requirements:
 	pip-compile requirements.in
+
 
 .PHONY: image
 image:

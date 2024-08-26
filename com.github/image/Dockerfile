@@ -12,5 +12,5 @@ RUN pip install -r requirements.txt
 # App
 COPY fetch.py ./
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD ["python", "fetch.py"]
+ENTRYPOINT ["/usr/bin/tini", "--", "python", "fetch.py"]
+CMD []

@@ -4,21 +4,9 @@ import feedparser
 import requests
 
 user = os.environ["MEDIUM_USER"]
-#user= "kamu-data"
 
-'''
-resp = requests.get(
-        f"https://medium.com/feed/{user}/",
-        headers={
-            "Content-Type": "application/json",
-            "charset": "utf-8"
-        }
-    )
-
-resp.raise_for_status()
-'''
-
-entries = feedparser.parse(f"https://medium.com/feed/{user}/")["entries"]
+# TODO: This does not return all publications, only a few latest ones :(
+entries = feedparser.parse(f"https://medium.com/feed/{user}")["entries"]
 
 for entry in entries:
     # Get all entries by title and unique url id

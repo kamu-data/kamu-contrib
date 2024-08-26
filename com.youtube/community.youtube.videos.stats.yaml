@@ -1,0 +1,61 @@
+kind: DatasetSnapshot
+version: 1
+content:
+  name: community.youtube.videos.stats
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.youtube.channel.kamu-data.videos.stats
+        - datasetRef: com.youtube.playlist.featuring-kamu-data.videos.stats
+      transform:
+        engine: datafusion
+        kind: Sql
+        query: |
+          select
+            op,
+            event_time,
+            video_id,
+            title,
+            published_at,
+            channel_id,
+            channel_title,
+            video_owner_channel_id,
+            video_owner_channel_title,
+            view_count,
+            like_count,
+            comment_count,
+            favorite_count
+          from "com.youtube.channel.kamu-data.videos.stats"
+          union all
+          select
+            op,
+            event_time,
+            video_id,
+            title,
+            published_at,
+            channel_id,
+            channel_title,
+            video_owner_channel_id,
+            video_owner_channel_title,
+            view_count,
+            like_count,
+            comment_count,
+            favorite_count
+          from "com.youtube.playlist.featuring-kamu-data.videos.stats"
+    - kind: SetInfo
+      description: 'ODF Community: History of YouTube videos stats'
+      keywords:
+        - ODF
+        - Community
+        - Social
+        - YouTube
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # ODF Community: History of YouTube videos stats
+            
+              See YouTube's [channel API](https://developers.google.com/youtube/v3/docs/playlists) documentation for details

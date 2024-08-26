@@ -2,7 +2,7 @@
 kind: DatasetSnapshot
 version: 1
 content:
-  name: com.youtube.stats.kamu-data.video
+  name: com.youtube.channel.kamu-data.videos.stats
   kind: Root
   metadata:
     - kind: SetPollingSource
@@ -13,11 +13,21 @@ content:
           - name: CHANNEL_ID
             value: "UCWciDIWI_HsJ6Md_DdyJPIQ"
           - name: YOUTUBE_API_KEY
-            value: ${{ env.YOUTUBE_API_KEY }}
       read:
         kind: NdJson
+        schema:
+          - video_id STRING
+          - title STRING
+          - published_at TIMESTAMP
+          - channel_id STRING
+          - channel_title STRING
+          - video_owner_channel_id STRING
+          - video_owner_channel_title STRING
+          - view_count BIGINT
+          - like_count BIGINT
+          - comment_count BIGINT
+          - favorite_count BIGINT
       merge:
         kind: Snapshot
         primaryKey:
           - video_id
-    - kind: SetVocab

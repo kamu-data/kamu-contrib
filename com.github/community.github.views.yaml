@@ -1,0 +1,54 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: community.github.views
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.github.stats:0.1.0"
+        args:
+          - --access-token
+          - ${{ env.GH_TOKEN }}
+          - --owner
+          - kamu-data
+          - --owner
+          - open-data-fabric
+          - views
+      read:
+        kind: NdJson
+        schema:
+          - owner_id BIGINT
+          - owner_login STRING
+          - repo_id BIGINT
+          - repo_name STRING
+          - timestamp TIMESTAMP
+          - count BIGINT
+          - uniques BIGINT
+      merge:
+        kind: Ledger
+        primaryKey:
+          - owner_id
+          - repo_id
+          - timestamp
+    - kind: SetVocab
+      eventTimeColumn: timestamp
+    - kind: SetInfo
+      description: History of repository views in kamu-data GitHub organization
+      keywords:
+        - ODF
+        - Community
+        - Social
+        - GitHub
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # History of repository views in kamu-data GitHub organization
+
+              See GitHub's [repository traffic API](https://docs.github.com/en/rest/metrics/traffic) documentation for details
+
