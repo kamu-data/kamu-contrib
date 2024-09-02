@@ -30,6 +30,12 @@ jobs:
             dnslink_subdomain: _dnslink.net.rocketpool.reth.tokens-minted.ipns.kamu.dev
           - dataset_name: net.rocketpool.reth.tokens-burned
             dnslink_subdomain: _dnslink.net.rocketpool.reth.tokens-burned.ipns.kamu.dev
+          - dataset_name: com.github.kamu-data.clones
+          - dataset_name: com.github.kamu-data.stargazers
+          - dataset_name: com.github.kamu-data.views
+          - dataset_name: com.youtube.channel.kamu-data.stats
+          - dataset_name: com.youtube.channel.kamu-data.videos.stats
+          - dataset_name: com.youtube.playlist.featuring-kamu-data.videos.stats
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -111,6 +117,8 @@ jobs:
         shell: bash
         env:
           ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUBSTATS_TOKEN }}
         run: |
           kamu -v pull --fetch-uncacheable ${{ matrix.dataset_name }}
           kamu list --output-format table -w
@@ -122,6 +130,7 @@ jobs:
       
       - name: Resolve current dataset CID
         id: resolve-dataset
+        if: ${{ matrix.dnslink_subdomain }}
         shell: bash
         run: |
           ipfs_cid=$( \
@@ -136,6 +145,7 @@ jobs:
           echo "CID=$ipfs_cid" >> $GITHUB_OUTPUT
 
       - name: Pin dataset in Pinata
+        if: ${{ matrix.dnslink_subdomain }}
         shell: bash
         env:
           OLD_CID: ${{ steps.resolve-dataset.outputs.CID }}
@@ -202,6 +212,7 @@ jobs:
           fi
 
       - name: Cleanup old pins
+        if: ${{ matrix.dnslink_subdomain }}
         shell: bash
         env:
           PINATA_ACCESS_TOKEN: ${{ secrets.PINATA_ACCESS_TOKEN }}
