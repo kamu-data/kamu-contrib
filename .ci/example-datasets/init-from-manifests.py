@@ -31,7 +31,7 @@ def get_dataset_id(name):
 ###############################################################################
 
 subprocess.run(
-    "kamu init",
+    "kamu init --exists-ok",
     env=dict(
         **os.environ,
         KAMU_WORKSPACE=os.getcwd()
@@ -53,8 +53,8 @@ subprocess.run(f"kamu add -r {KAMU_PROJECTS_ROOT}/kamu-cli/examples/reth-vs-snp5
 
 subprocess.run(f"kamu add -r {KAMU_PROJECTS_ROOT}/kamu-contrib/ca.bankofcanada/", shell=True, check=True)
 subprocess.run(f"kamu add -r {KAMU_PROJECTS_ROOT}/kamu-contrib/com.naturalearthdata/", shell=True, check=True)
-subprocess.run(f"kamu add -r {KAMU_PROJECTS_ROOT}/kamu-contrib/us.cityofnewyork.data/zipcode-boundaries.yaml", shell=True, check=True)
-
+subprocess.run(f"kamu add {KAMU_PROJECTS_ROOT}/kamu-contrib/us.cityofnewyork.data/zipcode-boundaries.yaml", shell=True, check=True)
+subprocess.run(f"kamu add {KAMU_PROJECTS_ROOT}/kamu-contrib/com.youtube/community.youtube.videos.stats.yaml", shell=True, check=True)
 
 # Test datasets
 subprocess.run(f"kamu add -r {KAMU_PROJECTS_ROOT}/kamu-contrib/testing/", shell=True, check=True)

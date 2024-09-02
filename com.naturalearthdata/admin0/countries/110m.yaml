@@ -18,9 +18,9 @@ content:
         engine: datafusion
         query: |
           select
-            "ADMIN" as admin,
-            "ISO_A2" as iso_a2,
-            "ISO_A3" as iso_a3,
+            ADMIN as admin,
+            ISO_A2 as iso_a2,
+            ISO_A3 as iso_a3,
             geometry
           from input
       merge:

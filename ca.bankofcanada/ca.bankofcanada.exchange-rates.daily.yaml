@@ -45,13 +45,6 @@ content:
           - FXGBPCAD DECIMAL(18,10)
           - FXUSDCAD DECIMAL(18,10)
           - FXVNDCAD DECIMAL(18,10)
-      # TODO: This no-op step makes kamu-cli use the experimental
-      # DataFusion ingest implementation instead of Spark. This should be
-      # removed once DataFusion ingest becomes the default.
-      preprocess:
-        kind: Sql
-        engine: datafusion
-        query: select * from input
       merge:
         kind: Ledger
         primaryKey:
