@@ -25,9 +25,14 @@ def headers():
 
 
 def unpin_old(name, keep_latest):
-    resp = requests.get(f'{PINATA_API_URL}/data/pinList', headers=headers())
+    resp = requests.get(f'{PINATA_API_URL}/data/pinList', headers=headers(), params={
+        'pageLimit': 1000,
+        'status': 'pinned',
+    })
     resp.raise_for_status()
     resp = resp.json()
+
+    print("Total pins returned:", len(resp["rows"]))
 
     entries_by_name = {}
     for row in resp['rows']:
@@ -41,6 +46,8 @@ def unpin_old(name, keep_latest):
 
         entries = entries_by_name.setdefault(entry_name, [])
         entries.append(row)
+
+    print(f"Found active pins:", len(entries_by_name))
 
     for name, entries in entries_by_name.items():
         entries.sort(key=lambda e: e['date_pinned'], reverse=True)
