@@ -1,0 +1,85 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.protocols
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Url
+        url: "https://api.llama.fi/protocols"
+      read:
+        kind: Json
+        schema:
+          - id BIGINT
+          - name STRING
+          - slug STRING
+          - address STRING
+          - symbol STRING
+          - url STRING
+          - description STRING
+          - chain STRING
+          - logo STRING
+          - category STRING
+          - module STRING
+          - twitter STRING
+          - gecko_id STRING
+          - cmcId STRING
+          - listedAt BIGINT
+          - deadUrl BOOL
+          - misrepresentedTokens BOOL
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            id,
+            name,
+            slug,
+            address,
+            symbol,
+            url,
+            deadUrl as dead_url,
+            description,
+            chain,
+            logo,
+            category,
+            module,
+            twitter,
+            gecko_id,
+            cmcId,
+            to_timestamp_seconds(listedAt) as listed_at,
+            misrepresentedTokens as misrepresented_tokens
+          from input
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - id
+    - kind: SetInfo
+      description: List of protocols
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # List of protocols tracked by DefiLlama.com
+
+              Columns:
+              - `id` - protocol identifier assigned by defillama
+              - `name` - symbolic name of the protocol
+              - `slug` - symbolic identifier of the protocol
+              - `chain` - canonical name of the chain the protocol is based on (will have a value of `Multi-Chain` if the protocol spans multiple chains)
+              - `listed_at` - timestamp when this protocol was first listed
+              - `gecko_id` - protocol identifier in coingecko.com
+              - `cmc_id` - protocol identifier in coinmarketcap.com
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.

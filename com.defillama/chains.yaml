@@ -1,0 +1,60 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.chains
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Url
+        url: "https://api.llama.fi/v2/chains"
+      read:
+        kind: Json
+        schema:
+          - name STRING
+          - tokenSymbol STRING
+          - chainId BIGINT
+          - gecko_id STRING
+          - cmcId BIGINT
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            name,
+            tokenSymbol as token_symbol,
+            chainId as chain_id,
+            gecko_id,
+            cmcId as cmc_id
+          from input
+      merge:
+        kind: Snapshot
+        # NOTE: chainId can be null and therefore cannot be used as a PK
+        primaryKey:
+          - name
+    - kind: SetInfo
+      description: List of chains
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Lists blockchains tracked by DefiLlama.com
+
+              Columns:
+              - `name` - canonical name of the chain
+              - `token_symbol` - symbol of the chain's native token
+              - `chain_id` - EVM chain identifier (may be null for non-EVM chains)
+              - `gecko_id` - chain identifier in coingecko.com
+              - `cmc_id` - chain identifier in coinmarketcap.com
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
