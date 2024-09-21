@@ -111,6 +111,74 @@ def chains_tvl(args):
 
 
 #################################
+# Pools
+#################################
+
+def pools_list(top_n_tvl=None):
+    resp = requests.get(
+        f"https://yields.llama.fi/pools",
+    )
+
+    resp.raise_for_status()
+    pools = resp.json()["data"]
+
+    if top_n_tvl:
+        pools = [p for p in pools if p["tvlUsd"]]
+        pools.sort(key = lambda p: p["tvlUsd"], reverse=True)
+        pools = pools[:args.top_n_tvl]
+    else:
+        pools.sort(key = lambda p: p["project"])
+
+    return pools
+
+
+def pools(args):
+    for c in pools_list(top_n_tvl = args.top_n_tvl):
+        print(json.dumps(c))
+
+
+def pool_yield(pool):
+    resp = requests.get(
+        f"https://yields.llama.fi/chart/{pool}",
+    )
+
+    resp.raise_for_status()
+    return resp.json()["data"]
+
+
+def pools_yield(args):
+    pools = pools_list(top_n_tvl = args.top_n_tvl)
+
+    for p in pools:
+        points = pool_yield(pool=p["pool"])
+
+        if args.enrich_with_spot_stats and len(points):
+            point = points[-1]
+            point["apyPct1D"] = p["apyPct1D"]
+            point["apyPct7D"] = p["apyPct7D"]
+            point["apyPct30D"] = p["apyPct30D"]
+            point["apyMean30d"] = p["apyMean30d"]
+            point["apyBaseInception"] = p["apyBaseInception"]
+            point["mu"] = p["mu"]
+            point["sigma"] = p["sigma"]
+            point["count"] = p["count"]
+            point["volumeUsd1d"] = p["volumeUsd1d"]
+            point["volumeUsd7d"] = p["volumeUsd7d"]
+            point["outlier"] = p["outlier"]
+            point["predictions"] = json.dumps(p["predictions"])
+            point["ilRisk"] = p["ilRisk"]
+
+        for point in points:
+            point["pool"] = p["pool"]
+            point["project"] = p["project"]
+            point["chain"] = p["chain"]
+            point["symbol"] = p["symbol"]
+            print(json.dumps(point))
+
+        time.sleep(args.request_interval)
+
+
+#################################
 
 
 if __name__ == "__main__":
@@ -133,6 +201,15 @@ if __name__ == "__main__":
 
     p_chains_tvl = sp_chains.add_parser('tvl')
     p_chains_tvl.add_argument('--top-n', type=int, default=None)
+
+    # pools
+    p_pools = subparsers.add_parser('pools')
+    p_pools.add_argument('--top-n-tvl', type=int, default=None)
+    sp_pools = p_pools.add_subparsers(dest='scmd', required=False)
+
+    p_pools_yields = sp_pools.add_parser('yield')
+    p_pools_yields.add_argument('--top-n-tvl', type=int, default=None)
+    p_pools_yields.add_argument('--enrich-with-spot-stats', action='store_true')
     
     
     args = parser.parse_args()
@@ -148,11 +225,8 @@ if __name__ == "__main__":
             chains(args)
         elif args.scmd == 'tvl':
             chains_tvl(args)
-    #     for repo in repos:
-    #         views(args.access_token, repo)
-    # elif args.cmd == 'clones':
-    #     for repo in repos:
-    #         clones(args.access_token, repo)
-    # elif args.cmd == 'stargazers':
-    #     for repo in repos:
-    #         stargazers(args.access_token, repo)
+    elif args.cmd == 'pools':
+        if args.scmd is None:
+            pools(args)
+        elif args.scmd == 'yield':
+            pools_yield(args)

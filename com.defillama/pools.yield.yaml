@@ -1,0 +1,132 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.pools.yield
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.1"
+        args:
+          - --request-interval
+          - '${{ env.request_interval }}'
+          - pools
+          - yield
+          - --enrich-with-spot-stats
+          - --top-n-tvl
+          - '${{ env.top_n_pools }}'
+      read:
+        kind: NdJson
+        schema:
+          - timestamp TIMESTAMP  # 2022-05-03T00:00:00.000Z
+          - pool STRING  # "747c1d2a-c668-4682-b9f9-296708a3dd90"
+          - project STRING  # "lido"
+          - chain STRING  # "Ethereum"
+          - symbol STRING  # "STETH"
+          - tvlUsd BIGINT  # 11074372760
+          - apyBase DOUBLE  # 3.6
+          - apyReward DOUBLE  # 3.6
+          - apy DOUBLE  # 3.6
+          - apyBase7d DOUBLE  # 3.6
+          - il7d DOUBLE
+          # The following are added by --enrich-with-spot-stats
+          # for the columns that are not part of historical data
+          - apyPct1D DOUBLE  # -0.00108
+          - apyPct7D DOUBLE  # -0.00139
+          - apyPct30D DOUBLE  # 0.00125
+          - apyMean30d DOUBLE  # 0.01158
+          - apyBaseInception DOUBLE  # 0.00459
+          - mu DOUBLE  # 5.71022
+          - sigma DOUBLE  # 0.34895
+          - count DOUBLE  # 564 TODO: Unclear what this metric represents - a number or trades?
+          - volumeUsd1d DOUBLE  # 3.24898
+          - volumeUsd7d DOUBLE  # 26.41292
+          - outlier BOOL  # false
+          - predictions STRING  # {"predictedClass": "Stable/Up", "predictedProbability": 69, "binnedConfidence": 2}
+          - ilRisk STRING  # "yes"
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            timestamp,
+            pool,
+            project,
+            chain,
+            symbol,
+            tvlUsd as tvl_usd,
+            apy,
+            apyBase as apy_base,
+            apyReward as apy_reward,
+            apyBase7d as apy_base_7d,
+            il7d,
+            -- enriched spot data --
+            apyPct1D as apy_pct_1d,
+            apyPct7D as apy_pct_7d,
+            apyPct30D as apy_pct_30d,
+            apyMean30d as apy_mean_30d,
+            apyBaseInception as apy_base_inception,
+            mu,
+            sigma,
+            volumeUsd1d as volume_usd_1d,
+            volumeUsd7d as volume_usd_7d,
+            outlier,
+            json_get_str(predictions, 'predictedClass') as prediction_class,
+            json_get_float(predictions, 'predictedProbability') as prediction_probability_pct,
+            ilRisk as il_risk
+          from input
+      merge:
+        kind: Ledger
+        primaryKey:
+          - timestamp
+          - pool
+    - kind: SetVocab
+      eventTimeColumn: timestamp
+    - kind: SetInfo
+      description: Historical DeFi pools yield and TVL information
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Historical DeFi pools yield and TVL information as tracked by DefiLlama.com
+              This dataset contains time-series data about APY (annual percentage yield) and TVL (total value locked) of different DeFi pools.
+
+              Columns:
+              - `timestamp` - time at which the metrics were actual
+              - `pool` - unique identifier for the liquidity pool (same as the `pool` column in `com.defillama.pools` dataset)
+              - `project` - name of the project associated with the pool (e.g. `Lido`)
+              - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
+              - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
+              - `tvl_usd` - total value locked (TVL) in the pool, denominated in USD
+              - `apy_base` - base annual percentage yield (APY) offered by the pool
+              - `apy_reward` - reward-based APY, if applicable, provided through incentives
+              - `apy` - overall APY, combining both base and reward-based yields
+              - `il7d` - impermanent loss experienced over the past 7 days, if applicable
+
+              For these columns full history may not be available so you should use the last non-null values:
+              - `apy_pct_1d` - percentage change in APY over the past day
+              - `apy_pct_7d` - percentage change in APY over the past 7 days
+              - `apy_pct_30d` - percentage change in APY over the past 30 days
+              - `apy_mean_30d` - mean APY over the past 30 days
+              - `apy_base_inception` - base APY since inception
+              - `mu` - mean expected return for the pool, a key statistical metric
+              - `sigma` - standard deviation of returns, indicating the pool's volatility
+              - `volume_usd_1d` - trading volume in USD over the past day
+              - `volume_usd_7d` - trading volume in USD over the past 7 days
+              - `outlier` - flag indicating whether the pool has been marked as an outlier (`true` / `false`)
+              - `prediction_class` - expected price trend, such as `Stable` or `Up` etc.
+              - `prediction_probability_pct` - probability of the prediction in percents
+              - `il_risk` - risk of impermanent loss in the pool (`no` or `yes`).
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.

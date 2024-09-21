@@ -1,0 +1,72 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.pools
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Url
+        url: "https://yields.llama.fi/pools"
+      read:
+        kind: Json
+        subPath: data
+        schema:
+          - pool STRING  # "747c1d2a-c668-4682-b9f9-296708a3dd90"
+          - project STRING  # "lido"
+          - chain STRING  # "Ethereum"
+          - symbol STRING  # "STETH"
+          - poolMeta STRING  # "USDC-pool"
+          - underlyingTokens ARRAY<STRING>  # ["0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
+          - rewardTokens ARRAY<STRING>  # ["0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63"]
+          - stablecoin BOOL  # false
+          - exposure STRING  # "single"
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            pool,
+            project,
+            chain,
+            symbol,
+            poolMeta as pool_meta,
+            underlyingTokens as underlying_tokens,
+            rewardTokens as reward_tokens,
+            stablecoin,
+            exposure
+          from input
+      merge:
+        kind: Snapshot
+        primaryKey:
+          - pool
+    - kind: SetInfo
+      description: List of pools
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # General DeFi pools information tracked by DefiLlama.com
+
+              Columns:
+              - `pool` - unique identifier for the liquidity pool
+              - `project` - name of the project associated with the pool (e.g. `Lido`)
+              - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
+              - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
+              - `pool_meta` - additional metadata related to the pool, if any
+              - `underlying_tokens` - list of token addresses that underlie the pool
+              - `reward_tokens` - list of token addresses distributed as rewards, if any
+              - `stablecoin` - flag indicating whether the token in the pool is a stablecoin (`true` / `false`)
+              - `exposure` - type of exposure in the pool (`single` for single-token exposure or `multi` for multi-token exposure)
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLlama.com.
