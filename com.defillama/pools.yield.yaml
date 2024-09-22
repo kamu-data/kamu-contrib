@@ -8,7 +8,7 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.1"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.3"
         args:
           - --request-interval
           - '${{ env.request_interval }}'

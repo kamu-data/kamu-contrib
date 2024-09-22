@@ -126,8 +126,8 @@ def update():
 
 
 def configure():
-    request_interval = 1
-    top_n = 10
+    request_interval = 2
+    top_n = 100
     variables = {
         "com.defillama.chains.tvl": [
             ("request_interval", request_interval),

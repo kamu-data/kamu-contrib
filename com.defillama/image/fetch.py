@@ -11,17 +11,23 @@ def log(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
+def api_request(url, **kwargs):
+    resp = requests.get(url, **kwargs)
+    text = resp.text
+    try:
+        resp.raise_for_status()
+        return json.loads(text)
+    except:
+        log("API request failed, response body:\n" + text)
+        raise
+
+
 #################################
 # Protocols
 #################################
 
 def protocols_list(top_n_tvl=None):
-    resp = requests.get(
-        f"https://api.llama.fi/protocols",
-    )
-
-    resp.raise_for_status()
-    protocols = resp.json()
+    protocols = api_request(f"https://api.llama.fi/protocols")
 
     if top_n_tvl:
         protocols = [p for p in protocols if p["tvl"]]
@@ -34,12 +40,7 @@ def protocols_list(top_n_tvl=None):
 
 
 def protocol_tvl(protocol):
-    resp = requests.get(
-        f"https://api.llama.fi/protocol/{protocol}",
-    )
-
-    resp.raise_for_status()
-    return resp.json()
+    return api_request(f"https://api.llama.fi/protocol/{protocol}")
 
 
 def protocols(args):
@@ -68,12 +69,7 @@ def protocols_chain_tvls(args):
 #################################
 
 def chains_list(top_n_tvl=None):
-    resp = requests.get(
-        f"https://api.llama.fi/v2/chains",
-    )
-
-    resp.raise_for_status()
-    chains = resp.json()
+    chains = api_request(f"https://api.llama.fi/v2/chains")
 
     if top_n_tvl:
         chains = [c for c in chains if c["tvl"]]
@@ -86,12 +82,7 @@ def chains_list(top_n_tvl=None):
 
 
 def chain_tvl(chain):
-    resp = requests.get(
-        f"https://api.llama.fi/v2/historicalChainTvl/{chain}",
-    )
-
-    resp.raise_for_status()
-    return resp.json()
+    return api_request(f"https://api.llama.fi/v2/historicalChainTvl/{chain}")
 
 
 def chains(args):
@@ -115,12 +106,9 @@ def chains_tvl(args):
 #################################
 
 def pools_list(top_n_tvl=None):
-    resp = requests.get(
-        f"https://yields.llama.fi/pools",
-    )
-
-    resp.raise_for_status()
-    pools = resp.json()["data"]
+    pools = api_request(
+        f"https://yields.llama.fi/pools"
+    )["data"]
 
     if top_n_tvl:
         pools = [p for p in pools if p["tvlUsd"]]
@@ -138,12 +126,9 @@ def pools(args):
 
 
 def pool_yield(pool):
-    resp = requests.get(
+    return api_request(
         f"https://yields.llama.fi/chart/{pool}",
-    )
-
-    resp.raise_for_status()
-    return resp.json()["data"]
+    )["data"]
 
 
 def pools_yield(args):
