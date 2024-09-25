@@ -109,7 +109,11 @@ def chains_tvl(args):
 # Pools
 #################################
 
-def pools_list(top_n_tvl=None):
+def predefined_pools():
+    with open(os.path.join(SCRIPT_DIR, "pools-subset.json")) as f:
+        return json.load(f)["pools"]
+
+def pools_list(top_n_tvl=None, predefined_subset=False):
     pools = api_request(
         f"https://yields.llama.fi/pools"
     )["data"]
@@ -118,6 +122,25 @@ def pools_list(top_n_tvl=None):
         pools = [p for p in pools if p["tvlUsd"]]
         pools.sort(key = lambda p: p["tvlUsd"], reverse=True)
         pools = pools[:args.top_n_tvl]
+    elif predefined_subset:
+        predefined = {
+            p["id"]: p
+            for p in predefined_pools()
+        }
+        
+        pools = [
+            p for p in pools
+            if p["pool"] in predefined
+        ]
+        assert len(predefined) == len(pools)
+
+        for p in pools:
+            token_symbols = predefined[p["pool"]]["underlying_token_symbol"]
+            if isinstance(token_symbols, str):
+                token_symbols = [token_symbols]
+            p["underlyingTokenSymbols"] = token_symbols
+
+        pools.sort(key = lambda p: p["project"])
     else:
         pools.sort(key = lambda p: p["project"])
 
@@ -125,7 +148,7 @@ def pools_list(top_n_tvl=None):
 
 
 def pools(args):
-    for c in pools_list(top_n_tvl = args.top_n_tvl):
+    for c in pools_list(top_n_tvl = args.top_n_tvl, predefined_subset = args.predefined_subset):
         print(json.dumps(c))
 
 
@@ -136,7 +159,7 @@ def pool_yield(pool):
 
 
 def pools_yield(args):
-    pools = pools_list(top_n_tvl = args.top_n_tvl)
+    pools = pools_list(top_n_tvl = args.top_n_tvl, predefined_subset = args.predefined_subset)
 
     for p in pools:
         points = pool_yield(pool=p["pool"])
@@ -254,10 +277,12 @@ if __name__ == "__main__":
     # pools
     p_pools = subparsers.add_parser('pools')
     p_pools.add_argument('--top-n-tvl', type=int, default=None)
+    p_pools.add_argument('--predefined-subset', action='store_true')
     sp_pools = p_pools.add_subparsers(dest='scmd', required=False)
 
     p_pools_yields = sp_pools.add_parser('yield')
     p_pools_yields.add_argument('--top-n-tvl', type=int, default=None)
+    p_pools_yields.add_argument('--predefined-subset', action='store_true')
     p_pools_yields.add_argument('--enrich-with-spot-stats', action='store_true')
 
     # tokens

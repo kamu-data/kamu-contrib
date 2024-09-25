@@ -7,17 +7,22 @@ content:
   metadata:
     - kind: SetPollingSource
       fetch:
-        kind: Url
-        url: "https://yields.llama.fi/pools"
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.5"
+        args:
+          - --request-interval
+          - '${{ env.request_interval }}'
+          - pools
+          - --predefined-subset
       read:
-        kind: Json
-        subPath: data
+        kind: NdJson
         schema:
           - pool STRING  # "747c1d2a-c668-4682-b9f9-296708a3dd90"
           - project STRING  # "lido"
           - chain STRING  # "Ethereum"
           - symbol STRING  # "STETH"
           - poolMeta STRING  # "USDC-pool"
+          - underlyingTokenSymbols ARRAY<STRING>  # ["USDC", "WETH"]
           - underlyingTokens ARRAY<STRING>  # ["0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
           - rewardTokens ARRAY<STRING>  # ["0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63"]
           - stablecoin BOOL  # false
@@ -32,7 +37,8 @@ content:
             chain,
             symbol,
             poolMeta as pool_meta,
-            underlyingTokens as underlying_tokens,
+            underlyingTokenSymbols as underlying_token_symbols,
+            underlyingTokens as underlying_token_addresses,
             rewardTokens as reward_tokens,
             stablecoin,
             exposure
@@ -55,6 +61,7 @@ content:
           - path: README.md
             content: |
               # General DeFi pools information tracked by DefiLlama.com
+              This dataset currently includes only the small subset of pools of interest.
 
               Columns:
               - `pool` - unique identifier for the liquidity pool
@@ -62,10 +69,15 @@ content:
               - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
               - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
               - `pool_meta` - additional metadata related to the pool, if any
-              - `underlying_tokens` - list of token addresses that underlie the pool
+              - `underlying_token_addresses` - list of token addresses that underlie the pool
+              - `underlying_token_symbols` - list of token symbols that underlie the pool
               - `reward_tokens` - list of token addresses distributed as rewards, if any
               - `stablecoin` - flag indicating whether the token in the pool is a stablecoin (`true` / `false`)
               - `exposure` - type of exposure in the pool (`single` for single-token exposure or `multi` for multi-token exposure)
+
+              Data source issues:
+              - Except for the synthetic `pool` UUID DefiLlama doesn't provide a natural primary key for the pools, in future we should enrich this data with the pool addresses
+              - `underlying_token_symbols` column does not come from DefiLlama and has to be enriched manually
 
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 

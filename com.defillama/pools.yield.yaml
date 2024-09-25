@@ -8,15 +8,14 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.4"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.5"
         args:
           - --request-interval
           - '${{ env.request_interval }}'
           - pools
           - yield
+          - --predefined-subset
           - --enrich-with-spot-stats
-          - --top-n-tvl
-          - '${{ env.top_n_pools }}'
       read:
         kind: NdJson
         schema:
@@ -99,6 +98,8 @@ content:
             content: |
               # Historical DeFi pools yield and TVL information as tracked by DefiLlama.com
               This dataset contains time-series data about APY (annual percentage yield) and TVL (total value locked) of different DeFi pools.
+
+              It currently includes only the small subset of pools of interest.
 
               Columns:
               - `timestamp` - time at which the metrics were actual
