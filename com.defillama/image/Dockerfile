@@ -11,6 +11,7 @@ RUN pip install -r requirements.txt
 
 # App
 COPY fetch.py ./
+COPY tokens-subset.json ./
 
 ENTRYPOINT ["/usr/bin/tini", "--", "python", "fetch.py"]
 CMD []

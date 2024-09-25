@@ -141,6 +141,10 @@ def configure():
             ("request_interval", request_interval),
             ("top_n_pools", top_n),
         ],
+        "com.defillama.tokens.prices": [
+            ("request_interval", request_interval),
+            ("tokens_span", 365 * 3),
+        ]
     }
 
     gql = """

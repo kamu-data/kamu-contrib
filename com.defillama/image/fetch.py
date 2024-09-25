@@ -5,13 +5,17 @@ import time
 import random
 import sys
 import argparse
+import datetime as dt
+import itertools
 
+SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 def log(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
 def api_request(url, **kwargs):
+    log("API Request:", url, kwargs)
     resp = requests.get(url, **kwargs)
     text = resp.text
     try:
@@ -164,6 +168,66 @@ def pools_yield(args):
 
 
 #################################
+# Tokens
+#################################
+
+def tokens_list():
+    with open(os.path.join(SCRIPT_DIR, 'tokens-subset.json')) as f:
+        return json.load(f)["tokens"]
+
+
+def tokens(args):
+    for token in tokens_list():
+        for chain, address in token["addresses"].items():
+            print(json.dumps({
+                "symbol": token["symbol"],
+                "chain": chain,
+                "address": address
+            }))
+
+
+def chunks(iterable, size):
+    it = iter(iterable)
+    chunk = list(itertools.islice(it, size))
+    while chunk:
+        yield chunk
+        chunk = list(itertools.islice(it, size))
+
+
+def token_prices(args):
+    tokens = [
+        (chain, address)
+        for token in tokens_list()
+        for chain, address in token["addresses"].items()
+    ]
+
+    for batch in chunks(tokens, args.batch):
+        coins = ",".join(
+            f"{chain}:{address}"
+            for chain, address in batch
+        )
+        
+        resp = api_request(
+            f"https://coins.llama.fi/chart/{coins}", 
+            params={"end": args.end, "span": args.span, "period": args.period},
+        )
+
+        for chain_addr, coin in resp["coins"].items():
+            chain, address = chain_addr.split(":")
+
+            for point in coin["prices"]:
+                print(json.dumps({
+                    "symbol": coin["symbol"],
+                    "chain": chain,
+                    "address": address,
+                    "decimals": coin["decimals"],
+                    "timestamp": dt.datetime.fromtimestamp(point["timestamp"], dt.timezone.utc).isoformat(),
+                    "price": point["price"],
+                }))
+
+        time.sleep(args.request_interval)
+
+#################################
 
 
 if __name__ == "__main__":
@@ -195,6 +259,22 @@ if __name__ == "__main__":
     p_pools_yields = sp_pools.add_parser('yield')
     p_pools_yields.add_argument('--top-n-tvl', type=int, default=None)
     p_pools_yields.add_argument('--enrich-with-spot-stats', action='store_true')
+
+    # tokens
+    p_tokens = subparsers.add_parser('tokens')
+    sp_tokens = p_tokens.add_subparsers(dest='scmd', required=False)
+
+    p_tokens_prices = sp_tokens.add_parser('prices')
+    # By default we will request data with 1-day period and will align the end of the requested interval
+    # with midnight UTC to ideally get the same values upon next ingestion and keep the ledger from skewing
+    now_utc = dt.datetime.now(dt.timezone.utc)
+    midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
+    midnight_utc = int(midnight_utc.timestamp())
+    p_tokens_prices.add_argument('--end', type=int, default=midnight_utc)
+    p_tokens_prices.add_argument('--span', type=int, default=365 * 3)
+    p_tokens_prices.add_argument('--period', default="1d")
+    p_tokens_prices.add_argument('--batch', type=int, default=1)
+
     
     
     args = parser.parse_args()
@@ -215,3 +295,8 @@ if __name__ == "__main__":
             pools(args)
         elif args.scmd == 'yield':
             pools_yield(args)
+    elif args.cmd == 'tokens':
+        if args.scmd is None:
+            tokens(args)
+        elif args.scmd == 'prices':
+            token_prices(args)

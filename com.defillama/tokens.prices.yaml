@@ -1,0 +1,75 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.tokens.prices
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.4"
+        args:
+          - --request-interval
+          - '${{ env.request_interval }}'
+          - tokens
+          - prices
+          - --span
+          - '${{ env.tokens_span }}'
+      read:
+        kind: NdJson
+        schema:
+          - timestamp TIMESTAMP
+          - symbol STRING
+          - chain STRING
+          - address STRING
+          - decimals INT
+          - price DOUBLE
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            timestamp,
+            symbol,
+            chain,
+            address,
+            decimals,
+            price as price_usd
+          from input
+      merge:
+        kind: Ledger
+        primaryKey:
+          - timestamp
+          - symbol
+          - chain
+          - address
+    - kind: SetVocab
+      eventTimeColumn: timestamp
+    - kind: SetInfo
+      description: Historical token prices information
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Historical token prices information as tracked by DefiLlama.com
+              This dataset contains time-series data about token prices of different tokens.
+
+              Columns:
+              - `timestamp` - represents the exact time the token price was recorded
+              - `symbol` - token symbol
+              - `chain` - symbolic name of the blockchain network
+              - `address` - token address on the chain
+              - `decimals` - number of decimal positions the smallest indivisible token value is shifted by
+              - `price_usd` - price of the token at the corresponding timestamp in USD
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.

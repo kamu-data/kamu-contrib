@@ -1,0 +1,16 @@
+{
+  "tokens": [
+    {
+      "symbol": "WBTC",
+      "addresses": {
+        "Base": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c"
+      }
+    },
+    {
+      "symbol": "wstETH",
+      "addresses": {
+        "Arbitrum": "0x0fBcbaEA96Ce0cF7Ee00A8c19c3ab6f5Dc8E1921"
+      }
+    }
+  ]
+}
