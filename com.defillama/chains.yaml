@@ -34,7 +34,7 @@ content:
         primaryKey:
           - name
     - kind: SetInfo
-      description: List of chains
+      description: List of blockchain networks tracked by DefiLlama.com
       keywords:
         - DefiLlama
         - Blockchain
@@ -46,7 +46,7 @@ content:
         items:
           - path: README.md
             content: |
-              # Lists blockchains tracked by DefiLlama.com
+              # Lists blockchain networks tracked by DefiLlama.com
 
               Columns:
               - `name` - canonical name of the chain

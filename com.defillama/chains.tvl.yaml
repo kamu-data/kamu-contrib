@@ -27,19 +27,17 @@ content:
         engine: datafusion
         query: |
           select
-            to_timestamp_seconds(date) as date,
+            to_timestamp_seconds(date) as event_time,
             chain_name,
             tvl as tvl_usd
           from input
       merge:
         kind: Ledger
         primaryKey:
-          - date
+          - event_time
           - chain_name
-    - kind: SetVocab
-      eventTimeColumn: date
     - kind: SetInfo
-      description: Total Value Locked per chain
+      description: Total value locked per chain
       keywords:
         - DefiLlama
         - Blockchain
@@ -51,11 +49,11 @@ content:
         items:
           - path: README.md
             content: |
-              # Total Value Locked per chain as tracked by DefiLlama.com
+              # Total value locked per chain as tracked by DefiLlama.com
               This dataset contains time-series data about liquidity (measured in US Dollars) locked withing different blockchains.
 
               Columns:
-              - `date` - timestamp for when this value was recorded
+              - `event_time` - timestamp for when this value was recorded
               - `chain_name` - symbolic name of the chain
               - `tvl_usd` - estimated liquidity (total value locked) in the chain measured in US Dollars
 

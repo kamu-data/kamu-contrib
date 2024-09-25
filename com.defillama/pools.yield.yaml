@@ -50,7 +50,7 @@ content:
         engine: datafusion
         query: |
           select
-            timestamp,
+            timestamp as event_time,
             pool,
             project,
             chain,
@@ -79,10 +79,8 @@ content:
       merge:
         kind: Ledger
         primaryKey:
-          - timestamp
+          - event_time
           - pool
-    - kind: SetVocab
-      eventTimeColumn: timestamp
     - kind: SetInfo
       description: Historical DeFi pools yield and TVL information
       keywords:
@@ -102,7 +100,7 @@ content:
               It currently includes only the small subset of pools of interest.
 
               Columns:
-              - `timestamp` - time at which the metrics were actual
+              - `event_time` - time at which the metrics were actual
               - `pool` - unique identifier for the liquidity pool (same as the `pool` column in `com.defillama.pools` dataset)
               - `project` - name of the project associated with the pool (e.g. `Lido`)
               - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)

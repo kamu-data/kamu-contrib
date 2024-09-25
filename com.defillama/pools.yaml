@@ -48,7 +48,7 @@ content:
         primaryKey:
           - pool
     - kind: SetInfo
-      description: List of pools
+      description: List of DeFi pools tracked by DefiLlama.com
       keywords:
         - DefiLlama
         - Blockchain
@@ -60,7 +60,7 @@ content:
         items:
           - path: README.md
             content: |
-              # General DeFi pools information tracked by DefiLlama.com
+              # List of DeFi pools tracked by DefiLlama.com
               This dataset currently includes only the small subset of pools of interest.
 
               Columns:

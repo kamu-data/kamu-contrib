@@ -30,7 +30,7 @@ content:
         engine: datafusion
         query: |
           select
-            timestamp,
+            timestamp as event_time,
             symbol,
             chain,
             address,
@@ -40,12 +40,10 @@ content:
       merge:
         kind: Ledger
         primaryKey:
-          - timestamp
+          - event_time
           - symbol
           - chain
           - address
-    - kind: SetVocab
-      eventTimeColumn: timestamp
     - kind: SetInfo
       description: Historical token prices information
       keywords:
@@ -63,7 +61,7 @@ content:
               This dataset contains time-series data about token prices of different tokens.
 
               Columns:
-              - `timestamp` - represents the exact time the token price was recorded
+              - `event_time` - represents the exact time the token price was recorded
               - `symbol` - token symbol
               - `chain` - symbolic name of the blockchain network
               - `address` - token address on the chain
