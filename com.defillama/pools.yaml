@@ -10,8 +10,6 @@ content:
         kind: Container
         image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.5"
         args:
-          - --request-interval
-          - '${{ env.request_interval }}'
           - pools
           - --predefined-subset
       read:
