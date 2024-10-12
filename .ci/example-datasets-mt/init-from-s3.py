@@ -19,6 +19,16 @@ subprocess.run(
     check=True,
 )
 
+subprocess.run(
+    "cp .kamuconfig .kamu/",
+    env=dict(
+        **os.environ,
+        KAMU_WORKSPACE=os.getcwd()
+    ),
+    shell=True,
+    check=True,
+)
+
 # Datasets owned by `kamu`
 s3_datasets = []
 for base_url in [S3_CONTRIB_DATASETS_URL, S3_EXAMPLE_DATASETS_URL]:
