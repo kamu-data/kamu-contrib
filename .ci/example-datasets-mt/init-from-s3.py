@@ -4,7 +4,9 @@ import os
 import sys
 import subprocess
 
-sys.path.append(os.path.dirname(os.path.realpath(__file__)))
+SCRIPT_PATH = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(SCRIPT_PATH)
+
 from common import *
 
 ###############################################################################
@@ -20,7 +22,7 @@ subprocess.run(
 )
 
 subprocess.run(
-    "cp .kamuconfig .kamu/",
+    f"cp {SCRIPT_PATH}/.kamuconfig .kamu/",
     env=dict(
         **os.environ,
         KAMU_WORKSPACE=os.getcwd()

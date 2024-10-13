@@ -6,7 +6,7 @@ on:
 concurrency: update-example-datasets-mt
 jobs:
   update:
-    name: Update example datasets
+    name: Update multi-tenant example datasets
     runs-on: ubuntu-latest
     permissions:
       id-token: write
