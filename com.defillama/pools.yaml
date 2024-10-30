@@ -80,3 +80,31 @@ content:
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
               This data is ingested for prototyping purposes only, all rights belong to DefiLlama.com.
+
+              ## Example Queries
+              **Question:** List all pools on Ethereum with their token symbols
+              
+              **Query:**
+              ```sql
+              select
+                pool,
+                project,
+                symbol
+              from 'kamu/com.defillama.pools'
+              where chain = 'Ethereum'
+              order by pool
+              ```
+
+              **Question:** Which pools on Ethereum involve stablecoins?
+              
+              **Query:**
+              ```sql
+              select
+                pool,
+                project,
+                symbol,
+                stablecoin
+              from 'kamu/com.defillama.pools'
+              where chain = 'Ethereum' and stablecoin = true
+              order by pool
+              ```

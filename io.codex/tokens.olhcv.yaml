@@ -80,3 +80,69 @@ content:
               See [Codex.io API](https://docs.codex.io/reference/queries#getbars) documentation for details.
 
               This data is ingested for prototyping purposes only, all rights belong to Codex.io.
+
+              ## Example Queries
+              **Question:** What's the latest trading volume of USDC token across all networks
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC'
+              group by event_time, symbol
+              order by event_time desc
+              limit 1
+              ```
+
+              Note the `group by` to `sum(volume)` across all networks.
+
+              **Question:** What was the trading volume of USDC on July 24, 2024?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC' and cast(event_time as date) == '2024-07-24'
+              group by event_time, symbol
+              ```
+
+              Note the `group by` to `sum(volume)` across all networks.
+
+              **Question:** What are the top 10 tokens by trading volume now
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where event_time in (
+                select max(event_time) from 'kamu/io.codex.tokens.olhcv'
+              )
+              group by event_time, symbol
+              order by volume desc
+              limit 10
+              ```
+
+              **Question:** What are the top 3 tokens by volume in the last 10 days on Ethereum chain
+              
+              **Query:**
+              ```sql
+              select
+                symbol,
+                min(event_time) as from,
+                max(event_time) as to,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where event_time >= (now() - interval '10 days') and network_name = 'Ethereum'
+              group by symbol
+              order by volume desc
+              limit 3
+              ```

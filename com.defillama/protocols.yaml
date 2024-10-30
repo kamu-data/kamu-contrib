@@ -83,3 +83,29 @@ content:
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
               This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** List all protocols that are based on Ethereum
+              
+              **Query:**
+              ```sql
+              select
+                id,
+                name,
+                slug,
+                chain
+              from 'kamu/com.defillama.protocols'
+              where chain = 'Ethereum'
+              order by name
+              ```
+
+              **Question:** What is the CoinGecko ID of the Lido protocol?
+              
+              **Query:**
+              ```sql
+              select
+                name,
+                gecko_id
+              from 'kamu/com.defillama.protocols'
+              where name = 'Lido'
+              ```

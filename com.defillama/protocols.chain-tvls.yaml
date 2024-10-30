@@ -67,3 +67,38 @@ content:
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
               This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** What was the TVL of Uniswap on Ethereum on October 1st, 2023?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                tvl_usd
+              from 'kamu/com.defillama.protocols.chain-tvls'
+              where protocol_name = 'Uniswap V3' and chain_name = 'Ethereum' and event_time = '2023-10-01'
+              order by event_time desc
+              limit 1
+              ```
+
+              **Question:** Which protocol has the highest TVL on Ethereum now?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                tvl_usd
+              from 'kamu/com.defillama.protocols.chain-tvls'
+              where chain_name = 'Ethereum' and event_time in (
+                select max(event_time) from 'kamu/com.defillama.protocols.chain-tvls'
+              )
+              order by tvl_usd desc
+              limit 1
+              ```
+
+              Note that because data for today may not yet exist in the dataset we use `max(event_time)` instead of `now()`.

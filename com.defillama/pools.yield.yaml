@@ -129,3 +129,39 @@ content:
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
               This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** Show the APY and TVL of Lido's pool on Ethereum as of October 1st, 2023
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                pool,
+                project,
+                chain,
+                tvl_usd,
+                apy
+              from 'kamu/com.defillama.pools.yield'
+              where project = 'Lido' and chain = 'Ethereum' and event_time = '2023-10-01'
+              order by event_time desc
+              limit 1
+              ```
+
+              **Question:** Which pool has the highest APY right now?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                pool,
+                project,
+                chain,
+                apy
+              from 'kamu/com.defillama.pools.yield'
+              where event_time in (
+                select max(event_time) from 'kamu/com.defillama.pools.yield'
+              )
+              order by apy desc
+              limit 1
+              ```
