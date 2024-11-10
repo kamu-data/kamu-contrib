@@ -83,10 +83,12 @@ content:
                 chain,
                 price_usd
               from 'kamu/com.defillama.tokens.prices'
-              where symbol = 'ETH' and chain = 'Ethereum' and event_time = '2023-10-10'
+              where symbol = 'ETH' and chain = 'Ethereum' and event_time < '2023-10-11'
               order by event_time desc
               limit 1
               ```
+
+              Note that we are using a combination of range condition on `event_time`, `order by` and `limit 1` to get the latest record on or preceding the desired date.
 
               **Question:** Which token has the highest price now?
               

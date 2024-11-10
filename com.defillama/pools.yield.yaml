@@ -102,7 +102,7 @@ content:
               Columns:
               - `event_time` - time at which the metrics were actual
               - `pool` - unique identifier for the liquidity pool (same as the `pool` column in `com.defillama.pools` dataset)
-              - `project` - name of the project associated with the pool (e.g. `Lido`)
+              - `project` - name of the project associated with the pool (e.g. `lido`, `aave-v3`)
               - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
               - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
               - `tvl_usd` - total value locked (TVL) in the pool, denominated in USD
@@ -132,7 +132,7 @@ content:
 
               ## Example Queries
               **Question:** Show the APY and TVL of Lido's pool on Ethereum as of October 1st, 2023
-              
+
               **Query:**
               ```sql
               select
@@ -143,13 +143,68 @@ content:
                 tvl_usd,
                 apy
               from 'kamu/com.defillama.pools.yield'
-              where project = 'Lido' and chain = 'Ethereum' and event_time = '2023-10-01'
+              where project = 'lido' and chain = 'Ethereum' and and event_time < '2024-10-02'
               order by event_time desc
               limit 1
               ```
 
+              Note that we are using a combination of range condition on `event_time`, `order by` and `limit 1` to get the latest record on or preceding the desired date.
+
               **Question:** Which pool has the highest APY right now?
-              
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from
+                (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                pool,
+                project,
+                chain,
+                apy
+              from latest_data
+              order by apy desc
+              limit 1
+              ```
+
+              Note the use of the `latest_data` CTE that makes sure we consider only the latest values per each pool when ordering by `apy`.
+
+              **Question:** What's the best pool for USDC by APY?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from
+                (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                pool,
+                project,
+                chain,
+                apy
+              from latest_data
+              where symbol = 'USDC'
+              order by apy desc
+              limit 1
+              ```
+
+              **Question:** What pool had the highest API in the last week on polygon?
+
               **Query:**
               ```sql
               select
@@ -159,9 +214,7 @@ content:
                 chain,
                 apy
               from 'kamu/com.defillama.pools.yield'
-              where event_time in (
-                select max(event_time) from 'kamu/com.defillama.pools.yield'
-              )
+              where event_time >= (now() - interval '7 days') and chain = 'Polygon'
               order by apy desc
               limit 1
               ```

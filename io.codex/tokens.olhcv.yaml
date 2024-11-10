@@ -146,3 +146,13 @@ content:
               order by volume desc
               limit 3
               ```
+
+              **Question:** What was the total trading volume of USDC between 1st and 10th of October 2024
+
+              **Query:**
+              ```sql
+              select
+                sum(volume) as total_volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC' and event_time >= '2024-10-01' and event_time < '2024-10-11'
+              ```
