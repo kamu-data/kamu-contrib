@@ -11,39 +11,75 @@ content:
       read:
         kind: Csv
         header: true
-        timestampFormat: 'M/d/yyyy h:mm:ss a'
         schema:
-          - cad_incident_id LONG  # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
-          - incident_datetime TIMESTAMP  # The date and time the incident was created in the dispatch system
+          - cad_incident_id BIGINT  # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
+          - incident_datetime STRING # The date and time the incident was created in the dispatch system
           - initial_call_type STRING  # The call type assigned at the time of incident creation.
-          - initial_severity_level_code LONG  # The segment(priority) assigned at the time of incident creation.
+          - initial_severity_level_code BIGINT  # The segment(priority) assigned at the time of incident creation.
           - final_call_type STRING  # The call type at the time the incident closes.
-          - final_severity_level_code LONG  # The segment(priority) assigned at the time the incident closes.
-          - first_assignment_datetime TIMESTAMP  # The date and time the first unit is assigned.
+          - final_severity_level_code BIGINT  # The segment(priority) assigned at the time the incident closes.
+          - first_assignment_datetime STRING # The date and time the first unit is assigned.
           - valid_dispatch_rspns_time_indc STRING  # Indicates that the components comprising the calculation of the DISPATCH_RESPONSE_SECONDS_QY are valid.
-          - dispatch_response_seconds_qy LONG  # The time elapsed in seconds between the incident_datetime and the first_assignment_datetime.
-          - first_activation_datetime TIMESTAMP  # The date and time the first unit gives the signal that it is enroute to the location of the incident.
-          - first_on_scene_datetime TIMESTAMP  # The date and time the first unit signals that it has arrived at the location of the incident.
+          - dispatch_response_seconds_qy BIGINT  # The time elapsed in seconds between the incident_datetime and the first_assignment_datetime.
+          - first_activation_datetime STRING # The date and time the first unit gives the signal that it is enroute to the location of the incident.
+          - first_on_scene_datetime STRING # The date and time the first unit signals that it has arrived at the location of the incident.
           - valid_incident_rspns_time_indc STRING  # Indicates that the components comprising the calculation of theINCIDENT_RESPONSE_SECONDS_QY are valid.
-          - incident_response_seconds_qy LONG  # The time elapsed in seconds between the incident_datetime and the first_on_scene_datetime.
-          - incident_travel_tm_seconds_qy LONG  # The time elapsed in seconds between the first_assignment_datetime and the first_on_scene_datetime.
-          - first_to_hosp_datetime TIMESTAMP  # The date and time the first unit gives the signal that it is enroute to the hospital.
-          - first_hosp_arrival_datetime TIMESTAMP  # The date and time the first unit signals that it has arrived at the hospital.
-          - incident_close_datetime TIMESTAMP  # The date and time the incident closes in the dispatch system.
+          - incident_response_seconds_qy BIGINT  # The time elapsed in seconds between the incident_datetime and the first_on_scene_datetime.
+          - incident_travel_tm_seconds_qy BIGINT  # The time elapsed in seconds between the first_assignment_datetime and the first_on_scene_datetime.
+          - first_to_hosp_datetime STRING # The date and time the first unit gives the signal that it is enroute to the hospital.
+          - first_hosp_arrival_datetime STRING # The date and time the first unit signals that it has arrived at the hospital.
+          - incident_close_datetime STRING # The date and time the incident closes in the dispatch system.
           - held_indicator STRING  # Indicates that for some reason a unit could not be assigned immediately
-          - incident_disposition_code LONG  # A code indicating the final outcome of the incident. See incident dispositions.
+          - incident_disposition_code STRING # A code indicating the final outcome of the incident. See incident dispositions.
           - borough STRING  # The borough of the incident location.
           - incident_dispatch_area STRING  # The dispatch area of the incident.
           - zipcode STRING  # The zip code of the incident.
-          - policeprecinct LONG  # The police precinct of the incident.
-          - citycouncildistrict LONG  # The city council district.
-          - communitydistrict LONG  # The community district.
-          - communityschooldistrict LONG  # The community school district.
-          - congressionaldistrict LONG  # The congressional district.
+          - policeprecinct BIGINT  # The police precinct of the incident.
+          - citycouncildistrict BIGINT  # The city council district.
+          - communitydistrict BIGINT  # The community district.
+          - communityschooldistrict BIGINT  # The community school district.
+          - congressionaldistrict BIGINT  # The congressional district.
           - reopen_indicator STRING  # Indicates that at some point the incident was closed but then reopened.
           - special_event_indicator STRING  # Indicates that the incident was a special event such as the NYC Marathon.
           - standby_indicator STRING  # Indicates that the units were assigned to stand by in case they were needed.
           - transfer_indicator STRING  # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            cad_incident_id,
+            to_timestamp(incident_datetime, '%m/%d/%Y %I:%M:%S %p') as incident_datetime,
+            initial_call_type,
+            initial_severity_level_code,
+            final_call_type,
+            final_severity_level_code,
+            to_timestamp(first_assignment_datetime, '%m/%d/%Y %I:%M:%S %p') as first_assignment_datetime,
+            valid_dispatch_rspns_time_indc,
+            dispatch_response_seconds_qy,
+            to_timestamp(first_activation_datetime, '%m/%d/%Y %I:%M:%S %p') as first_activation_datetime,
+            to_timestamp(first_on_scene_datetime, '%m/%d/%Y %I:%M:%S %p') as first_on_scene_datetime,
+            valid_incident_rspns_time_indc,
+            incident_response_seconds_qy,
+            incident_travel_tm_seconds_qy,
+            to_timestamp(first_to_hosp_datetime, '%m/%d/%Y %I:%M:%S %p') as first_to_hosp_datetime,
+            to_timestamp(first_hosp_arrival_datetime, '%m/%d/%Y %I:%M:%S %p') as first_hosp_arrival_datetime,
+            to_timestamp(incident_close_datetime, '%m/%d/%Y %I:%M:%S %p') as incident_close_datetime,
+            held_indicator,
+            incident_disposition_code,
+            borough,
+            incident_dispatch_area,
+            zipcode,
+            policeprecinct,
+            citycouncildistrict,
+            communitydistrict,
+            communityschooldistrict,
+            congressionaldistrict,
+            reopen_indicator,
+            special_event_indicator,
+            standby_indicator,
+            transfer_indicator
+          from input
       merge:
         kind: Ledger
         primaryKey:
