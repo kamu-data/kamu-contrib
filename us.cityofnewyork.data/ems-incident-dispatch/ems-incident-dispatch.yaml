@@ -43,6 +43,7 @@ content:
           - special_event_indicator STRING  # Indicates that the incident was a special event such as the NYC Marathon.
           - standby_indicator STRING  # Indicates that the units were assigned to stand by in case they were needed.
           - transfer_indicator STRING  # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
+      # TODO: remove this step once timestampFormat support is added in https://github.com/kamu-data/kamu-cli/issues/438
       preprocess:
         kind: Sql
         engine: datafusion
