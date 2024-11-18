@@ -91,20 +91,26 @@ content:
               Note that we are using a combination of range condition on `event_time`, `order by` and `limit 1` to get the latest record on or preceding the desired date.
 
               **Question:** Which token has the highest price now?
-              
+
               **Query:**
               ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by symbol, chain order by event_time desc) as row_num
+                  from 'kamu/com.defillama.tokens.prices'
+                )
+                where row_num = 1
+              )
               select
                 event_time,
                 symbol,
                 chain,
                 price_usd
-              from 'kamu/com.defillama.tokens.prices'
-              where event_time in (
-                select max(event_time) from 'kamu/com.defillama.tokens.prices'
-              )
+              from latest_data
               order by price_usd desc
               limit 1
               ```
 
-              Note that because data for today may not yet exist in the dataset we use `max(event_time)` instead of `now()`.
+              Note that because data for today may not yet exist in the dataset we use `latest_data` CTE instead of comparing to `now()`.

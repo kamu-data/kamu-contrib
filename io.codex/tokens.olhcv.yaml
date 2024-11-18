@@ -118,14 +118,20 @@ content:
               
               **Query:**
               ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by address order by event_time desc) as row_num
+                  from 'kamu/io.codex.tokens.olhcv'
+                )
+                where row_num = 1
+              )
               select
                 event_time,
                 symbol,
                 sum(volume) as volume
-              from 'kamu/io.codex.tokens.olhcv'
-              where event_time in (
-                select max(event_time) from 'kamu/io.codex.tokens.olhcv'
-              )
+              from latest_data
               group by event_time, symbol
               order by volume desc
               limit 10
