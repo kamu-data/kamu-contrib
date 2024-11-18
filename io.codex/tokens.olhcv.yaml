@@ -162,3 +162,13 @@ content:
               from 'kamu/io.codex.tokens.olhcv'
               where symbol = 'USDC' and event_time >= '2024-10-01' and event_time < '2024-10-11'
               ```
+
+              **Question:** How many wallets bought aave in the last 24 hours on ethereum?
+
+              **Query:**
+              ```sql
+              select
+                sum(buyers) as total_buyers
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'AAVE' and event_time >= (now() - interval '24 hours') and network_name = 'Ethereum'
+              ```
