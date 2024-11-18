@@ -155,8 +155,7 @@ content:
               **Query:**
               ```sql
               with latest_data as (
-                select * from
-                (
+                select * from (
                   select
                     *,
                     row_number() over (partition by pool order by event_time desc) as row_num
@@ -182,8 +181,7 @@ content:
               **Query:**
               ```sql
               with latest_data as (
-                select * from
-                (
+                select * from (
                   select
                     *,
                     row_number() over (partition by pool order by event_time desc) as row_num
@@ -203,7 +201,7 @@ content:
               limit 1
               ```
 
-              **Question:** What pool had the highest API in the last week on polygon?
+              **Question:** What pool had the highest APY in the last week on polygon?
 
               **Query:**
               ```sql
@@ -217,4 +215,28 @@ content:
               where event_time >= (now() - interval '7 days') and chain = 'Polygon'
               order by apy desc
               limit 1
+              ```
+
+              **Question:** What are the best pools to invest in right now?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                pool,
+                project,
+                chain,
+                apy
+              from latest_data
+              order by apy_mean_30d desc
+              limit 5
               ```
