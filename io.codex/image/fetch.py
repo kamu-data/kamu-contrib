@@ -12,6 +12,9 @@ import itertools
 TOKEN = os.environ["CODEX_API_KEY"]
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 
+DATE_MIN = '2021-01-01:00:00:00Z'
+GET_BARS_MAX_DATAPOINTS = 1500
+
 
 def log(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
@@ -73,8 +76,31 @@ def tokens_list_resolved():
 
 
 def tokens_bars(args):
-    t_from = int(dt.datetime.fromisoformat(getattr(args, "from")).timestamp())
-    t_to = int(dt.datetime.fromisoformat(args.to).timestamp())
+    t_from = getattr(args, 'from')
+    if t_from is None:
+        t_from = os.environ.get('ODF_ETAG')
+    if t_from is None:
+        t_from = DATE_MIN
+
+    t_to = args.to
+    if t_to is None:
+        # Align the end of the requested interval with midnight UTC to
+        # ideally get the same values upon next ingestion and keep the ledger from skewing
+        t_to = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+
+    t_from = int(dt.datetime.fromisoformat(t_from).timestamp())
+    t_to = int(dt.datetime.fromisoformat(t_to).timestamp())
+
+    est_data_points = (t_to - t_from) / (60 * 60 * 24)
+    has_more = False
+
+    log("Estimated data points:", est_data_points)
+    if est_data_points > GET_BARS_MAX_DATAPOINTS:
+        est_data_points = GET_BARS_MAX_DATAPOINTS
+        t_to = t_from + (60 * 60 * 24) * est_data_points
+        has_more = True
+
+    log(f"Adjusted from: {t_from}, to: {t_to}, est_points: {est_data_points}")
 
     tokens = tokens_list_resolved()
 
@@ -181,6 +207,20 @@ def tokens_bars(args):
 
         time.sleep(args.request_interval)
 
+    etag = dt.datetime.fromtimestamp(t_to, dt.timezone.utc).isoformat()
+    log(f"Finished ingest iteration has_more: {has_more}, etag: {etag}")
+
+    etag_path = os.environ.get("ODF_NEW_ETAG_PATH")
+    has_more_path = os.environ.get("ODF_NEW_HAS_MORE_DATA_PATH")
+
+    if etag_path:
+        with open(etag_path, 'w') as f:
+            f.write(etag)
+
+    if has_more and has_more_path:
+        with open(has_more_path, 'w') as f:
+            pass
+
 #################################
 
 
@@ -194,11 +234,9 @@ if __name__ == "__main__":
     sp_tokens = p_tokens.add_subparsers(dest='scmd', required=True)
 
     p_tokens_bars = sp_tokens.add_parser('bars')
-    # By default we will request data with 1-day period and will align the end of the requested interval
-    # with midnight UTC to ideally get the same values upon next ingestion and keep the ledger from skewing
-    p_tokens_bars.add_argument('--from', type=str, default='2022-01-01:00:00:00Z')
-    p_tokens_bars.add_argument('--to', type=str, default=dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat())
-    p_tokens_bars.add_argument('--resolution', default="1D")
+    p_tokens_bars.add_argument('--from', type=str, default=None)
+    p_tokens_bars.add_argument('--to', type=str, default=None)
+    p_tokens_bars.add_argument('--resolution', default='1D')
     
     args = parser.parse_args()
     log("Parsed args:", args)
