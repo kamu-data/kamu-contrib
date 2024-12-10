@@ -26,6 +26,39 @@ def api_request(url, **kwargs):
         raise
 
 
+def get_last_updated():
+    last_updated = os.environ.get('ODF_ETAG')
+    if last_updated:
+        return dt.datetime.fromisoformat(last_updated)
+    else:
+        return None
+
+
+def write_last_updated(last_updated):
+    etag_path = os.environ.get("ODF_NEW_ETAG_PATH")
+    if etag_path:
+        with open(etag_path, 'w') as f:
+            f.write(last_updated.isoformat())
+
+
+def is_up_to_date(last_updated, now):
+    if last_updated:
+        delta = now - last_updated
+        log("Time since last update:", delta)
+        if delta.days < 1:
+            log("Considering up-to-date")
+            write_last_updated(last_updated)
+            return True
+    return False
+
+
+def write_has_more():
+    path = os.environ.get("ODF_NEW_HAS_MORE_DATA_PATH")
+    if path:
+        with open(path, 'w') as f:
+            pass
+
+
 #################################
 # Protocols
 #################################
@@ -53,6 +86,11 @@ def protocols(args):
 
 
 def protocols_chain_tvls(args):
+    now = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    last_updated = get_last_updated()
+    if is_up_to_date(last_updated, now):
+        return
+
     protocols = protocols_list(top_n_tvl = args.top_n)
     log("Fetching chain tvls for protocols:", protocols)
 
@@ -66,6 +104,8 @@ def protocols_chain_tvls(args):
                 print(json.dumps(point))
 
         time.sleep(args.request_interval)
+
+    write_last_updated(now)
 
 
 #################################
@@ -95,6 +135,11 @@ def chains(args):
 
 
 def chains_tvl(args):
+    now = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    last_updated = get_last_updated()
+    if is_up_to_date(last_updated, now):
+        return
+
     chains = chains_list(top_n_tvl = args.top_n)
 
     for c in chains:
@@ -103,6 +148,8 @@ def chains_tvl(args):
             print(json.dumps(point))
 
         time.sleep(args.request_interval)
+
+    write_last_updated(now)
 
 
 #################################
@@ -159,6 +206,11 @@ def pool_yield(pool):
 
 
 def pools_yield(args):
+    now = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    last_updated = get_last_updated()
+    if is_up_to_date(last_updated, now):
+        return
+
     pools = pools_list(top_n_tvl = args.top_n_tvl, predefined_subset = args.predefined_subset)
 
     for p in pools:
@@ -189,6 +241,8 @@ def pools_yield(args):
 
         time.sleep(args.request_interval)
 
+    write_last_updated(now)
+
 
 #################################
 # Tokens
@@ -218,6 +272,25 @@ def chunks(iterable, size):
 
 
 def token_prices(args):
+    # Align to midnight to make sure we don't ingest data that might still be updated
+    now = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    now_ts = now.timestamp()
+
+    last_updated = get_last_updated()
+    if is_up_to_date(last_updated, now):
+        return
+
+    if not last_updated:
+        last_updated = dt.datetime.fromisoformat(args.start)
+
+    est_data_points = (now - last_updated).days
+    has_more = False
+    if est_data_points > args.span:
+        now = last_updated + dt.timedelta(days = args.span)
+        has_more = True
+
+    log(f"Ingest iteration start: {last_updated.isoformat()}, end: {now.isoformat()}, span: {args.span}, estimated: {est_data_points}, has_more: {has_more}")
+
     tokens = [
         (chain, address)
         for token in tokens_list()
@@ -232,7 +305,7 @@ def token_prices(args):
         
         resp = api_request(
             f"https://coins.llama.fi/chart/{coins}", 
-            params={"end": args.end, "span": args.span, "period": args.period},
+            params={"start": last_updated.timestamp(), "span": args.span, "period": args.period},
         )
 
         for chain_addr, coin in resp["coins"].items():
@@ -249,6 +322,10 @@ def token_prices(args):
                 }))
 
         time.sleep(args.request_interval)
+
+    write_last_updated(now)
+    if has_more:
+        write_has_more()
 
 #################################
 
@@ -290,13 +367,8 @@ if __name__ == "__main__":
     sp_tokens = p_tokens.add_subparsers(dest='scmd', required=False)
 
     p_tokens_prices = sp_tokens.add_parser('prices')
-    # By default we will request data with 1-day period and will align the end of the requested interval
-    # with midnight UTC to ideally get the same values upon next ingestion and keep the ledger from skewing
-    now_utc = dt.datetime.now(dt.timezone.utc)
-    midnight_utc = now_utc.replace(hour=0, minute=0, second=0, microsecond=0)
-    midnight_utc = int(midnight_utc.timestamp())
-    p_tokens_prices.add_argument('--end', type=int, default=midnight_utc)
-    p_tokens_prices.add_argument('--span', type=int, default=365 * 3)
+    p_tokens_prices.add_argument('--start', type=str, default='2021-01-01:00:00:00Z')
+    p_tokens_prices.add_argument('--span', type=int, default=365)
     p_tokens_prices.add_argument('--period', default="1d")
     p_tokens_prices.add_argument('--batch', type=int, default=1)
 

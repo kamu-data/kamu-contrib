@@ -8,12 +8,12 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-io.codex:0.1.0"
+        image: "ghcr.io/kamu-data/fetch-io.codex:0.2.0"
         env:
           - name: CODEX_API_KEY
         args:
           - --request-interval
-          - '${{ env.request_interval }}'
+          - '${{ env.request_interval || 1 }}'
           - tokens
           - bars
       read:

@@ -75,33 +75,7 @@ def tokens_list_resolved():
     ]
 
 
-def tokens_bars(args):
-    t_from = getattr(args, 'from')
-    if t_from is None:
-        t_from = os.environ.get('ODF_ETAG')
-    if t_from is None:
-        t_from = DATE_MIN
-
-    t_to = args.to
-    if t_to is None:
-        # Align the end of the requested interval with midnight UTC to
-        # ideally get the same values upon next ingestion and keep the ledger from skewing
-        t_to = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-
-    t_from = int(dt.datetime.fromisoformat(t_from).timestamp())
-    t_to = int(dt.datetime.fromisoformat(t_to).timestamp())
-
-    est_data_points = (t_to - t_from) / (60 * 60 * 24)
-    has_more = False
-
-    log("Estimated data points:", est_data_points)
-    if est_data_points > GET_BARS_MAX_DATAPOINTS:
-        est_data_points = GET_BARS_MAX_DATAPOINTS
-        t_to = t_from + (60 * 60 * 24) * est_data_points
-        has_more = True
-
-    log(f"Adjusted from: {t_from}, to: {t_to}, est_points: {est_data_points}")
-
+def tokens_bars_impl(t_from, t_to, args):
     tokens = tokens_list_resolved()
 
     gql = """
@@ -206,6 +180,38 @@ def tokens_bars(args):
             print(json.dumps(point))
 
         time.sleep(args.request_interval)
+
+
+def tokens_bars(args):
+    t_from = getattr(args, 'from')
+    if not t_from:
+        t_from = os.environ.get('ODF_ETAG')
+    if not t_from:
+        t_from = DATE_MIN
+
+    t_to = args.to
+    if not t_to:
+        # Align the end of the requested interval with midnight UTC to
+        # ideally get the same values upon next ingestion and keep the ledger from skewing
+        t_to = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+
+    t_from = int(dt.datetime.fromisoformat(t_from).timestamp())
+    t_to = int(dt.datetime.fromisoformat(t_to).timestamp())
+
+    est_data_points = (t_to - t_from) / (60 * 60 * 24)
+    has_more = False
+
+    log("Estimated data points:", est_data_points)
+
+    if est_data_points > GET_BARS_MAX_DATAPOINTS:
+        est_data_points = GET_BARS_MAX_DATAPOINTS
+        t_to = t_from + (60 * 60 * 24) * est_data_points
+        has_more = True
+
+    log(f"Adjusted from: {t_from}, to: {t_to}, est_points: {est_data_points}")
+
+    if est_data_points >= 1:
+        tokens_bars_impl(t_from, t_to, args)
 
     etag = dt.datetime.fromtimestamp(t_to, dt.timezone.utc).isoformat()
     log(f"Finished ingest iteration has_more: {has_more}, etag: {etag}")

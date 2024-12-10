@@ -1,4 +1,4 @@
-IMAGE = ghcr.io/kamu-data/fetch-io.codex:0.1.0
+IMAGE = ghcr.io/kamu-data/fetch-io.codex:0.2.0
 
 .PHONY: requirements
 requirements:

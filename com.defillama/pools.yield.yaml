@@ -8,10 +8,10 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.5"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.0"
         args:
           - --request-interval
-          - '${{ env.request_interval }}'
+          - '${{ env.request_interval || 1 }}'
           - pools
           - yield
           - --predefined-subset

@@ -8,14 +8,18 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.1.5"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.0"
         args:
           - --request-interval
-          - '${{ env.request_interval }}'
+          - ${{ env.request_interval || 1 }}
           - tokens
           - prices
+          - --start
+          - ${{ env.tokens_start || '2021-01-01:00:00:00Z' }}
           - --span
-          - '${{ env.tokens_span }}'
+          - ${{ env.tokens_span || 100 }}
+          - --batch
+          - ${{ env.tokens_batch || 5 }}
       read:
         kind: NdJson
         schema:

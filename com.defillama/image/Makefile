@@ -1,4 +1,4 @@
-IMAGE = ghcr.io/kamu-data/fetch-com.defillama:0.1.5
+IMAGE = ghcr.io/kamu-data/fetch-com.defillama:0.2.0
 
 .PHONY: requirements
 requirements:
