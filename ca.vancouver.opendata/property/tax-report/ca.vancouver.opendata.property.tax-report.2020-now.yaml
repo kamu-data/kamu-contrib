@@ -10,16 +10,45 @@ content:
         url: https://opendata.vancouver.ca/explore/dataset/property-tax-report/download/?format=csv&timezone=America/Los_Angeles&lang=en&use_labels_for_header=true&csv_separator=%3B
       read:
         kind: Csv
-        separator: ';'
+        separator: ";"
         header: true
-        nullValue: ''
+        nullValue: ""
+        schema:
+          - PID STRING
+          - LEGAL_TYPE STRING
+          - FOLIO STRING
+          - LAND_COORDINATE STRING
+          - ZONING_DISTRICT STRING
+          - ZONING_CLASSIFICATION STRING
+          - LOT STRING
+          - PLAN STRING
+          - BLOCK STRING
+          - DISTRICT_LOT STRING
+          - FROM_CIVIC_NUMBER STRING
+          - TO_CIVIC_NUMBER STRING
+          - STREET_NAME STRING
+          - PROPERTY_POSTAL_CODE STRING
+          - NARRATIVE_LEGAL_LINE1 STRING
+          - NARRATIVE_LEGAL_LINE2 STRING
+          - NARRATIVE_LEGAL_LINE3 STRING
+          - NARRATIVE_LEGAL_LINE4 STRING
+          - NARRATIVE_LEGAL_LINE5 STRING
+          - CURRENT_LAND_VALUE STRING
+          - CURRENT_IMPROVEMENT_VALUE STRING
+          - TAX_ASSESSMENT_YEAR STRING
+          - PREVIOUS_LAND_VALUE STRING
+          - PREVIOUS_IMPROVEMENT_VALUE STRING
+          - YEAR_BUILT STRING
+          - BIG_IMPROVEMENT_YEAR STRING
+          - TAX_LEVY STRING
+          - NEIGHBOURHOOD_CODE STRING
+          - REPORT_YEAR STRING
       preprocess:
         kind: Sql
-        engine: spark
+        engine: datafusion
         query: |
-          SELECT
+          select
             PID,
-            to_date(REPORT_YEAR, "yyyy") as REPORT_YEAR,
             LEGAL_TYPE,
             FOLIO,
             LAND_COORDINATE,
@@ -46,12 +75,13 @@ content:
             YEAR_BUILT,
             BIG_IMPROVEMENT_YEAR,
             TAX_LEVY,
-            NEIGHBOURHOOD_CODE
-          FROM input
+            NEIGHBOURHOOD_CODE,
+            cast(concat(REPORT_YEAR, '-01-01') as date) as REPORT_YEAR
+          from input
       merge:
         kind: Ledger
         primaryKey:
-          - PID
           - REPORT_YEAR
+          - PID
     - kind: SetVocab
       eventTimeColumn: REPORT_YEAR

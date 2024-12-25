@@ -7,16 +7,16 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Url
-        url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=shp&timezone=America/Los_Angeles&lang=en
+        url: https://opendata.vancouver.ca/explore/dataset/block-outlines/download/?format=geojson&timezone=America/Los_Angeles&lang=en
+      prepare:
+      - kind: Pipe
+        # Dataset contains some malformed geometry :(
+        command:
+        - 'jq'
+        - '-c'
+        - '.features[] | select(.geometry != null) | .'
       read:
-        kind: EsriShapefile
-      preprocess:
-        kind: Sql
-        engine: spark
-        query: |
-          SELECT
-            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry
-          FROM input
+        kind: NdGeoJson
       merge:
         # TODO
         kind: Append

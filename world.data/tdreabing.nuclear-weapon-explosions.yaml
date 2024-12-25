@@ -14,7 +14,6 @@ content:
         kind: Csv
         separator: ','
         header: true
-        nullValue: '-'
       preprocess:
           kind: Sql
           engine: spark
@@ -26,11 +25,11 @@ content:
               name,
               confirmation,
               medium,
-              cast(`latitude` as decimal(9,6)) as latitude,
-              cast(`longitude` as decimal(9,6)) as longitude,
-              cast(`depth` as decimal(9,6)) as depth,
+              cast(`latitude` as double) as latitude,
+              cast(`longitude` as double) as longitude,
+              try_cast(`depth` as double) as depth,
               mb,
-              cast(`max_yield` as decimal(9,6)) as max_yield,
+              cast(`max_yield` as double) as max_yield,
               salvo
             FROM input
       merge:

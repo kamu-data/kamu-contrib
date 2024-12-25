@@ -7,18 +7,9 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Url
-        url: https://opendata.vancouver.ca/explore/dataset/local-area-boundary/download/?format=shp&timezone=America/Los_Angeles&lang=en
+        url: https://opendata.vancouver.ca/explore/dataset/local-area-boundary/download/?format=geojson&timezone=America/Los_Angeles&lang=en
       read:
-        kind: EsriShapefile
-      preprocess:
-        kind: Sql
-        engine: spark
-        query: |
-          SELECT
-            ST_Transform(geometry, "epsg:3157", "epsg:4326") as geometry,
-            MAPID,
-            NAME
-          FROM input
+        kind: GeoJson
       merge:
         # TODO
         kind: Append
