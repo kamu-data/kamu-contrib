@@ -153,6 +153,7 @@
       ]
     },
     {
+      "pool": "2b9bf1c6-a018-4e93-a32f-7cf6ccd311fc",
       "chain": "Polygon",
       "project": "aave-v3",
       "symbol": "WETH",
