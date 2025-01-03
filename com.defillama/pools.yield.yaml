@@ -8,7 +8,7 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.0"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.1"
         args:
           - --request-interval
           - '${{ env.request_interval || 1 }}'
@@ -97,7 +97,7 @@ content:
               # Historical DeFi pools yield and TVL information as tracked by DefiLlama.com
               This dataset contains time-series data about APY (annual percentage yield) and TVL (total value locked) of different DeFi pools.
 
-              It currently includes only the small subset of pools of interest.
+              It currently includes only a small subset of pools of interest.
 
               Columns:
               - `event_time` - time at which the metrics were actual
@@ -110,6 +110,8 @@ content:
               - `apy_reward` - reward-based APY, if applicable, provided through incentives
               - `apy` - overall APY, combining both base and reward-based yields
               - `il7d` - impermanent loss experienced over the past 7 days, if applicable
+
+              The `pool` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(project, chain, symbol)` columns.
 
               For these columns full history may not be available so you should use the last non-null values:
               - `apy_pct_1d` - percentage change in APY over the past day
@@ -137,13 +139,13 @@ content:
               ```sql
               select
                 event_time,
-                pool,
                 project,
                 chain,
+                symbol,
                 tvl_usd,
                 apy
               from 'kamu/com.defillama.pools.yield'
-              where project = 'lido' and chain = 'Ethereum' and and event_time < '2024-10-02'
+              where project = 'lido' and chain = 'Ethereum' and event_time < '2024-10-02'
               order by event_time desc
               limit 1
               ```
@@ -165,9 +167,9 @@ content:
               )
               select
                 event_time,
-                pool,
                 project,
                 chain,
+                symbol,
                 apy
               from latest_data
               order by apy desc
@@ -191,9 +193,9 @@ content:
               )
               select
                 event_time,
-                pool,
                 project,
                 chain,
+                symbol,
                 apy
               from latest_data
               where symbol = 'USDC'
@@ -207,9 +209,9 @@ content:
               ```sql
               select
                 event_time,
-                pool,
                 project,
                 chain,
+                symbol,
                 apy
               from 'kamu/com.defillama.pools.yield'
               where event_time >= (now() - interval '7 days') and chain = 'Polygon'
@@ -232,9 +234,9 @@ content:
               )
               select
                 event_time,
-                pool,
                 project,
                 chain,
+                symbol,
                 apy
               from latest_data
               order by apy_mean_30d desc

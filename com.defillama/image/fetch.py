@@ -171,7 +171,7 @@ def pools_list(top_n_tvl=None, predefined_subset=False):
         pools = pools[:args.top_n_tvl]
     elif predefined_subset:
         predefined = {
-            p["id"]: p
+            p["pool"]: p
             for p in predefined_pools()
         }
         
@@ -182,10 +182,7 @@ def pools_list(top_n_tvl=None, predefined_subset=False):
         assert len(predefined) == len(pools)
 
         for p in pools:
-            token_symbols = predefined[p["pool"]]["underlying_token_symbol"]
-            if isinstance(token_symbols, str):
-                token_symbols = [token_symbols]
-            p["underlyingTokenSymbols"] = token_symbols
+            p["underlyingTokenSymbols"] = predefined[p["pool"]]["underlyingTokenSymbols"]
 
         pools.sort(key = lambda p: p["project"])
     else:
