@@ -89,6 +89,7 @@
       "chain": "Polygon",
       "symbol": "WMATIC-WETH",
       "project": "uniswap-v3",
+      "poolMeta": "0.05%",
       "underlyingTokenSymbols": [
         "WMATIC",
         "WETH"
@@ -117,6 +118,7 @@
       "chain": "Polygon",
       "project": "uniswap-v3",
       "symbol": "WMATIC-WETH",
+      "poolMeta": "0.3%",
       "underlyingTokenSymbols": [
         "WMATIC",
         "WETH"

@@ -234,6 +234,7 @@ def pools_yield(args):
             point["project"] = p["project"]
             point["chain"] = p["chain"]
             point["symbol"] = p["symbol"]
+            point["poolMeta"] = p["poolMeta"]
             print(json.dumps(point))
 
         time.sleep(args.request_interval)

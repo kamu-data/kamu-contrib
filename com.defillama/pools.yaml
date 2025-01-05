@@ -8,7 +8,7 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.2"
+        image: "ghcr.io/kamu-data/fetch-com.defillama:0.2.3"
         args:
           - pools
           - --predefined-subset
@@ -35,6 +35,7 @@ content:
             chain,
             symbol,
             poolMeta as pool_meta,
+            concat('https://defillama.com/yields/pool/', pool) as defillama_url,
             underlyingTokenSymbols as underlying_token_symbols,
             underlyingTokens as underlying_token_addresses,
             rewardTokens as reward_tokens,
@@ -66,12 +67,15 @@ content:
               - `project` - name of the project associated with the pool (e.g. `Lido`)
               - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
               - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
-              - `pool_meta` - additional metadata related to the pool, if any
+              - `pool_meta` - additional metadata that identifies the pool, if any
+              - `defillama_url` - URL of the pool in DefiLlama
               - `underlying_token_addresses` - list of token addresses that underlie the pool
               - `underlying_token_symbols` - list of token symbols that underlie the pool
               - `reward_tokens` - list of token addresses distributed as rewards, if any
               - `stablecoin` - flag indicating whether the token in the pool is a stablecoin (`true` / `false`)
               - `exposure` - type of exposure in the pool (`single` for single-token exposure or `multi` for multi-token exposure)
+
+              The `pool` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(project, chain, symbol, pool_meta)` columns.
 
               Data source issues:
               - Except for the synthetic `pool` UUID DefiLlama doesn't provide a natural primary key for the pools, in future we should enrich this data with the pool addresses
@@ -87,9 +91,10 @@ content:
               **Query:**
               ```sql
               select
-                pool,
                 project,
-                symbol
+                symbol,
+                pool_meta,
+                defillama_url
               from 'kamu/com.defillama.pools'
               where chain = 'Ethereum'
               order by pool
@@ -100,9 +105,10 @@ content:
               **Query:**
               ```sql
               select
-                pool,
                 project,
                 symbol,
+                pool_meta,
+                defillama_url,
                 stablecoin
               from 'kamu/com.defillama.pools'
               where chain = 'Ethereum' and stablecoin = true
