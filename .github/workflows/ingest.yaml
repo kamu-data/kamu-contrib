@@ -98,6 +98,7 @@ jobs:
                 - chainId: 1
                   chainName: Ethereum Mainnet
                   nodeUrl: ${{ secrets.ETH_MAINNET_WS }}
+                  getLogsBlockStride: 10000
           " > .kamuconfig
 
           # Add pinning service
