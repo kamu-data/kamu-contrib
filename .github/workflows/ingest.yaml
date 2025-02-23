@@ -94,11 +94,11 @@ jobs:
           content:
             source:
               ethereum:
+                getLogsBlockStride: 10000
                 rpcEndpoints:
-                - chainId: 1
-                  chainName: Ethereum Mainnet
-                  nodeUrl: ${{ secrets.ETH_MAINNET_WS }}
-                  getLogsBlockStride: 10000
+                  - chainId: 1
+                    chainName: Ethereum Mainnet
+                    nodeUrl: ${{ secrets.ETH_MAINNET_WS }}
           " > .kamuconfig
 
           # Add pinning service
