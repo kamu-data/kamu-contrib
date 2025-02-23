@@ -97,7 +97,7 @@ jobs:
                 rpcEndpoints:
                 - chainId: 1
                   chainName: Ethereum Mainnet
-                  nodeUrl: ${{ secrets.INFURA_ETH_MAINNET_WS }}
+                  nodeUrl: ${{ secrets.ETH_MAINNET_WS }}
           " > .kamuconfig
 
           # Add pinning service
