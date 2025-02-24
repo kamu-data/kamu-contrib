@@ -104,8 +104,9 @@ jobs:
           # Add pinning service
           ipfs pin remote service add pinata https://api.pinata.cloud/psa "${{ secrets.PINATA_ACCESS_TOKEN }}"
 
-          # Create workspace
+          # Create / upgrade workspace
           kamu init --exists-ok
+          kamu system upgrade-workspace
           kamu list --output-format table -w
 
       - name: Sync dataset from S3
