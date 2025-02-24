@@ -28,6 +28,16 @@ subprocess.run(
     check=True,
 )
 
+subprocess.run(
+    "kamu system upgrade-workspace",
+    env=dict(
+        **os.environ,
+        KAMU_WORKSPACE=os.getcwd()
+    ),
+    shell=True,
+    check=True,
+)
+
 # External datasets
 for name, url in EXTERNAL_DATASETS.items():
     subprocess.run(f"kamu pull {url} --as {name}", shell=True, check=True)

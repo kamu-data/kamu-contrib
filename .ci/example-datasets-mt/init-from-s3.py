@@ -22,6 +22,16 @@ subprocess.run(
 )
 
 subprocess.run(
+    "kamu system upgrade-workspace",
+    env=dict(
+        **os.environ,
+        KAMU_WORKSPACE=os.getcwd()
+    ),
+    shell=True,
+    check=True,
+)
+
+subprocess.run(
     f"cp {SCRIPT_PATH}/.kamuconfig .kamu/",
     env=dict(
         **os.environ,
