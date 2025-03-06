@@ -72,13 +72,22 @@ content:
               # List of protocols tracked by DefiLlama.com
 
               Columns:
-              - `id` - protocol identifier assigned by defillama
-              - `name` - symbolic name of the protocol
-              - `slug` - symbolic identifier of the protocol
+              - `id` - numeric protocol identifier assigned by defillama
+              - `name` - display name of the protocol
+              - `slug` - unique symbolic identifier of the protocol
+              - `address` - contract address of the protocol on the corresponding `chain`
+              - `symbol` - short symbol assigned to the family of protocols (non-unique)
+              - `url` - protocol website URL
+              - `dead_url` - `true` when URL is believed to be broken
+              - `description` - long-form description of the protocol
               - `chain` - canonical name of the chain the protocol is based on (will have a value of `Multi-Chain` if the protocol spans multiple chains)
-              - `listed_at` - timestamp when this protocol was first listed
+              - `logo` - URL of the logo image
+              - `category` - classifies the protocol purpose (`Dexs`, `Yield`, `Liquid Staking` etc.)
+              - `twitter` - X.com (formerly Twitter) handle
               - `gecko_id` - protocol identifier in coingecko.com
-              - `cmc_id` - protocol identifier in coinmarketcap.com
+              - `cmcId` - protocol identifier in coinmarketcap.com
+              - `listed_at` - timestamp when this protocol was first listed
+              - `misrepresented_tokens` - `true` if the protocol have used token substitutions at any point.
 
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
