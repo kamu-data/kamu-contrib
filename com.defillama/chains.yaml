@@ -49,7 +49,7 @@ content:
               # Lists blockchain networks tracked by DefiLlama.com
 
               Columns:
-              - `name` - canonical name of the chain
+              - `name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
               - `token_symbol` - symbol of the chain's native token
               - `chain_id` - EVM chain identifier (may be null for non-EVM chains)
               - `gecko_id` - chain identifier in coingecko.com

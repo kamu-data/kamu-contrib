@@ -59,23 +59,23 @@ content:
               This dataset contains bars / candlestick data about selected set of tokens.
 
               Columns:
-              - `event_time` - closing time for which the bucket data is reported 
-              - `symbol` - token symbol
+              - `event_time` - timestamp when the data was recorded
+              - `symbol` - symbol of the token (for example `ETH`, `USDC`, `GRT`)
               - `network_id` - numeric network ID as can be found on chainlist.org
-              - `network_name` - symbolic name of the blockchain network
+              - `network_name` - symbolic name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
               - `address` - token address on the chain
-              - `open` - opening price in USD
-              - `low` - low price in USD
-              - `high` - high price in USD
-              - `close` - closing price in USD
+              - `open` - opening price in US Dollars
+              - `low` - low price in US Dollars
+              - `high` - high price in US Dollars
+              - `close` - closing price in US Dollars
               - `transactions` - number of transactions
-              - `volume` - total traded volume in USD
+              - `volume` - total traded volume in US Dollars
               - `buys` - number of buys
               - `buyers` - number of unique buyers
-              - `buy_volume` - buy volume in USD
+              - `buy_volume` - buy volume in US Dollars
               - `sells` - number of sells
               - `sellers` - number of unique sellers
-              - `sell_volume` - sell volume in USD
+              - `sell_volume` - sell volume in US Dollars
 
               See [Codex.io API](https://docs.codex.io/reference/queries#getbars) documentation for details.
 

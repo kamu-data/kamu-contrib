@@ -64,15 +64,15 @@ content:
 
               Columns:
               - `pool` - unique identifier for the liquidity pool
-              - `project` - name of the project associated with the pool (e.g. `Lido`)
-              - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
-              - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
+              - `project` - name of the protocol/project associated with the pool (e.g. `lido`, `aave-v3`)
+              - `chain` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `symbol` - symbol of the token of the pool (e.g. `STETH`)
               - `pool_meta` - additional metadata that identifies the pool, if any
               - `defillama_url` - URL of the pool in DefiLlama
-              - `underlying_token_addresses` - list of token addresses that underlie the pool
-              - `underlying_token_symbols` - list of token symbols that underlie the pool
-              - `reward_tokens` - list of token addresses distributed as rewards, if any
-              - `stablecoin` - flag indicating whether the token in the pool is a stablecoin (`true` / `false`)
+              - `underlying_token_addresses` - list of token addresses that underly the pool
+              - `underlying_token_symbols` - list of token symbols that underly the pool
+              - `reward_tokens` - token addresses distributed as rewards
+              - `stablecoin` - flag indicating whether the token in the pool is a stablecoin
               - `exposure` - type of exposure in the pool (`single` for single-token exposure or `multi` for multi-token exposure)
 
               The `pool` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(project, chain, symbol, pool_meta)` columns.

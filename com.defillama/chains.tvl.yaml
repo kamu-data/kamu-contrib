@@ -54,7 +54,7 @@ content:
 
               Columns:
               - `event_time` - timestamp for when this value was recorded
-              - `chain_name` - symbolic name of the chain
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
               - `tvl_usd` - estimated liquidity (total value locked) in the chain measured in US Dollars
 
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.

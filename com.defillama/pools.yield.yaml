@@ -103,17 +103,17 @@ content:
               It currently includes only a small subset of pools of interest.
 
               Columns:
-              - `event_time` - time at which the metrics were actual
-              - `pool` - unique identifier for the liquidity pool (same as the `pool` column in `com.defillama.pools` dataset)
-              - `project` - name of the project associated with the pool (e.g. `lido`, `aave-v3`)
-              - `chain` - blockchain network on which the project operates (e.g. `Ethereum`)
-              - `symbol` - symbol representing the token in the pool (e.g. `STETH`)
+              - `event_time` - timestamp when the data was recorded
+              - `pool` - unique identifier for the liquidity pool
+              - `project` - name of the protocol/project associated with the pool (e.g. `lido`, `aave-v3`)
+              - `chain` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `symbol` - symbol of the token of the pool (e.g. `STETH`)
               - `pool_meta` - additional metadata that identifies the pool, if any
               - `defillama_url` - URL of the pool in DefiLlama
-              - `tvl_usd` - total value locked (TVL) in the pool, denominated in USD
+              - `tvl_usd` - total value locked (TVL) in the pool measured in US Dollars
               - `apy_base` - base annual percentage yield (APY) offered by the pool
-              - `apy_reward` - reward-based APY, if applicable, provided through incentives
-              - `apy` - overall APY, combining both base and reward-based yields
+              - `apy_reward` - reward-based APY provided through incentives
+              - `apy` - annual percentage yield (APY)
               - `il7d` - impermanent loss experienced over the past 7 days, if applicable
 
               The `pool` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(project, chain, symbol, pool_meta)` columns.
@@ -129,7 +129,7 @@ content:
               - `volume_usd_1d` - trading volume in USD over the past day
               - `volume_usd_7d` - trading volume in USD over the past 7 days
               - `outlier` - flag indicating whether the pool has been marked as an outlier (`true` / `false`)
-              - `prediction_class` - expected price trend, such as `Stable` or `Up` etc.
+              - `prediction_class` - expected price trend (example: `Stable`, `Up`, `Down`)
               - `prediction_probability_pct` - probability of the prediction in percents
               - `il_risk` - risk of impermanent loss in the pool (`no` or `yes`).
 

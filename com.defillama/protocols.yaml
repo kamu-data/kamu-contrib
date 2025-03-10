@@ -73,14 +73,14 @@ content:
 
               Columns:
               - `id` - numeric protocol identifier assigned by defillama
-              - `name` - display name of the protocol
+              - `name` - name of the protocol
               - `slug` - unique symbolic identifier of the protocol
               - `address` - contract address of the protocol on the corresponding `chain`
               - `symbol` - short symbol assigned to the family of protocols (non-unique)
               - `url` - protocol website URL
               - `dead_url` - `true` when URL is believed to be broken
-              - `description` - long-form description of the protocol
-              - `chain` - canonical name of the chain the protocol is based on (will have a value of `Multi-Chain` if the protocol spans multiple chains)
+              - `description` - description of the protocol
+              - `chain` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`, `Multi-Chain` if the protocol spans multiple chains)
               - `logo` - URL of the logo image
               - `category` - classifies the protocol purpose (`Dexs`, `Yield`, `Liquid Staking` etc.)
               - `twitter` - X.com (formerly Twitter) handle

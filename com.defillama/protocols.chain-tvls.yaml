@@ -58,11 +58,11 @@ content:
               This dataset contains time-series data about liquidity (measured in US Dollars) locked withing different protocols, broken down by individual blockchains these protocols operate on.
 
               Columns:
-              - `event_time` - timestamp for when this value was recorded
+              - `event_time` - timestamp when the data was recorded
               - `protocol_slug` - symbolic identifier of the protocol
-              - `protocol_name` - canonical name of the protocol
-              - `chain_name` - canonical name of the chain
-              - `tvl_usd` - estimated liquidity (total value locked) in the chain measured in US Dollars
+              - `protocol_name` - name of the protocol
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `tvl_usd` - total value locked (TVL) in the pool measured in US Dollars
 
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 

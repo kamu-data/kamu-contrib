@@ -66,11 +66,11 @@ content:
 
               Columns:
               - `event_time` - represents the exact time the token price was recorded
-              - `symbol` - token symbol
-              - `chain` - symbolic name of the blockchain network
+              - `symbol` - symbol of the token (for example `ETH`, `USDC`, `GRT`)
+              - `chain` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
               - `address` - token address on the chain
               - `decimals` - number of decimal positions the smallest indivisible token value is shifted by
-              - `price_usd` - price of the token at the corresponding timestamp in USD
+              - `price_usd` - price of the token in US Dollars
 
               See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
 
