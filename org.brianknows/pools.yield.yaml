@@ -1,0 +1,214 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.pools.yield.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.pools.yield
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            pool as pool_id,
+            project as protocol_name,
+            chain as chain_name,
+            symbol,
+            -- pool_meta,
+            -- defillama_url,
+            tvl_usd as tvl_usd_value,
+            apy,
+            apy_base,
+            apy_reward,
+            -- apy_base_7d,
+            -- il7d,
+            apy_pct_1d,
+            apy_pct_7d,
+            apy_pct_30d,
+            apy_mean_30d,
+            -- apy_base_inception,
+            -- mu,
+            -- sigma,
+            volume_usd_1d,
+            volume_usd_7d,
+            -- outlier,
+            prediction_class as price_trend
+            -- prediction_probability_pct,
+            -- il_risk
+          from 'com.defillama.pools.yield'
+          where not outlier
+    - kind: SetInfo
+      description: Historical DeFi pools yield and TVL information
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Historical DeFi pools yield and TVL information as tracked by DefiLlama.com
+              This dataset contains time-series data about APY (annual percentage yield) and TVL (total value locked) of different DeFi pools.
+
+              It currently includes only a small subset of pools of interest.
+
+              Columns:
+              - `event_time` - timestamp when the data was recorded
+              - `pool_id` - unique identifier for the liquidity pool
+              - `protocol_name` - name of the protocol/project associated with the pool (e.g. `lido`, `aave-v3`)
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `symbol` - symbol of the token of the pool (e.g. `STETH`)
+              - `tvl_usd_value` - total value locked (TVL) in the pool measured in US Dollars
+              - `apy_base` - base annual percentage yield (APY) offered by the pool
+              - `apy_reward` - reward-based APY provided through incentives
+              - `apy` - annual percentage yield (APY)
+              - `il7d` - impermanent loss experienced over the past 7 days, if applicable
+
+              The `pool_id` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(protocol_name, chain_name, symbol, pool_meta)` columns.
+
+              For these columns full history may not be available so you should use the last non-null values:
+              - `apy_pct_1d` - percentage change in APY over the past day
+              - `apy_pct_7d` - percentage change in APY over the past 7 days
+              - `apy_pct_30d` - percentage change in APY over the past 30 days
+              - `apy_mean_30d` - mean APY over the past 30 days
+              - `apy_base_inception` - base APY since inception
+              - `mu` - mean expected return for the pool, a key statistical metric
+              - `sigma` - standard deviation of returns, indicating the pool's volatility
+              - `volume_usd_1d` - trading volume in USD over the past day
+              - `volume_usd_7d` - trading volume in USD over the past 7 days
+              - `outlier` - flag indicating whether the pool has been marked as an outlier (`true` / `false`)
+              - `price_trend` - expected price trend (example: `Stable`, `Up`, `Down`)
+              - `prediction_probability_pct` - probability of the prediction in percents
+              - `il_risk` - risk of impermanent loss in the pool (`no` or `yes`).
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** Show the APY and TVL of Lido's pool on Ethereum as of October 1st, 2023
+
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                tvl_usd_value,
+                apy
+              from 'kamu/com.defillama.pools.yield'
+              where protocol_name = 'lido' and chain_name = 'Ethereum' and event_time < '2024-10-02'
+              order by event_time desc
+              limit 1
+              ```
+
+              Note that we are using a combination of range condition on `event_time`, `order by` and `limit 1` to get the latest record on or preceding the desired date.
+
+              **Question:** Which pool has the highest APY right now?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                apy
+              from latest_data
+              order by apy desc
+              limit 1
+              ```
+
+              Note the use of the `latest_data` CTE that makes sure we consider only the latest values per each pool when ordering by `apy`.
+
+              **Question:** What's the best pool for USDC by APY?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                apy
+              from latest_data
+              where symbol = 'USDC'
+              order by apy desc
+              limit 1
+              ```
+
+              **Question:** What pool had the highest APY in the last week on polygon?
+
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                apy
+              from 'kamu/com.defillama.pools.yield'
+              where event_time >= (now() - interval '7 days') and chain_name = 'Polygon'
+              order by apy desc
+              limit 1
+              ```
+
+              **Question:** What are the best pools to invest in right now?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                apy
+              from latest_data
+              order by apy_mean_30d desc
+              limit 5
+              ```

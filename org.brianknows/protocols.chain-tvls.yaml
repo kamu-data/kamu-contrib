@@ -1,0 +1,109 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.protocols.chain-tvls.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.protocols.chain-tvls
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            -- protocol_slug,
+            protocol_name,
+            chain_name,
+            tvl_usd as tvl_usd_value
+          from 'com.defillama.protocols.chain-tvls'
+    - kind: SetInfo
+      description: Total value locked per protocol per chain
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Total value locked per protocol per chain as tracked by DefiLlama.com
+              This dataset contains time-series data about liquidity (measured in US Dollars) locked withing different protocols, broken down by individual blockchains these protocols operate on.
+
+              Columns:
+              - `event_time` - timestamp when the data was recorded
+              - `protocol_name` - name of the protocol
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `tvl_usd_value` - total value locked (TVL) in the pool measured in US Dollars
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** What was the TVL of Uniswap on Ethereum on October 1st, 2023?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                tvl_usd_value
+              from 'kamu/com.defillama.protocols.chain-tvls'
+              where protocol_name = 'Uniswap V3' and chain_name = 'Ethereum' and event_time = '2023-10-01'
+              order by event_time desc
+              limit 1
+              ```
+
+              **Question:** Which protocol has the highest TVL on Ethereum now?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by protocol_name, chain_name order by event_time desc) as row_num
+                  from 'kamu/com.defillama.protocols.chain-tvls'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                tvl_usd_value
+              from latest_data
+              where chain_name = 'Ethereum'
+              order by tvl_usd_value desc
+              limit 1
+              ```
+
+              Note that because data for today may not yet exist in the dataset we `latest_data` CTE instead of comparing to `now()`.
+
+              **Question:** What is the current TVL of Uniswap V3 protocol?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by protocol_name, chain_name order by event_time desc) as row_num
+                  from 'kamu/com.defillama.protocols.chain-tvls'
+                )
+                where row_num = 1
+              )
+              select
+                protocol_name,
+                sum(tvl_usd_value) as total_tvl_usd_value
+              from latest_data
+              where protocol_name = 'Uniswap V3'
+              group by protocol_name
+              ```

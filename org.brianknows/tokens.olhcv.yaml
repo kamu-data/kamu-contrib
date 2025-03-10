@@ -1,0 +1,158 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: io.codex.tokens.prices
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: io.codex.tokens.olhcv
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            symbol,
+            network_id as chain_id,
+            network_name as chain_name,
+            address as token_address,
+            -- open,
+            -- low,
+            -- high,
+            close as price_usd,
+            transactions,
+            volume,
+            -- buys,
+            buyers as buyers_count,
+            buy_volume,
+            -- sells,
+            sellers as sellers_count,
+            sell_volume
+          from 'io.codex.tokens.olhcv'
+    - kind: SetInfo
+      description: Historical token prices information
+      keywords:
+        - Codex
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Historical token price and trading data as tracked by Codex.io
+              This dataset contains prices and trading volume history for selected set of tokens.
+
+              Columns:
+              - `event_time` - timestamp when the data was recorded
+              - `symbol` - symbol of the token (for example `ETH`, `USDC`, `GRT`)
+              - `chain_id` - chain identifier
+              - `chain_name` - symbolic name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `token_address` - token address on the chain
+              - `price_usd` - price in US Dollars
+              - `transactions` - number of transactions
+              - `volume` - total traded volume in US Dollars
+              - `buyers_count` - number of unique buyers
+              - `buy_volume` - buy volume in US Dollars
+              - `sellers_count` - number of unique sellers
+              - `sell_volume` - sell volume in US Dollars
+
+              See [Codex.io API](https://docs.codex.io/reference/queries#getbars) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to Codex.io.
+
+              ## Example Queries
+              **Question:** What's the latest trading volume of USDC token across all networks
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC'
+              group by event_time, symbol
+              order by event_time desc
+              limit 1
+              ```
+
+              Note the `group by` to `sum(volume)` across all networks.
+
+              **Question:** What was the trading volume of USDC on July 24, 2024?
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC' and cast(event_time as date) == '2024-07-24'
+              group by event_time, symbol
+              ```
+
+              Note the `group by` to `sum(volume)` across all networks.
+
+              **Question:** What are the top 10 tokens by trading volume now
+              
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by token_address order by event_time desc) as row_num
+                  from 'kamu/io.codex.tokens.olhcv'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                symbol,
+                sum(volume) as volume
+              from latest_data
+              group by event_time, symbol
+              order by volume desc
+              limit 10
+              ```
+
+              **Question:** What are the top 3 tokens by volume in the last 10 days on Ethereum chain
+              
+              **Query:**
+              ```sql
+              select
+                symbol,
+                min(event_time) as from,
+                max(event_time) as to,
+                sum(volume) as volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where event_time >= (now() - interval '10 days') and chain_name = 'Ethereum'
+              group by symbol
+              order by volume desc
+              limit 3
+              ```
+
+              **Question:** What was the total trading volume of USDC between 1st and 10th of October 2024
+
+              **Query:**
+              ```sql
+              select
+                sum(volume) as total_volume
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'USDC' and event_time >= '2024-10-01' and event_time < '2024-10-11'
+              ```
+
+              **Question:** How many wallets bought aave in the last 24 hours on ethereum?
+
+              **Query:**
+              ```sql
+              select
+                sum(buyers_count) as total_buyers_count
+              from 'kamu/io.codex.tokens.olhcv'
+              where symbol = 'AAVE' and event_time >= (now() - interval '24 hours') and chain_name = 'Ethereum'
+              ```

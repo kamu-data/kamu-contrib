@@ -1,0 +1,92 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.tokens.prices.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.tokens.prices
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            symbol,
+            chain as chain_name,
+            address,
+            decimals,
+            price_usd
+          from 'com.defillama.tokens.prices'
+    - kind: SetInfo
+      description: Historical token prices information
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Historical token prices information as tracked by DefiLlama.com
+              This dataset contains time-series data about token prices of different tokens.
+
+              Columns:
+              - `event_time` - represents the exact time the token price was recorded
+              - `symbol` - symbol of the token (for example `ETH`, `USDC`, `GRT`)
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `address` - token address on the chain
+              - `decimals` - number of decimal positions the smallest indivisible token value is shifted by
+              - `price_usd` - price of the token in US Dollars
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** What's the price of ETH on Ethereum as of October 10th, 2023
+              
+              **Query:**
+              ```sql
+              select
+                event_time,
+                symbol,
+                chain_name,
+                price_usd
+              from 'kamu/com.defillama.tokens.prices'
+              where symbol = 'ETH' and chain_name = 'Ethereum' and event_time < '2023-10-11'
+              order by event_time desc
+              limit 1
+              ```
+
+              Note that we are using a combination of range condition on `event_time`, `order by` and `limit 1` to get the latest record on or preceding the desired date.
+
+              **Question:** Which token has the highest price now?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by symbol, chain_name order by event_time desc) as row_num
+                  from 'kamu/com.defillama.tokens.prices'
+                )
+                where row_num = 1
+              )
+              select
+                event_time,
+                symbol,
+                chain_name,
+                price_usd
+              from latest_data
+              order by price_usd desc
+              limit 1
+              ```
+
+              Note that because data for today may not yet exist in the dataset we use `latest_data` CTE instead of comparing to `now()`.

@@ -1,0 +1,89 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.protocols.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.protocols
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            -- id,
+            name as protocol_name,
+            -- slug,
+            address as protocol_address,
+            symbol,
+            -- url,
+            -- dead_url,
+            chain as chain_name,
+            description,
+            -- logo,
+            category as protocol_category,
+            module,
+            twitter as twitter_handle,
+            gecko_id as coingecko_id,
+            cmcId as coinmarketcap_id,
+            listed_at as listed_time
+            -- misrepresented_tokens
+          from 'com.defillama.protocols'
+          where not misrepresented_tokens
+    - kind: SetInfo
+      description: List of protocols
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # List of protocols tracked by DefiLlama.com
+
+              Columns:
+              - `protocol_name` - name of the protocol
+              - `protocol_address` - contract address of the protocol on the corresponding `chain_name`
+              - `symbol` - short symbol assigned to the family of protocols (non-unique)
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`, `Multi-Chain` if the protocol spans multiple chains)
+              - `description` - description of the protocol
+              - `protocol_category` - classifies the protocol purpose (`Dexs`, `Yield`, `Liquid Staking` etc.)
+              - `twitter_handle` - X.com (formerly Twitter) handle
+              - `coingecko_id` - protocol identifier in coingecko.com
+              - `coinmarketcap_id` - protocol identifier in coinmarketcap.com
+              - `listed_time` - timestamp when this protocol was first listed
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLllama.com.
+
+              ## Example Queries
+              **Question:** List all protocols that are based on Ethereum
+              
+              **Query:**
+              ```sql
+              select
+                protocol_name,
+                chain_name
+              from 'kamu/com.defillama.protocols'
+              where chain_name = 'Ethereum'
+              order by protocol_name, chain_name
+              ```
+
+              **Question:** What is the CoinGecko ID of the Lido protocol?
+              
+              **Query:**
+              ```sql
+              select
+                protocol_name,
+                coingecko_id
+              from 'kamu/com.defillama.protocols'
+              where protocol_name = 'Lido'
+              ```

@@ -1,0 +1,94 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.pools.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.pools
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            pool as pool_id,
+            project as protocol_name,
+            chain as chain_name,
+            symbol,
+            -- pool_meta,
+            -- defillama_url,
+            underlying_token_symbols as pool_tokens_symbols,
+            underlying_token_addresses as pool_tokens_addresses,
+            reward_tokens,
+            stablecoin
+            -- exposure
+          from 'com.defillama.pools'
+    - kind: SetInfo
+      description: List of DeFi pools tracked by DefiLlama.com
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # List of DeFi pools tracked by DefiLlama.com
+              This dataset currently includes only the small subset of pools of interest.
+
+              Columns:
+              - `event_time` - timestamp when the data was recorded
+              - `pool_id` - unique identifier for the liquidity pool
+              - `protocol_name` - name of the protocol/project associated with the pool (e.g. `lido`, `aave-v3`)
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `symbol` - symbol of the token of the pool (e.g. `STETH`)
+              - `pool_tokens_symbols` - symbols of the tokens of the pool (e.g. `STETH`)
+              - `pool_tokens_addresses` - list of token addresses that underly the pool
+              - `reward_tokens` - token addresses distributed as rewards
+              - `stablecoin` - flag indicating whether the token in the pool is a stablecoin
+
+              The `pool_id` column represents a unique pool ID in DefiLlama. It's internal and should be used for grouping and JOINs only. A human-friendly unique primary key of the pool is a combination of `(protocol_name, chain_name, symbol, pool_meta)` columns.
+
+              Data source issues:
+              - Except for the synthetic `pool_id` UUID DefiLlama doesn't provide a natural primary key for the pools, in future we should enrich this data with the pool addresses
+              - `pool_tokens_symbols` column does not come from DefiLlama and has to be enriched manually
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLlama.com.
+
+              ## Example Queries
+              **Question:** List all pools on Ethereum with their token symbols
+              
+              **Query:**
+              ```sql
+              select
+                protocol_name,
+                symbol,
+                pool_meta,
+                defillama_url
+              from 'kamu/com.defillama.pools'
+              where chain_name = 'Ethereum'
+              order by protocol_name
+              ```
+
+              **Question:** Which pools on Ethereum involve stablecoins?
+              
+              **Query:**
+              ```sql
+              select
+                protocol_name,
+                symbol,
+                pool_meta,
+                defillama_url,
+                stablecoin
+              from 'kamu/com.defillama.pools'
+              where chain_name = 'Ethereum' and stablecoin = true
+              order by protocol_name
+              ```

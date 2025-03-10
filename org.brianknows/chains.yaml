@@ -1,0 +1,71 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.defillama.chains.deriv
+  kind: Derivative
+  metadata:
+    - kind: SetTransform
+      inputs:
+        - datasetRef: com.defillama.chains
+      transform:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            event_time,
+            name as chain_name,
+            token_symbol,
+            chain_id,
+            gecko_id as coingecko_id,
+            cmc_id as coinmarketcap_id
+          from 'com.defillama.chains'
+    - kind: SetInfo
+      description: List of blockchain networks tracked by DefiLlama.com
+      keywords:
+        - DefiLlama
+        - Blockchain
+        - Crypto
+        - Defi
+    - kind: SetAttachments
+      attachments:
+        kind: Embedded
+        items:
+          - path: README.md
+            content: |
+              # Lists blockchain networks tracked by DefiLlama.com
+
+              Columns:
+              - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
+              - `token_symbol` - symbol of the chain's native token
+              - `chain_id` - EVM chain identifier (may be null for non-EVM chains)
+              - `coingecko_id` - chain identifier in coingecko.com
+              - `coinmarketcap_id` - chain identifier in coinmarketcap.com
+
+              See [DefiLlama API](https://defillama.com/docs/api) documentation for details.
+
+              This data is ingested for prototyping purposes only, all rights belong to DefiLlama.com.
+
+              ## Example Queries
+              **Question:** List all chains with their native token symbol
+              
+              **Query:**
+              ```sql
+              select
+                chain_name,
+                token_symbol
+              from 'kamu/com.defillama.chains'
+              order by chain_name
+              ```
+
+              **Question:** What is the CoinGecko ID of Ethereum?
+              
+              **Query:**
+              ```sql
+              select
+                chain_name,
+                coingecko_id
+              from 'kamu/com.defillama.chains'
+              where chain_name = 'Ethereum'
+              limit 1
+              ```
