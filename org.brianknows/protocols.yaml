@@ -25,7 +25,7 @@ content:
             description,
             -- logo,
             category as protocol_category,
-            module,
+            -- module,
             twitter as twitter_handle,
             gecko_id as coingecko_id,
             cmcId as coinmarketcap_id,
