@@ -51,7 +51,7 @@ content:
                 event_time,
                 chain_name,
                 tvl_usd_value
-              from 'kamu/com.defillama.chains.tvl'
+              from 'brian-knows/com.defillama.chains.tvl'
               where chain_name = 'Ethereum' and event_time = '2023-10-10'
               order by event_time desc
               limit 1
@@ -66,7 +66,7 @@ content:
                   select
                     *,
                     row_number() over (partition by chain_name order by event_time desc) as row_num
-                  from 'kamu/com.defillama.chains.tvl'
+                  from 'brian-knows/com.defillama.chains.tvl'
                 )
                 where row_num = 1
               )

@@ -106,7 +106,7 @@ content:
                 defillama_url,
                 tvl_usd_value,
                 apy
-              from 'kamu/com.defillama.pools.yield'
+              from 'brian-knows/com.defillama.pools.yield'
               where protocol_name = 'lido' and chain_name = 'Ethereum' and event_time < '2024-10-02'
               order by event_time desc
               limit 1
@@ -123,7 +123,7 @@ content:
                   select
                     *,
                     row_number() over (partition by pool order by event_time desc) as row_num
-                  from 'kamu/com.defillama.pools.yield'
+                  from 'brian-knows/com.defillama.pools.yield'
                 )
                 where row_num = 1
               )
@@ -151,7 +151,7 @@ content:
                   select
                     *,
                     row_number() over (partition by pool order by event_time desc) as row_num
-                  from 'kamu/com.defillama.pools.yield'
+                  from 'brian-knows/com.defillama.pools.yield'
                 )
                 where row_num = 1
               )
@@ -181,7 +181,7 @@ content:
                 pool_meta,
                 defillama_url,
                 apy
-              from 'kamu/com.defillama.pools.yield'
+              from 'brian-knows/com.defillama.pools.yield'
               where event_time >= (now() - interval '7 days') and chain_name = 'Polygon'
               order by apy desc
               limit 1
@@ -196,7 +196,7 @@ content:
                   select
                     *,
                     row_number() over (partition by pool order by event_time desc) as row_num
-                  from 'kamu/com.defillama.pools.yield'
+                  from 'brian-knows/com.defillama.pools.yield'
                 )
                 where row_num = 1
               )

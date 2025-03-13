@@ -73,7 +73,7 @@ content:
                 symbol,
                 pool_meta,
                 defillama_url
-              from 'kamu/com.defillama.pools'
+              from 'brian-knows/com.defillama.pools'
               where chain_name = 'Ethereum'
               order by protocol_name
               ```
@@ -88,7 +88,7 @@ content:
                 pool_meta,
                 defillama_url,
                 stablecoin
-              from 'kamu/com.defillama.pools'
+              from 'brian-knows/com.defillama.pools'
               where chain_name = 'Ethereum' and stablecoin = true
               order by protocol_name
               ```

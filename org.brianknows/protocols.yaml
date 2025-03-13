@@ -72,7 +72,7 @@ content:
               select
                 protocol_name,
                 chain_name
-              from 'kamu/com.defillama.protocols'
+              from 'brian-knows/com.defillama.protocols'
               where chain_name = 'Ethereum'
               order by protocol_name, chain_name
               ```
@@ -84,6 +84,6 @@ content:
               select
                 protocol_name,
                 coingecko_id
-              from 'kamu/com.defillama.protocols'
+              from 'brian-knows/com.defillama.protocols'
               where protocol_name = 'Lido'
               ```

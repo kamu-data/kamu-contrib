@@ -55,7 +55,7 @@ content:
                 protocol_name,
                 chain_name,
                 tvl_usd_value
-              from 'kamu/com.defillama.protocols.chain-tvls'
+              from 'brian-knows/com.defillama.protocols.chain-tvls'
               where protocol_name = 'Uniswap V3' and chain_name = 'Ethereum' and event_time = '2023-10-01'
               order by event_time desc
               limit 1
@@ -70,7 +70,7 @@ content:
                   select
                     *,
                     row_number() over (partition by protocol_name, chain_name order by event_time desc) as row_num
-                  from 'kamu/com.defillama.protocols.chain-tvls'
+                  from 'brian-knows/com.defillama.protocols.chain-tvls'
                 )
                 where row_num = 1
               )
@@ -96,7 +96,7 @@ content:
                   select
                     *,
                     row_number() over (partition by protocol_name, chain_name order by event_time desc) as row_num
-                  from 'kamu/com.defillama.protocols.chain-tvls'
+                  from 'brian-knows/com.defillama.protocols.chain-tvls'
                 )
                 where row_num = 1
               )

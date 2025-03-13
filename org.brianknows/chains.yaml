@@ -54,7 +54,7 @@ content:
               select
                 chain_name,
                 token_symbol
-              from 'kamu/com.defillama.chains'
+              from 'brian-knows/com.defillama.chains'
               order by chain_name
               ```
 
@@ -65,7 +65,7 @@ content:
               select
                 chain_name,
                 coingecko_id
-              from 'kamu/com.defillama.chains'
+              from 'brian-knows/com.defillama.chains'
               where chain_name = 'Ethereum'
               limit 1
               ```

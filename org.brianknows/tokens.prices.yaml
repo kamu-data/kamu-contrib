@@ -58,7 +58,7 @@ content:
                 symbol,
                 chain_name,
                 price_usd
-              from 'kamu/com.defillama.tokens.prices'
+              from 'brian-knows/com.defillama.tokens.prices'
               where symbol = 'ETH' and chain_name = 'Ethereum' and event_time < '2023-10-11'
               order by event_time desc
               limit 1
@@ -75,7 +75,7 @@ content:
                   select
                     *,
                     row_number() over (partition by symbol, chain_name order by event_time desc) as row_num
-                  from 'kamu/com.defillama.tokens.prices'
+                  from 'brian-knows/com.defillama.tokens.prices'
                 )
                 where row_num = 1
               )

@@ -74,7 +74,7 @@ content:
                 event_time,
                 symbol,
                 sum(volume) as volume
-              from 'kamu/io.codex.tokens.olhcv'
+              from 'brian-knows/io.codex.tokens.prices'
               where symbol = 'USDC'
               group by event_time, symbol
               order by event_time desc
@@ -91,7 +91,7 @@ content:
                 event_time,
                 symbol,
                 sum(volume) as volume
-              from 'kamu/io.codex.tokens.olhcv'
+              from 'brian-knows/io.codex.tokens.prices'
               where symbol = 'USDC' and cast(event_time as date) == '2024-07-24'
               group by event_time, symbol
               ```
@@ -107,7 +107,7 @@ content:
                   select
                     *,
                     row_number() over (partition by token_address order by event_time desc) as row_num
-                  from 'kamu/io.codex.tokens.olhcv'
+                  from 'brian-knows/io.codex.tokens.prices'
                 )
                 where row_num = 1
               )
@@ -130,7 +130,7 @@ content:
                 min(event_time) as from,
                 max(event_time) as to,
                 sum(volume) as volume
-              from 'kamu/io.codex.tokens.olhcv'
+              from 'brian-knows/io.codex.tokens.prices'
               where event_time >= (now() - interval '10 days') and chain_name = 'Ethereum'
               group by symbol
               order by volume desc
@@ -143,7 +143,7 @@ content:
               ```sql
               select
                 sum(volume) as total_volume
-              from 'kamu/io.codex.tokens.olhcv'
+              from 'brian-knows/io.codex.tokens.prices'
               where symbol = 'USDC' and event_time >= '2024-10-01' and event_time < '2024-10-11'
               ```
 
@@ -153,6 +153,6 @@ content:
               ```sql
               select
                 sum(buyers_count) as total_buyers_count
-              from 'kamu/io.codex.tokens.olhcv'
+              from 'brian-knows/io.codex.tokens.prices'
               where symbol = 'AAVE' and event_time >= (now() - interval '24 hours') and chain_name = 'Ethereum'
               ```
