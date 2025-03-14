@@ -2,7 +2,7 @@
 kind: DatasetSnapshot
 version: 1
 content:
-  name: community.github.views
+  name: com.github.kamu-data.views
   kind: Root
   metadata:
     - kind: SetPollingSource

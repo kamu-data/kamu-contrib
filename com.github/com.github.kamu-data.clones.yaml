@@ -2,7 +2,7 @@
 kind: DatasetSnapshot
 version: 1
 content:
-  name: community.github.stargazers
+  name: com.github.kamu-data.clones
   kind: Root
   metadata:
     - kind: SetPollingSource
@@ -16,7 +16,7 @@ content:
           - kamu-data
           - --owner
           - open-data-fabric
-          - stargazers
+          - clones
       read:
         kind: NdJson
         schema:
@@ -24,20 +24,19 @@ content:
           - owner_login STRING
           - repo_id BIGINT
           - repo_name STRING
-          - starred_at TIMESTAMP
-          - user_id BIGINT
-          - user_login STRING
+          - timestamp TIMESTAMP
+          - count BIGINT
+          - uniques BIGINT
       merge:
         kind: Ledger
         primaryKey:
           - owner_id
           - repo_id
-          - starred_at
-          - user_id
+          - timestamp
     - kind: SetVocab
-      eventTimeColumn: starred_at
+      eventTimeColumn: timestamp
     - kind: SetInfo
-      description: History of repository stars in kamu-data GitHub organization
+      description: History of repository clones in kamu-data GitHub organization
       keywords:
         - ODF
         - Community
@@ -49,7 +48,7 @@ content:
         items:
           - path: README.md
             content: |
-              # History of repository stars in kamu-data GitHub organization
+              # History of repository clones in kamu-data GitHub organization
 
               See GitHub's [repository traffic API](https://docs.github.com/en/rest/metrics/traffic) documentation for details
 
