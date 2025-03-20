@@ -32,7 +32,6 @@ subprocess.run(
 
 # Push to Platform via ODF Smart Transfer Protocol
 for dataset in datasets:
-    id = dataset["ID"].removeprefix("did:odf:")
     account = dataset["Owner"]
     name = dataset["Name"]
 
