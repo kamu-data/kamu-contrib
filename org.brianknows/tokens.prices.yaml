@@ -16,7 +16,7 @@ content:
             event_time,
             symbol,
             chain as chain_name,
-            address,
+            address as token_address,
             decimals,
             price_usd
           from 'com.defillama.tokens.prices'
@@ -40,7 +40,7 @@ content:
               - `event_time` - represents the exact time the token price was recorded
               - `symbol` - symbol of the token (for example `ETH`, `USDC`, `GRT`)
               - `chain_name` - name of the blockchain network (example: `Ethereum`, `Base`, `Arbitrum`)
-              - `address` - token address on the chain
+              - `token_address` - token address on the chain
               - `decimals` - number of decimal positions the smallest indivisible token value is shifted by
               - `price_usd` - price of the token in US Dollars
 
