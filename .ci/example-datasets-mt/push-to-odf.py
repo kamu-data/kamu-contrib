@@ -17,16 +17,18 @@ PUSH_FLAGS = os.environ.get('PUSH_FLAGS', '')
 
 ###############################################################################
 
-def get_password(account: str) -> str:
-    return PLATFORM_PASSWORD if account == PLATFORM_LOGIN else account
-
-###############################################################################
-
 # List datasets
 datasets = json.loads(subprocess.check_output(
     "kamu list --all-accounts --output-format json --wide",
     shell=True,
 ))
+
+# Login to Platform service as an admin account
+subprocess.run(
+    f"kamu --account {PLATFORM_LOGIN} login password {PLATFORM_LOGIN} {PLATFORM_PASSWORD} {PLATFORM_API_URL}",
+    shell=True,
+    check=True,
+)
 
 # Push to Platform via ODF Smart Transfer Protocol
 for dataset in datasets:
@@ -34,19 +36,14 @@ for dataset in datasets:
     account = dataset["Owner"]
     name = dataset["Name"]
 
-    # Login to Platform service as a target account
-    subprocess.run(
-        f"kamu --account {account} login password {account} {get_password(account)} {PLATFORM_API_URL}",
-        shell=True,
-        check=True,
-    )
-
     # Form odf+https URL for the dataset
     url = f"odf+{PLATFORM_API_URL}/{account}/{name}/"
 
-    # Push via Smart Transfer Protocol
+    # Push via Smart Transfer Protocol:
+    #  - log as an admin account (who has token)
+    #  - use target account name to properly identify the dataset
     subprocess.run(
-        f"kamu --account {account} push {PUSH_FLAGS} {name} --to {url}",
+        f"kamu --account {PLATFORM_LOGIN} push {PUSH_FLAGS} {account}/{name} --to {url}",
         shell=True,
         check=True,
     )
