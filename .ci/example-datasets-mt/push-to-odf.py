@@ -28,7 +28,7 @@ datasets = json.loads(subprocess.check_output(
     shell=True,
 ))
 
-# Push to s3
+# Push to Platform via ODF Smart Transfer Protocol
 for dataset in datasets:
     id = dataset["ID"].removeprefix("did:odf:")
     account = dataset["Owner"]
