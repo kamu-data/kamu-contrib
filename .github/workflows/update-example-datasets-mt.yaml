@@ -86,8 +86,10 @@ jobs:
       - name: Push to Demo Env
         shell: bash
         env:
-          S3_TARGET_URL: ${{ secrets.DEMO_DATASETS_S3_TARGET_URL }}
+          PLATFORM_API_URL: https://api.demo.kamu.dev
+          PLATFORM_LOGIN: ${{ secrets.DEMO_PLATFORM_LOGIN }}
+          PLATFORM_PASSWORD: ${{ secrets.DEMO_PLATFORM_PASSWORD }}
           PUSH_FLAGS: --force
         run: |
           cd workspace
-          ../kamu-contrib/.ci/example-datasets-mt/push-to-s3.py
+          ../kamu-contrib/.ci/example-datasets-mt/push-to-odf.py
