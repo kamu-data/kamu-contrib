@@ -12,7 +12,7 @@ from common import *
 
 PLATFORM_API_URL = os.environ.get('PLATFORM_API_URL', None)
 PLATFORM_LOGIN = os.environ.get('PLATFORM_LOGIN', None)
-PLATFORM_PASSWORD = os.environ.get('PLATFORM_PASSWORD', None)
+PLATFORM_TOKEN = os.environ.get('PLATFORM_TOKEN', None)
 PUSH_FLAGS = os.environ.get('PUSH_FLAGS', '')
 
 ###############################################################################
@@ -25,7 +25,7 @@ datasets = json.loads(subprocess.check_output(
 
 # Login to Platform service as an admin account
 subprocess.run(
-    f"kamu --account {PLATFORM_LOGIN} login password {PLATFORM_LOGIN} {PLATFORM_PASSWORD} {PLATFORM_API_URL}",
+    f"kamu --account {PLATFORM_LOGIN} login {PLATFORM_API_URL} --access-token {PLATFORM_TOKEN}",
     shell=True,
     check=True,
 )
@@ -40,7 +40,7 @@ for dataset in datasets:
     url = f"odf+{PLATFORM_API_URL}/{account}/{name}/"
 
     # Push via Smart Transfer Protocol:
-    #  - log as an admin account (who has token)
+    #  - log as a local account (who has logged in to the Platform and has valid token)
     #  - use target account name to properly identify the dataset
     subprocess.run(
         f"kamu --account {PLATFORM_LOGIN} push {PUSH_FLAGS} {account}/{name} --to {url}",
