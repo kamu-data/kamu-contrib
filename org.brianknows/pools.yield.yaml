@@ -202,3 +202,57 @@ content:
               order by apy_mean_30d desc
               limit 5
               ```
+
+              **Question:** Which pool had the highest peak TVL for USDC within the last month?
+
+              **Query:**
+              ```sql
+              select
+                event_time,
+                protocol_name,
+                chain_name,
+                symbol,
+                tvl_usd_value
+              from 'brian-knows/com.defillama.pools.yield'
+              where event_time >= (now() - interval '30 days') and symbol = 'USDC'
+              order by tvl_usd_value desc
+              limit 1
+              ```
+
+              **Question:** Which pool has the highest TVL increase in the last month?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool_id order by event_time desc) as row_num
+                  from 'brian-knows/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              ),
+              previous_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool_id order by event_time desc) as row_num
+                  from 'brian-knows/com.defillama.pools.yield'
+                  where event_time < (now() - interval '30 days')
+                )
+                where row_num = 1
+              )
+              select
+                latest.pool_id,
+                latest.protocol_name,
+                latest.chain_name,
+                latest.symbol,
+                latest.tvl_usd_value as latest_tvl,
+                previous.tvl_usd_value as previous_tvl,
+                (latest.tvl_usd_value - previous.tvl_usd_value) as tvl_growth
+              from latest_data as latest
+              join previous_data as previous
+                on latest.pool_id = previous.pool_id
+              order by tvl_growth desc
+              limit 1
+              ```

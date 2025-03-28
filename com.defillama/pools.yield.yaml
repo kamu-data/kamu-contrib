@@ -257,3 +257,57 @@ content:
               order by apy_mean_30d desc
               limit 5
               ```
+
+              **Question:** Which pool had the highest peak TVL for USDC within the last month?
+
+              **Query:**
+              ```sql
+              select
+                event_time,
+                project,
+                chain,
+                symbol,
+                tvl_usd
+              from 'kamu/com.defillama.pools.yield'
+              where event_time >= (now() - interval '30 days') and symbol = 'USDC'
+              order by tvl_usd desc
+              limit 1
+              ```
+
+              **Question:** Which pool has the highest TVL increase in the last month?
+
+              **Query:**
+              ```sql
+              with latest_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                )
+                where row_num = 1
+              ),
+              previous_data as (
+                select * from (
+                  select
+                    *,
+                    row_number() over (partition by pool order by event_time desc) as row_num
+                  from 'kamu/com.defillama.pools.yield'
+                  where event_time < (now() - interval '30 days')
+                )
+                where row_num = 1
+              )
+              select
+                latest.pool,
+                latest.project,
+                latest.chain,
+                latest.symbol,
+                latest.tvl_usd as latest_tvl,
+                previous.tvl_usd as previous_tvl,
+                (latest.tvl_usd - previous.tvl_usd) as tvl_growth
+              from latest_data as latest
+              join previous_data as previous
+                on latest.pool = previous.pool
+              order by tvl_growth desc
+              limit 1
+              ```

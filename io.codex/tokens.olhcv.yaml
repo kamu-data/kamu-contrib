@@ -168,7 +168,12 @@ content:
               **Query:**
               ```sql
               select
-                sum(buyers) as total_buyers
+                event_time,
+                symbol,
+                network_name,
+                buyers
               from 'kamu/io.codex.tokens.olhcv'
-              where symbol = 'AAVE' and event_time >= (now() - interval '24 hours') and network_name = 'Ethereum'
+              where symbol = 'AAVE' and network_name = 'Ethereum'
+              order by event_time desc
+              limit 1
               ```

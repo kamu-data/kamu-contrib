@@ -152,7 +152,12 @@ content:
               **Query:**
               ```sql
               select
-                sum(buyers_count) as total_buyers_count
+                event_time,
+                symbol,
+                chain_name,
+                buyers_count
               from 'brian-knows/io.codex.tokens.prices'
-              where symbol = 'AAVE' and event_time >= (now() - interval '24 hours') and chain_name = 'Ethereum'
+              where symbol = 'AAVE' and chain_name = 'Ethereum'
+              order by event_time desc
+              limit 1
               ```
