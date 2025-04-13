@@ -1,8 +1,9 @@
-IMAGE = ghcr.io/kamu-data/fetch-io.codex:0.2.0
+IMAGE = ghcr.io/kamu-data/fetch-io.codex:0.3.1
 
 .PHONY: requirements
 requirements:
 	pip-compile requirements.in
+
 
 .PHONY: image
 image:
