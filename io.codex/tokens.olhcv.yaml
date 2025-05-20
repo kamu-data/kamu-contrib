@@ -8,12 +8,14 @@ content:
     - kind: SetPollingSource
       fetch:
         kind: Container
-        image: "ghcr.io/kamu-data/fetch-io.codex:0.2.0"
+        image: "ghcr.io/kamu-data/fetch-io.codex:0.3.1"
         env:
           - name: CODEX_API_KEY
         args:
           - --request-interval
-          - '${{ env.request_interval || 1 }}'
+          - '${{ env.request_interval || 0.3 }}'
+          - --max-iterations
+          - '${{ env.max_iterations || 1 }}'
           - tokens
           - bars
       read:
@@ -82,37 +84,39 @@ content:
               This data is ingested for prototyping purposes only, all rights belong to Codex.io.
 
               ## Example Queries
-              **Question:** What's the latest trading volume of USDC token across all networks
+              **Question:** What's the trading volume of USDC token across all networks
               
               **Query:**
               ```sql
               select
-                event_time,
+                event_time::date as date,
                 symbol,
                 sum(volume) as volume
               from 'kamu/io.codex.tokens.olhcv'
-              where symbol = 'USDC'
-              group by event_time, symbol
-              order by event_time desc
-              limit 1
+              where
+                symbol = 'USDC'
+                and event_time::date = (now() - interval '1 day')::date
+              group by 1, 2
               ```
 
-              Note the `group by` to `sum(volume)` across all networks.
+              Notes:
+              - Assuming the question is about *daily* trading volume, so filtering `event_time` from the previous day.
+              - Using `group by` to `sum(volume)` across all networks and time itervals.
 
               **Question:** What was the trading volume of USDC on July 24, 2024?
               
               **Query:**
               ```sql
               select
-                event_time,
+                event_time::date as date,
                 symbol,
                 sum(volume) as volume
               from 'kamu/io.codex.tokens.olhcv'
-              where symbol = 'USDC' and cast(event_time as date) == '2024-07-24'
-              group by event_time, symbol
+              where
+                symbol = 'USDC'
+                and event_time::date == '2024-07-24'
+              group by 1, 2
               ```
-
-              Note the `group by` to `sum(volume)` across all networks.
 
               **Question:** What are the top 10 tokens by trading volume now
               
