@@ -11,6 +11,7 @@ from common import *
 
 ###############################################################################
 
+log("Initializing workspace")
 subprocess.run(
     "kamu init --multi-tenant --exists-ok", 
     env=dict(
@@ -21,6 +22,7 @@ subprocess.run(
     check=True,
 )
 
+log("Upgrading workspace")
 subprocess.run(
     "kamu system upgrade-workspace",
     env=dict(
@@ -31,8 +33,9 @@ subprocess.run(
     check=True,
 )
 
+log("Updating config")
 subprocess.run(
-    f"cp {SCRIPT_PATH}/.kamuconfig .kamu/",
+    f"cp -f {SCRIPT_PATH}/.kamuconfig .kamu/",
     env=dict(
         **os.environ,
         KAMU_WORKSPACE=os.getcwd()
@@ -50,6 +53,7 @@ for base_url in [S3_CONTRIB_DATASETS_URL, S3_EXAMPLE_DATASETS_URL]:
     )
 
 for url in s3_datasets:
+    log(f"Pulling: {url}")
     subprocess.run(
         f"kamu --account kamu pull --no-alias {url}",
         shell=True,
@@ -62,6 +66,8 @@ for mt_repo_url in S3_MULTI_TENANT_EXAMPLES_URLS:
         url = mt_repo_url + did
         alias = s3_cat(f"{mt_repo_url}{did}info/alias")
         account, name = alias.split('/', 1)
+
+        log(f"Pulling: {url}")
         subprocess.run(
             f"kamu --account {account} pull --no-alias {url} --as {name}",
             shell=True,

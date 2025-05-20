@@ -1,3 +1,4 @@
+import sys
 import subprocess
 
 S3_BASE_URL = "s3://datasets.kamu.dev/odf/v2/"
@@ -12,6 +13,10 @@ S3_MULTI_TENANT_EXAMPLES_URLS = [
 
 # Output
 S3_EXAMPLE_MT_DATASETS_URL = f"{S3_BASE_URL}example-mt/"
+
+
+def log(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 def s3_listdir(url):
