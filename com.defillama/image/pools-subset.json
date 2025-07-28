@@ -179,18 +179,6 @@
       ]
     },
     {
-      "pool": "7e930fdf-5a52-4982-9ce3-0323fede4918",
-      "chain": "Base",
-      "symbol": "USDC-WETH",
-      "project": "morpho-blue",
-      "underlyingTokenSymbols": [
-        "WETH"
-      ],
-      "underlyingTokens": [
-        "0x4200000000000000000000000000000000000006"
-      ]
-    },
-    {
       "pool": "21915427-4de3-41e2-bc95-60e492deb28e",
       "chain": "Base",
       "symbol": "USDC-WETH",

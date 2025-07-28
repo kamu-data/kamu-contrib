@@ -174,12 +174,16 @@ def pools_list(top_n_tvl=None, predefined_subset=False):
             p["pool"]: p
             for p in predefined_pools()
         }
-        
+
         pools = [
             p for p in pools
             if p["pool"] in predefined
         ]
-        assert len(predefined) == len(pools)
+
+        if len(predefined) != len(pools):
+            log("Response:\n%s", json.dumps(pools, indent=2))
+            missing_pools = "\n- ".join(sorted(set(predefined.keys()).difference(p["pool"] for p in pools)))
+            raise Exception(f"Expected {len(predefined)} pools in response but got {len(pools)}. Missing pools:\n- {missing_pools}")
 
         for p in pools:
             p["underlyingTokenSymbols"] = predefined[p["pool"]]["underlyingTokenSymbols"]
