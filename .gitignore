@@ -2,3 +2,4 @@
 .kamu.local
 .ipynb_checkpoints
 __pycache__
+.env

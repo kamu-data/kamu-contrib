@@ -1,0 +1,43 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: com.spotify.playlists
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: Container
+        image: "ghcr.io/kamu-data/fetch-com.spotify:0.1.0"
+        args:
+          - playlist-tracks
+        env:
+          - name: SPOTIFY_CLIENT_ID
+          - name: SPOTIFY_CLIENT_SECRET
+          - name: SPOTIFY_USERNAME
+          - name: SPOTIFY_TOKEN_INFO
+      read:
+        kind: NdJson
+        # TODO: Split playlists and tracks into two datasets
+        schema:
+          - added_at TIMESTAMP
+          - playlist STRUCT<id STRING, name STRING>
+          - track STRUCT<id STRING, name STRING>
+          - added_by STRUCT<id STRING>
+      # TODO: Surrogate ID is needed due to missing support for nesting in `primaryKey`
+      # See: https://github.com/kamu-data/kamu-cli/issues/1354
+      preprocess:
+       kind: Sql
+       engine: datafusion
+       query: |
+         select
+           concat(playlist.id, '-', track.id, '-', to_unixtime(added_at)) as id,
+           *
+         from input
+      merge:
+        kind: Snapshot
+        # Spotify allows duplicates (playlist.id, track.id) so we consider `added_at` too
+        primaryKey:
+          - id
+    - kind: SetVocab
+      eventTimeColumn: added_at
