@@ -1,0 +1,44 @@
+---
+kind: DatasetSnapshot
+version: 1
+content:
+  name: xyz.peaq.did.add-attribute
+  kind: Root
+  metadata:
+    - kind: SetPollingSource
+      fetch:
+        kind: EthereumLogs
+        chainId: 3338 # peaq
+        signature: |
+          AddAttribute(
+            address sender,
+            address did_account,
+            bytes name,
+            bytes value,
+            uint32 validity
+          )
+        # Using known first block to limit history scanning
+        filter: |
+          block_number >= 3717155
+      read:
+        kind: Parquet
+      preprocess:
+        kind: Sql
+        engine: datafusion
+        query: |
+          select
+            block_timestamp,
+            block_number,
+            block_hash,
+            transaction_index,
+            transaction_hash,
+            log_index,
+            'AddAttribute' as event_name,
+            event.sender as sender,
+            event.did_account as did_account,
+            cast(event.name as String) as name
+          from input
+      merge:
+        kind: Append
+    - kind: SetVocab
+      eventTimeColumn: block_timestamp
