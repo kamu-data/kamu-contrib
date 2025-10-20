@@ -41,7 +41,7 @@ content:
           avatarUrl: https://cdn-icons-png.flaticon.com/512/3530/3530558.png
           email: support+moa.gov.nl@kamu.dev
         - accountName: mim.dk
-          password: mim.dk
+          password: mim.dk.password
           accountType: Organization
           avatarUrl: https://cdn-icons-png.flaticon.com/512/3530/3530558.png
           email: support+mim.dk@kamu.dev
