@@ -35,7 +35,7 @@ def api_request(gql, variables=None):
         resp.raise_for_status()
         data = json.loads(text)
         if "errors" in data:
-            raise Exception(f"GQL Error: {res['errors']}")
+            raise Exception(f"GQL Error: {data['errors']}")
         return data
     except:
         log("API request failed, response body:\n" + text)
