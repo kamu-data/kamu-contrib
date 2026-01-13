@@ -1,12 +1,11 @@
+import math
 import json
 import os
 import requests
 import time
-import random
 import sys
 import argparse
 import datetime as dt
-import itertools
 
 
 TOKEN = os.environ["CODEX_API_KEY"]
@@ -74,8 +73,13 @@ def tokens_list_resolved():
         for network, address in token["addresses"].items()
     ]
 
-
-def tokens_bars_impl(t_from, t_to, args):
+# Streams bars per token, returning the watermark.
+# Watermark is `min(max(token.timestamps) for token in tokens)`.
+# We rely on the behavior of Codex to return at least one data point per time range
+# even if this point preceeds the range and returning empty result only for ranges that
+# don't have any preceeding data points. If the range preceeds historical data of all
+# tokens - then `t_to` is returned as watermark to make sure next scan makes progress.
+def tokens_bars_impl(t_from: int, t_to: int, args) -> int:
     tokens = tokens_list_resolved()
 
     gql = """
@@ -104,6 +108,8 @@ def tokens_bars_impl(t_from, t_to, args):
     }
     """
 
+    max_timestamps_per_token = []
+
     for token in tokens:
         resp = api_request(gql, variables={
             "symbol": "{address}:{network_id}".format(**token),
@@ -111,6 +117,9 @@ def tokens_bars_impl(t_from, t_to, args):
             "to": t_to,
             "resolution": args.resolution
         })["data"]["getBars"]
+
+        if resp["t"]:
+            max_timestamps_per_token.append(max(resp["t"]))
 
         assert (
             len(resp["t"]) ==
@@ -180,6 +189,8 @@ def tokens_bars_impl(t_from, t_to, args):
             print(json.dumps(point))
 
         time.sleep(args.request_interval)
+    
+    return min(max_timestamps_per_token) if max_timestamps_per_token else t_to
 
 
 def tokens_bars(args):
@@ -188,32 +199,53 @@ def tokens_bars(args):
         t_from = os.environ.get('ODF_ETAG')
     if not t_from:
         t_from = DATE_MIN
-
-    t_to = args.to
-    if not t_to:
-        # Align the end of the requested interval with midnight UTC to
-        # ideally get the same values upon next ingestion and keep the ledger from skewing
-        t_to = dt.datetime.now(dt.timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
-
     t_from = int(dt.datetime.fromisoformat(t_from).timestamp())
-    t_to = int(dt.datetime.fromisoformat(t_to).timestamp())
 
-    est_data_points = (t_to - t_from) / (60 * 60 * 24)
-    has_more = False
+    if not args.to:
+        t_to = int(dt.datetime.now(dt.timezone.utc).timestamp())
+    else:
+        t_to = int(dt.datetime.fromisoformat(args.to).timestamp())
+    
+    resolution_seconds = {
+        "1": 60,
+        "5": 60 * 5,
+        "15": 60* 15,
+        "30": 60 * 30,
+        "60": 60 * 60,
+        "240": 60 * 60 * 4,
+        "720": 60 * 60 * 12,
+        "1D": 60 * 60 * 24,
+        "7D": 60 * 60 * 24 * 7,
+    }[args.resolution]
 
-    log("Estimated data points:", est_data_points)
+    iteration = 0
+    t_from_it = t_from
 
-    if est_data_points > GET_BARS_MAX_DATAPOINTS:
-        est_data_points = GET_BARS_MAX_DATAPOINTS
-        t_to = t_from + (60 * 60 * 24) * est_data_points
-        has_more = True
+    while True:
+        iteration += 1
+        t_to_it = t_to
 
-    log(f"Adjusted from: {t_from}, to: {t_to}, est_points: {est_data_points}")
+        est_data_points = math.ceil((t_to_it - t_from_it) / resolution_seconds)
+        has_more = False
 
-    if est_data_points >= 1:
-        tokens_bars_impl(t_from, t_to, args)
+        log("Estimated data points:", est_data_points)
 
-    etag = dt.datetime.fromtimestamp(t_to, dt.timezone.utc).isoformat()
+        if est_data_points > GET_BARS_MAX_DATAPOINTS:
+            est_data_points = GET_BARS_MAX_DATAPOINTS
+            t_to_it = t_from_it + math.floor(GET_BARS_MAX_DATAPOINTS * resolution_seconds) - resolution_seconds
+            has_more = True
+
+        log(f"Iteration: {iteration}, from: {t_from_it}, to: {t_to_it}, est_points: {est_data_points}")
+
+        watermark = tokens_bars_impl(t_from_it, t_to_it, args)
+
+        if not has_more or iteration >= args.max_iterations:
+            break
+        else:
+            t_from_it = t_to_it
+
+    # Using watermark as etag
+    etag = dt.datetime.fromtimestamp(watermark, dt.timezone.utc).isoformat()
     log(f"Finished ingest iteration has_more: {has_more}, etag: {etag}")
 
     etag_path = os.environ.get("ODF_NEW_ETAG_PATH")
@@ -233,6 +265,7 @@ def tokens_bars(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--request-interval', type=float, default=0.3)
+    parser.add_argument('--max-iterations', type=int, default=1)
     subparsers = parser.add_subparsers(dest='cmd', required=True)
     
     # tokens
@@ -242,7 +275,19 @@ if __name__ == "__main__":
     p_tokens_bars = sp_tokens.add_parser('bars')
     p_tokens_bars.add_argument('--from', type=str, default=None)
     p_tokens_bars.add_argument('--to', type=str, default=None)
-    p_tokens_bars.add_argument('--resolution', default='1D')
+
+    # See: https://docs.codex.io/reference/queries#getbars
+    p_tokens_bars.add_argument('--resolution', default='1D', choices=[
+        "1",
+        "5",
+        "15",
+        "30",
+        "60",
+        "240",
+        "720",
+        "1D",
+        "7D",
+    ])
     
     args = parser.parse_args()
     log("Parsed args:", args)
