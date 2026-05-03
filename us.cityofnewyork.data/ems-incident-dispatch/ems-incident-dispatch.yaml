@@ -12,37 +12,100 @@ content:
         kind: Csv
         header: true
         schema:
-          - cad_incident_id BIGINT  # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
-          - incident_datetime STRING # The date and time the incident was created in the dispatch system
-          - initial_call_type STRING  # The call type assigned at the time of incident creation.
-          - initial_severity_level_code BIGINT  # The segment(priority) assigned at the time of incident creation.
-          - final_call_type STRING  # The call type at the time the incident closes.
-          - final_severity_level_code BIGINT  # The segment(priority) assigned at the time the incident closes.
-          - first_assignment_datetime STRING # The date and time the first unit is assigned.
-          - valid_dispatch_rspns_time_indc STRING  # Indicates that the components comprising the calculation of the DISPATCH_RESPONSE_SECONDS_QY are valid.
-          - dispatch_response_seconds_qy BIGINT  # The time elapsed in seconds between the incident_datetime and the first_assignment_datetime.
-          - first_activation_datetime STRING # The date and time the first unit gives the signal that it is enroute to the location of the incident.
-          - first_on_scene_datetime STRING # The date and time the first unit signals that it has arrived at the location of the incident.
-          - valid_incident_rspns_time_indc STRING  # Indicates that the components comprising the calculation of theINCIDENT_RESPONSE_SECONDS_QY are valid.
-          - incident_response_seconds_qy BIGINT  # The time elapsed in seconds between the incident_datetime and the first_on_scene_datetime.
-          - incident_travel_tm_seconds_qy BIGINT  # The time elapsed in seconds between the first_assignment_datetime and the first_on_scene_datetime.
-          - first_to_hosp_datetime STRING # The date and time the first unit gives the signal that it is enroute to the hospital.
-          - first_hosp_arrival_datetime STRING # The date and time the first unit signals that it has arrived at the hospital.
-          - incident_close_datetime STRING # The date and time the incident closes in the dispatch system.
-          - held_indicator STRING  # Indicates that for some reason a unit could not be assigned immediately
-          - incident_disposition_code STRING # A code indicating the final outcome of the incident. See incident dispositions.
-          - borough STRING  # The borough of the incident location.
-          - incident_dispatch_area STRING  # The dispatch area of the incident.
-          - zipcode STRING  # The zip code of the incident.
-          - policeprecinct BIGINT  # The police precinct of the incident.
-          - citycouncildistrict BIGINT  # The city council district.
-          - communitydistrict BIGINT  # The community district.
-          - communityschooldistrict BIGINT  # The community school district.
-          - congressionaldistrict BIGINT  # The congressional district.
-          - reopen_indicator STRING  # Indicates that at some point the incident was closed but then reopened.
-          - special_event_indicator STRING  # Indicates that the incident was a special event such as the NYC Marathon.
-          - standby_indicator STRING  # Indicates that the units were assigned to stand by in case they were needed.
-          - transfer_indicator STRING  # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
+          fields:
+            # An incident identifier comprising the julian date and a 4 character sequenceLONG starting at 1 each day.
+            - name: cad_incident_id
+              type: Int64
+            # The date and time the incident was created in the dispatch system
+            - name: incident_datetime
+              type: String
+            # The call type assigned at the time of incident creation.
+            - name: initial_call_type
+              type: String
+            # The segment(priority) assigned at the time of incident creation.
+            - name: initial_severity_level_code
+              type: Int64
+            # The call type at the time the incident closes.
+            - name: final_call_type
+              type: String
+            # The segment(priority) assigned at the time the incident closes.
+            - name: final_severity_level_code
+              type: Int64
+            # The date and time the first unit is assigned.
+            - name: first_assignment_datetime
+              type: String
+            # Indicates that the components comprising the calculation of the DISPATCH_RESPONSE_SECONDS_QY are valid."
+            - name: valid_dispatch_rspns_time_indc
+              type: String
+            # The time elapsed in seconds between the incident_datetime and the first_assignment_datetime.
+            - name: dispatch_response_seconds_qy
+              type: Int64
+            # The date and time the first unit gives the signal that it is enroute to the location of the incident.
+            - name: first_activation_datetime
+              type: String
+            # The date and time the first unit signals that it has arrived at the location of the incident.
+            - name: first_on_scene_datetime
+              type: String
+            # Indicates that the components comprising the calculation of theINCIDENT_RESPONSE_SECONDS_QY are valid.
+            - name: valid_incident_rspns_time_indc
+              type: String
+            # The time elapsed in seconds between the incident_datetime and the first_on_scene_datetime.
+            - name: incident_response_seconds_qy
+              type: Int64
+            # The time elapsed in seconds between the first_assignment_datetime and the first_on_scene_datetime.
+            - name: incident_travel_tm_seconds_qy
+              type: Int64
+            # The date and time the first unit gives the signal that it is enroute to the hospital.
+            - name: first_to_hosp_datetime
+              type: String
+            # The date and time the first unit signals that it has arrived at the hospital.
+            - name: first_hosp_arrival_datetime
+              type: String
+            # The date and time the incident closes in the dispatch system.
+            - name: incident_close_datetime
+              type: String
+            # Indicates that for some reason a unit could not be assigned immediately
+            - name: held_indicator
+              type: String
+            # A code indicating the final outcome of the incident. See incident dispositions.
+            - name: incident_disposition_code
+              type: String
+            # The borough of the incident location.
+            - name: borough
+              type: String
+            # The dispatch area of the incident.
+            - name: incident_dispatch_area
+              type: String
+            # The zip code of the incident.
+            - name: zipcode
+              type: String
+            # The police precinct of the incident.
+            - name: policeprecinct
+              type: Int64
+            # The city council district.
+            - name: citycouncildistrict
+              type: Int64
+            # The community district.
+            - name: communitydistrict
+              type: Int64
+            # The community school district.
+            - name: communityschooldistrict
+              type: Int64
+            # The congressional district.
+            - name: congressionaldistrict
+              type: Int64
+            # Indicates that at some point the incident was closed but then reopened.
+            - name: reopen_indicator
+              type: String
+            # Indicates that the incident was a special event such as the NYC Marathon.
+            - name: special_event_indicator
+              type: String
+            # Indicates that the units were assigned to stand by in case they were needed.
+            - name: standby_indicator
+              type: String
+            # Indicates that the incident was created for the transportation of a patient from one facility (ie a hospital or nursing home) to another.
+            - name: transfer_indicator
+              type: String
       # TODO: remove this step once timestampFormat support is added in https://github.com/kamu-data/kamu-cli/issues/438
       preprocess:
         kind: Sql

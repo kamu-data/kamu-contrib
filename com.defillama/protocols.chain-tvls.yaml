@@ -19,11 +19,17 @@ content:
       read:
         kind: NdJson
         schema:
-          - date BIGINT
-          - protocol_slug STRING
-          - protocol_name STRING
-          - chain_name STRING
-          - totalLiquidityUSD DOUBLE
+          fields:
+            - name: date
+              type: Int64
+            - name: protocol_slug
+              type: String
+            - name: protocol_name
+              type: String
+            - name: chain_name
+              type: String
+            - name: totalLiquidityUSD
+              type: Float64
       preprocess:
         kind: Sql
         engine: datafusion

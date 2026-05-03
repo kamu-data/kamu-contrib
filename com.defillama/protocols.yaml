@@ -12,23 +12,71 @@ content:
       read:
         kind: Json
         schema:
-          - id BIGINT
-          - name STRING
-          - slug STRING
-          - address STRING
-          - symbol STRING
-          - url STRING
-          - description STRING
-          - chain STRING
-          - logo STRING
-          - category STRING
-          - module STRING
-          - twitter STRING
-          - gecko_id STRING
-          - cmcId STRING
-          - listedAt BIGINT
-          - deadUrl BOOL
-          - misrepresentedTokens BOOL
+          fields:
+            - name: id
+              type: Int64
+            - name: name
+              type: String
+            - name: slug
+              type:
+                kind: Option
+                inner: String
+            - name: address
+              type:
+                kind: Option
+                inner: String
+            - name: symbol
+              type:
+                kind: Option
+                inner: String
+            - name: url
+              type:
+                kind: Option
+                inner: String
+            - name: description
+              type:
+                kind: Option
+                inner: String
+            - name: chain
+              type:
+                kind: Option
+                inner: String
+            - name: logo
+              type:
+                kind: Option
+                inner: String
+            - name: category
+              type:
+                kind: Option
+                inner: String
+            - name: module
+              type:
+                kind: Option
+                inner: String
+            - name: twitter
+              type:
+                kind: Option
+                inner: String
+            - name: gecko_id
+              type:
+                kind: Option
+                inner: String
+            - name: cmcId
+              type:
+                kind: Option
+                inner: String
+            - name: listedAt
+              type:
+                kind: Option
+                inner: Int64
+            - name: deadUrl
+              type:
+                kind: Option
+                inner: Bool
+            - name: misrepresentedTokens
+              type:
+                kind: Option
+                inner: Bool
       preprocess:
         kind: Sql
         engine: datafusion

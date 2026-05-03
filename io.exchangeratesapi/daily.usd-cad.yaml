@@ -18,8 +18,14 @@ content:
         kind: Csv
         header: false
         schema:
-        - date TIMESTAMP
-        - rate DECIMAL(18,10)
+          fields:
+            - name: date
+              type: Timestamp
+            - name: rate
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 10
       merge:
         kind: Ledger
         primaryKey:

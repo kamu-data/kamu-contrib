@@ -19,33 +19,121 @@ content:
       read:
         kind: NdJson
         schema:
-          - timestamp TIMESTAMP  # 2022-05-03T00:00:00.000Z
-          - pool STRING  # "747c1d2a-c668-4682-b9f9-296708a3dd90"
-          - project STRING  # "lido"
-          - chain STRING  # "Ethereum"
-          - symbol STRING  # "STETH"
-          - poolMeta STRING  # "0.3%"
-          - tvlUsd BIGINT  # 11074372760
-          - apyBase DOUBLE  # 3.6
-          - apyReward DOUBLE  # 3.6
-          - apy DOUBLE  # 3.6
-          - apyBase7d DOUBLE  # 3.6
-          - il7d DOUBLE
-          # The following are added by --enrich-with-spot-stats
-          # for the columns that are not part of historical data
-          - apyPct1D DOUBLE  # -0.00108
-          - apyPct7D DOUBLE  # -0.00139
-          - apyPct30D DOUBLE  # 0.00125
-          - apyMean30d DOUBLE  # 0.01158
-          - apyBaseInception DOUBLE  # 0.00459
-          - mu DOUBLE  # 5.71022
-          - sigma DOUBLE  # 0.34895
-          - count DOUBLE  # 564 TODO: Unclear what this metric represents - a number or trades?
-          - volumeUsd1d DOUBLE  # 3.24898
-          - volumeUsd7d DOUBLE  # 26.41292
-          - outlier BOOL  # false
-          - predictions STRING  # {"predictedClass": "Stable/Up", "predictedProbability": 69, "binnedConfidence": 2}
-          - ilRisk STRING  # "yes"
+          fields:
+            - name: timestamp
+              type: Timestamp
+              # example: 2022-05-03T00:00:00.000Z
+            - name: pool
+              type: String
+              # example: "747c1d2a-c668-4682-b9f9-296708a3dd90"
+            - name: project
+              type: String
+              # example: "lido"
+            - name: chain
+              type: String
+              # example: "Ethereum"
+            - name: symbol
+              type: String
+              # example: "STETH"
+            - name: poolMeta
+              type:
+                kind: Option
+                inner: String
+              # example: "0.3%"
+            - name: tvlUsd
+              type: Int64
+              # example: 11074372760
+            - name: apyBase
+              type:
+                kind: Option
+                inner: Float64
+              # example: 3.6
+            - name: apyReward
+              type:
+                kind: Option
+                inner: Float64
+              # example: 3.6
+            - name: apy
+              type:
+                kind: Option
+                inner: Float64
+              # example: 3.6
+            - name: apyBase7d
+              type:
+                kind: Option
+                inner: Float64
+              # example: 3.6
+            - name: il7d
+              type:
+                kind: Option
+                inner: Float64
+            # The following are added by --enrich-with-spot-stats
+            # for the columns that are not part of historical data
+            - name: apyPct1D
+              type:
+                kind: Option
+                inner: Float64  
+              # example: -0.00108
+            - name: apyPct7D
+              type:
+                kind: Option
+                inner: Float64  
+              # example: -0.00139
+            - name: apyPct30D
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 0.00125
+            - name: apyMean30d
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 0.01158
+            - name: apyBaseInception
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 0.00459
+            - name: mu
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 5.71022
+            - name: sigma
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 0.34895
+            - name: count
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 564 TODO: Unclear what this metric represents - a number or trades?
+            - name: volumeUsd1d
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 3.24898
+            - name: volumeUsd7d
+              type:
+                kind: Option
+                inner: Float64  
+              # example: 26.41292
+            - name: outlier
+              type:
+                kind: Option
+                inner: Bool  
+              # example: false
+            - name: predictions
+              type:
+                kind: Option
+                inner: String  
+              # example: {"predictedClass": "Stable/Up", "predictedProbability": 69, "binnedConfidence": 2}
+            - name: ilRisk
+              type:
+                kind: Option
+                inner: String  
+              # example: "yes"
       preprocess:
         kind: Sql
         engine: datafusion

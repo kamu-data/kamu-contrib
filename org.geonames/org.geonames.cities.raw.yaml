@@ -16,25 +16,64 @@ content:
         header: false
         separator: "\t"
         schema:
-          - geonameid BIGINT          # integer id of record in geonames database
-          - name STRING               # name of geographical point (utf8) varchar(200)
-          - asciiname STRING          # name of geographical point in plain ascii characters, varchar(200)
-          - alternatenames STRING     # alternatenames, comma separated, ascii names automatically transliterated, convenience attribute from alternatename table, varchar(10000)
-          - latitude STRING           # latitude in decimal degrees (wgs84)
-          - longitude STRING          # longitude in decimal degrees (wgs84)
-          - feature_class STRING      # see http://www.geonames.org/export/codes.html, char(1)
-          - feature_code STRING       # see http://www.geonames.org/export/codes.html, varchar(10)
-          - country_code STRING       # ISO-3166 2-letter country code, 2 characters
-          - cc2 STRING                # alternate country codes, comma separated, ISO-3166 2-letter country code, 200 characters
-          - admin1_code STRING        # fipscode (subject to change to iso code), see exceptions below, see file admin1Codes.txt for display names of this code; varchar(20)
-          - admin2_code STRING        # code for the second administrative division, a county in the US, see file admin2Codes.txt; varchar(80)
-          - admin3_code STRING        # code for third level administrative division, varchar(20)
-          - admin4_code STRING        # code for fourth level administrative division, varchar(20)
-          - population BIGINT         # bigint (8 byte int)
-          - elevation DOUBLE          # in meters, integer
-          - dem STRING                # digital elevation model, srtm3 or gtopo30, average elevation of 3''x3'' (ca 90mx90m) or 30''x30'' (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.
-          - timezone STRING           # the iana timezone id (see file timeZone.txt) varchar(40)
-          - modification_date STRING  # date of last modification in yyyy-MM-dd format
+          fields:
+            # integer id of record in geonames database
+            - name: geonameid
+              type: Int64
+            # name of geographical point (utf8) varchar(200)
+            - name: name
+              type: String
+            # name of geographical point in plain ascii characters, varchar(200)
+            - name: asciiname
+              type: String
+            # alternatenames, comma separated, ascii names automatically transliterated, convenience attribute from alternatename table, varchar(10000)
+            - name: alternatenames
+              type: String
+            # latitude in decimal degrees (wgs84)
+            - name: latitude
+              type: String
+            # longitude in decimal degrees (wgs84)
+            - name: longitude
+              type: String
+            # see http://www.geonames.org/export/codes.html, char(1)
+            - name: feature_class
+              type: String
+            # see http://www.geonames.org/export/codes.html, varchar(10)
+            - name: feature_code
+              type: String
+            # ISO-3166 2-letter country code, 2 characters
+            - name: country_code
+              type: String
+            # alternate country codes, comma separated, ISO-3166 2-letter country code, 200 characters
+            - name: cc2
+              type: String
+            # fipscode (subject to change to iso code), see exceptions below, see file admin1Codes.txt for display names of this code; varchar(20)
+            - name: admin1_code
+              type: String
+            # code for the second administrative division, a county in the US, see file admin2Codes.txt; varchar(80)
+            - name: admin2_code
+              type: String
+            # code for third level administrative division, varchar(20)
+            - name: admin3_code
+              type: String
+            # code for fourth level administrative division, varchar(20)
+            - name: admin4_code
+              type: String
+            # bigint (8 byte int)
+            - name: population
+              type: Int64
+            # in meters, integer
+            - name: elevation
+              type: Float64
+            # digital elevation model, srtm3 or gtopo30, average elevation of 3''x3'' (ca 90mx90m) or 30''x30'' (ca 900mx900m) area in meters, integer. srtm processed by cgiar/ciat.
+            - name: dem
+              type: String
+            # the iana timezone id (see file timeZone.txt) varchar(40)
+            - name: timezone
+              type: String
+            # date of last modification in yyyy-MM-dd format
+            - name: modification_date
+              type: String
       # TODO: This no-op step makes kamu-cli use the experimental
       # DataFusion ingest implementation instead of Spark. This should be
       # removed once DataFusion ingest becomes the default.

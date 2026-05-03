@@ -12,15 +12,25 @@ content:
       read:
         kind: NdJson
         schema:
-          - time BIGINT
-          - high DOUBLE
-          - low DOUBLE
-          - open DOUBLE
-          - volumefrom DOUBLE
-          - volumeto DOUBLE
-          - close DOUBLE
-          - '"conversionType" STRING'
-          - '"conversionSymbol" STRING'
+          fields:
+            - name: time
+              type: Int64
+            - name: high
+              type: Float64
+            - name: low
+              type: Float64
+            - name: open
+              type: Float64
+            - name: volumefrom
+              type: Float64
+            - name: volumeto
+              type: Float64
+            - name: close
+              type: Float64
+            - name: conversionType
+              type: String
+            - name: conversionSymbol
+              type: String
       preprocess:
         kind: Sql
         engine: datafusion
@@ -35,8 +45,8 @@ content:
             close,
             volumefrom,
             volumeto,
-            "conversionType" as conversion_type,
-            "conversionSymbol" as conversion_symbol
+            conversionType as conversion_type,
+            conversionSymbol as conversion_symbol
           from input
       merge:
         kind: Ledger

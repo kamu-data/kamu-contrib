@@ -18,12 +18,19 @@ content:
         kind: Csv
         header: true
         schema:
-          - timestamp TIMESTAMP
-          - open DOUBLE
-          - high DOUBLE
-          - low DOUBLE
-          - close DOUBLE
-          - volume DOUBLE
+          fields:
+            - name: timestamp
+              type: Timestamp
+            - name: open
+              type: Float64   # TODO: Use decimal
+            - name: high
+              type: Float64
+            - name: low
+              type: Float64
+            - name: close
+              type: Float64
+            - name: volume
+              type: Float64
       preprocess:
         kind: Sql
         engine: datafusion

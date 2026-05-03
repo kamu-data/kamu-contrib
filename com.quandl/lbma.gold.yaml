@@ -12,13 +12,39 @@ content:
         kind: Csv
         header: true
         schema:
-          - '"Date" DATE'
-          - '"USD (AM)" DECIMAL(18,4)'
-          - '"USD (PM)" DECIMAL(18,4)'
-          - '"GBP (AM)" DECIMAL(18,4)'
-          - '"GBP (PM)" DECIMAL(18,4)'
-          - '"EURO (AM)" DECIMAL(18,4)'
-          - '"EURO (PM)" DECIMAL(18,4)'
+          fields:
+            - name: Date
+              type: Date
+            - name: USD (AM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
+            - name: USD (PM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
+            - name: GBP (AM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
+            - name: GBP (PM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
+            - name: EURO (AM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
+            - name: EURO (PM)
+              type:
+                kind: Decimal
+                precision: 18
+                scale: 4
       preprocess:
         kind: Sql
         engine: datafusion

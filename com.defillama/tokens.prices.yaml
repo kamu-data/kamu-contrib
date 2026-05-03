@@ -23,12 +23,19 @@ content:
       read:
         kind: NdJson
         schema:
-          - timestamp TIMESTAMP
-          - symbol STRING
-          - chain STRING
-          - address STRING
-          - decimals INT
-          - price DOUBLE
+          fields:
+            - name: timestamp
+              type: Timestamp
+            - name: symbol
+              type: String
+            - name: chain
+              type: String
+            - name: address
+              type: String
+            - name: decimals
+              type: Int32
+            - name: price
+              type: Float64
       preprocess:
         kind: Sql
         engine: datafusion

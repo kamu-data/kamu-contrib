@@ -12,11 +12,25 @@ content:
       read:
         kind: Json
         schema:
-          - name STRING
-          - tokenSymbol STRING
-          - chainId BIGINT
-          - gecko_id STRING
-          - cmcId BIGINT
+          fields:
+            - name: name
+              type: String
+            - name: tokenSymbol
+              type:
+                kind: Option
+                inner: String
+            - name: chainId
+              type:
+                kind: Option
+                inner: Int64
+            - name: gecko_id
+              type:
+                kind: Option
+                inner: String
+            - name: cmcId
+              type:
+                kind: Option
+                inner: Int64
       preprocess:
         kind: Sql
         engine: datafusion

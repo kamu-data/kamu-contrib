@@ -20,13 +20,21 @@ content:
       read:
         kind: NdJson
         schema:
-          - owner_id BIGINT
-          - owner_login STRING
-          - repo_id BIGINT
-          - repo_name STRING
-          - starred_at TIMESTAMP
-          - user_id BIGINT
-          - user_login STRING
+          fields:
+            - name: owner_id
+              type: Int64
+            - name: owner_login
+              type: String
+            - name: repo_id
+              type: Int64
+            - name: repo_name
+              type: String
+            - name: starred_at
+              type: Timestamp
+            - name: user_id
+              type: Int64
+            - name: user_login
+              type: String
       merge:
         kind: Ledger
         primaryKey:

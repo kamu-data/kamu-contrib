@@ -14,36 +14,37 @@ content:
         header: true
         nullValue: ""
         schema:
-          - PID STRING
-          - LEGAL_TYPE STRING
-          - FOLIO STRING
-          - LAND_COORDINATE STRING
-          - ZONING_DISTRICT STRING
-          - ZONING_CLASSIFICATION STRING
-          - LOT STRING
-          - PLAN STRING
-          - BLOCK STRING
-          - DISTRICT_LOT STRING
-          - FROM_CIVIC_NUMBER STRING
-          - TO_CIVIC_NUMBER STRING
-          - STREET_NAME STRING
-          - PROPERTY_POSTAL_CODE STRING
-          - NARRATIVE_LEGAL_LINE1 STRING
-          - NARRATIVE_LEGAL_LINE2 STRING
-          - NARRATIVE_LEGAL_LINE3 STRING
-          - NARRATIVE_LEGAL_LINE4 STRING
-          - NARRATIVE_LEGAL_LINE5 STRING
-          - CURRENT_LAND_VALUE STRING
-          - CURRENT_IMPROVEMENT_VALUE STRING
-          - TAX_ASSESSMENT_YEAR STRING
-          - PREVIOUS_LAND_VALUE STRING
-          - PREVIOUS_IMPROVEMENT_VALUE STRING
-          - YEAR_BUILT STRING
-          - BIG_IMPROVEMENT_YEAR STRING
-          - TAX_LEVY STRING
-          - NEIGHBOURHOOD_CODE STRING
-          - REPORT_YEAR STRING
-          - NOTE STRING
+          fields:
+            - { name: PID, type: String }
+            - { name: LEGAL_TYPE, type: String }
+            - { name: FOLIO, type: String }
+            - { name: LAND_COORDINATE, type: String }
+            - { name: ZONING_DISTRICT, type: String }
+            - { name: ZONING_CLASSIFICATION, type: String }
+            - { name: LOT, type: String }
+            - { name: PLAN, type: String }
+            - { name: BLOCK, type: String }
+            - { name: DISTRICT_LOT, type: String }
+            - { name: FROM_CIVIC_NUMBER, type: String }
+            - { name: TO_CIVIC_NUMBER, type: String }
+            - { name: STREET_NAME, type: String }
+            - { name: PROPERTY_POSTAL_CODE, type: String }
+            - { name: NARRATIVE_LEGAL_LINE1, type: String }
+            - { name: NARRATIVE_LEGAL_LINE2, type: String }
+            - { name: NARRATIVE_LEGAL_LINE3, type: String }
+            - { name: NARRATIVE_LEGAL_LINE4, type: String }
+            - { name: NARRATIVE_LEGAL_LINE5, type: String }
+            - { name: CURRENT_LAND_VALUE, type: String }
+            - { name: CURRENT_IMPROVEMENT_VALUE, type: String }
+            - { name: TAX_ASSESSMENT_YEAR, type: String }
+            - { name: PREVIOUS_LAND_VALUE, type: String }
+            - { name: PREVIOUS_IMPROVEMENT_VALUE, type: String }
+            - { name: YEAR_BUILT, type: String }
+            - { name: BIG_IMPROVEMENT_YEAR, type: String }
+            - { name: TAX_LEVY, type: String }
+            - { name: NEIGHBOURHOOD_CODE, type: String }
+            - { name: REPORT_YEAR, type: String }
+            - { name: NOTE, type: String }
       preprocess:
         kind: Sql
         engine: datafusion

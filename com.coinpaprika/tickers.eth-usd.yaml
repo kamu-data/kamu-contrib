@@ -12,10 +12,15 @@ content:
       read:
         kind: NdJson
         schema:
-          - timestamp TIMESTAMP
-          - price DOUBLE
-          - volume_24h DOUBLE
-          - market_cap DOUBLE
+          fields:
+            - name: timestamp
+              type: Timestamp
+            - name: price
+              type: Float64     # TODO: Use decimal
+            - name: volume_24h
+              type: Float64
+            - name: market_cap
+              type: Float64
       preprocess:
         kind: Sql
         engine: datafusion

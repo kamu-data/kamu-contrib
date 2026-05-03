@@ -16,17 +16,29 @@ content:
       read:
         kind: NdJson
         schema:
-          - video_id STRING
-          - title STRING
-          - published_at TIMESTAMP
-          - channel_id STRING
-          - channel_title STRING
-          - video_owner_channel_id STRING
-          - video_owner_channel_title STRING
-          - view_count BIGINT
-          - like_count BIGINT
-          - comment_count BIGINT
-          - favorite_count BIGINT
+          fields:
+            - name: video_id
+              type: String
+            - name: title
+              type: String
+            - name: published_at
+              type: Timestamp
+            - name: channel_id
+              type: String
+            - name: channel_title
+              type: String
+            - name: video_owner_channel_id
+              type: String
+            - name: video_owner_channel_title
+              type: String
+            - name: view_count
+              type: Int64
+            - name: like_count
+              type: Int64
+            - name: comment_count
+              type: Int64
+            - name: favorite_count
+              type: Int64
       merge:
         kind: Snapshot
         primaryKey:

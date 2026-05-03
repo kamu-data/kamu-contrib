@@ -20,10 +20,31 @@ content:
         kind: NdJson
         # TODO: Split playlists and tracks into two datasets
         schema:
-          - added_at TIMESTAMP
-          - playlist STRUCT<id STRING, name STRING>
-          - track STRUCT<id STRING, name STRING>
-          - added_by STRUCT<id STRING>
+          fields:
+            - name: added_at
+              type: Timestamp
+            - name: playlist
+              type:
+                kind: Struct
+                fields:
+                  - name: id
+                    type: String
+                  - name: name
+                    type: String
+            - name: track
+              type:
+                kind: Struct
+                fields:
+                  - name: id
+                    type: String
+                  - name: name
+                    type: String
+            - name: added_by
+              type:
+                kind: Struct
+                fields:
+                  - name: id
+                    type: String
       # TODO: Surrogate ID is needed due to missing support for nesting in `primaryKey`
       # See: https://github.com/kamu-data/kamu-cli/issues/1354
       preprocess:

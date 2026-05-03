@@ -19,9 +19,13 @@ content:
       read:
         kind: NdJson
         schema:
-          - date BIGINT
-          - chain_name STRING
-          - tvl DOUBLE
+          fields:
+            - name: date
+              type: Int64
+            - name: chain_name
+              type: String
+            - name: tvl
+              type: Float64
       preprocess:
         kind: Sql
         engine: datafusion

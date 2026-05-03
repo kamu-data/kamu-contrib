@@ -15,16 +15,47 @@ content:
       read:
         kind: NdJson
         schema:
-          - pool STRING  # "747c1d2a-c668-4682-b9f9-296708a3dd90"
-          - project STRING  # "lido"
-          - chain STRING  # "Ethereum"
-          - symbol STRING  # "STETH"
-          - poolMeta STRING  # "USDC-pool"
-          - underlyingTokenSymbols ARRAY<STRING>  # ["USDC", "WETH"]
-          - underlyingTokens ARRAY<STRING>  # ["0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
-          - rewardTokens ARRAY<STRING>  # ["0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63"]
-          - stablecoin BOOL  # false
-          - exposure STRING  # "single"
+          fields:
+            - name: pool
+              type: String
+              # example: "747c1d2a-c668-4682-b9f9-296708a3dd90"
+            - name: project
+              type: String
+              # example: "lido"
+            - name: chain
+              type: String
+              # example: "Ethereum"
+            - name: symbol
+              type: String
+              # example: "STETH"
+            - name: poolMeta
+              type:
+                kind: Option
+                inner: String
+              # example: "USDC-pool"
+            - name: underlyingTokenSymbols
+              type:
+                kind: List
+                itemType: String
+              # example: ["USDC", "WETH"]
+            - name: underlyingTokens
+              type:
+                kind: List
+                itemType: String
+              # example: ["0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"]
+            - name: rewardTokens
+              type:
+                kind: Option
+                inner:
+                  kind: List
+                  itemType: String
+              # example: ["0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63"]
+            - name: stablecoin
+              type: Bool
+              # example: false
+            - name: exposure
+              type: String
+              # example: "single"
       preprocess:
         kind: Sql
         engine: datafusion

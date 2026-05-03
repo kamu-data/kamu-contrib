@@ -19,23 +19,41 @@ content:
       read:
         kind: NdJson
         schema:
-          - event_time TIMESTAMP
-          - symbol STRING
-          - network_id INT
-          - network_name STRING
-          - address STRING
-          - open DOUBLE
-          - low DOUBLE
-          - high DOUBLE
-          - close DOUBLE
-          - transactions BIGINT
-          - volume DOUBLE
-          - buys BIGINT
-          - buyers BIGINT
-          - buy_volume DOUBLE
-          - sells BIGINT
-          - sellers BIGINT
-          - sell_volume DOUBLE
+          fields:
+            - name: event_time
+              type: Timestamp
+            - name: symbol
+              type: String
+            - name: network_id
+              type: Int32
+            - name: network_name
+              type: String
+            - name: address
+              type: String
+            - name: open
+              type: Float64
+            - name: low
+              type: Float64
+            - name: high
+              type: Float64
+            - name: close
+              type: Float64
+            - name: transactions
+              type: Int64
+            - name: volume
+              type: Float64
+            - name: buys
+              type: Int64
+            - name: buyers
+              type: Int64
+            - name: buy_volume
+              type: Float64
+            - name: sells
+              type: Int64
+            - name: sellers
+              type: Int64
+            - name: sell_volume
+              type: Float64
       merge:
         kind: Ledger
         primaryKey:
